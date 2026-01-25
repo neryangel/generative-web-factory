@@ -46,17 +46,26 @@ export function CreateTenantDialog({ children, onSuccess }: CreateTenantDialogPr
 
     setLoading(true);
     try {
-      const { error } = await createTenant(name.trim(), slug.trim());
+      console.log('Creating tenant:', { name: name.trim(), slug: slug.trim() });
+      
+      const { data, error } = await createTenant(name.trim(), slug.trim());
       
       if (error) {
         console.error('Tenant creation error:', error);
-        if (error.message.includes('duplicate')) {
+        if (error.message?.includes('duplicate')) {
           toast.error('שם הארגון כבר קיים, נסה שם אחר');
+        } else if (error.message?.includes('row-level security')) {
+          toast.error('שגיאת הרשאות - נסה להתחבר מחדש');
         } else {
           toast.error(`שגיאה ביצירת הארגון: ${error.message}`);
         }
         return;
       }
+
+      console.log('Tenant created successfully:', data);
+      
+      // Small delay to ensure the trigger has completed
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       toast.success('הארגון נוצר בהצלחה!');
       setOpen(false);
