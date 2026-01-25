@@ -9,6 +9,7 @@ import { SortablePreviewSection } from '@/components/editor/SortablePreviewSecti
 import { AddSectionButton } from '@/components/editor/AddSectionButton';
 import { DeleteSectionDialog } from '@/components/editor/DeleteSectionDialog';
 import { SiteSettingsDialog } from '@/components/site/SiteSettingsDialog';
+import { ThemeCustomizer } from '@/components/editor/ThemeCustomizer';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -36,6 +37,8 @@ import {
   Upload,
   ExternalLink,
   Plus,
+  Palette,
+  Layers,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -575,26 +578,54 @@ export default function SiteEditor() {
           </div>
         </div>
 
-        {/* Right Sidebar - Section List */}
+        {/* Right Sidebar - Section List & Theme */}
         {isEditing && (
-          <aside className="w-64 bg-card border-r shrink-0 overflow-auto">
-            <div className="p-4">
-              <h3 className="font-semibold mb-4">סקשנים</h3>
-              
-              <SortableSectionList
-                sections={sections}
-                selectedSectionId={selectedSectionId}
-                onSelect={setSelectedSectionId}
-                onReorder={handleDragEnd}
-              />
+          <aside className="w-72 bg-card border-r shrink-0 overflow-auto">
+            {/* Tabs */}
+            <div className="flex border-b">
+              <button
+                onClick={() => setSelectedSectionId(null)}
+                className={`flex-1 py-3 px-4 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
+                  !selectedSectionId ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Layers className="w-4 h-4" />
+                סקשנים
+              </button>
+              <button
+                onClick={() => setSelectedSectionId('theme')}
+                className={`flex-1 py-3 px-4 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
+                  selectedSectionId === 'theme' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Palette className="w-4 h-4" />
+                עיצוב
+              </button>
+            </div>
 
-              {currentPage && currentTenant && (
-                <AddSectionButton
-                  pageId={currentPage.id}
-                  tenantId={currentTenant.id}
-                  currentSectionsCount={sections.length}
-                  onSectionAdded={handleSectionAdded}
-                />
+            <div className="p-4">
+              {selectedSectionId === 'theme' ? (
+                <ThemeCustomizer site={site} onUpdate={setSite} />
+              ) : (
+                <>
+                  <h3 className="font-semibold mb-4">סקשנים</h3>
+                  
+                  <SortableSectionList
+                    sections={sections}
+                    selectedSectionId={selectedSectionId}
+                    onSelect={setSelectedSectionId}
+                    onReorder={handleDragEnd}
+                  />
+
+                  {currentPage && currentTenant && (
+                    <AddSectionButton
+                      pageId={currentPage.id}
+                      tenantId={currentTenant.id}
+                      currentSectionsCount={sections.length}
+                      onSectionAdded={handleSectionAdded}
+                    />
+                  )}
+                </>
               )}
             </div>
           </aside>
