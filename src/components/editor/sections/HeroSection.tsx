@@ -3,6 +3,7 @@ import { EditableText } from '../EditableText';
 import { ImagePickerDialog } from '../ImagePickerDialog';
 import { Button } from '@/components/ui/button';
 import { Image as ImageIcon, ArrowLeft, Sparkles, ChevronDown } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface HeroContent {
   headline?: string;
@@ -24,6 +25,7 @@ export function HeroSection({
   isSelected 
 }: SectionProps) {
   const heroContent = content as HeroContent;
+  const { colors, fonts, getButtonRadius } = useTheme();
 
   const updateContent = (key: keyof HeroContent, value: unknown) => {
     onContentChange?.({ ...content, [key]: value });
@@ -35,9 +37,15 @@ export function HeroSection({
         isSelected ? 'ring-2 ring-primary ring-offset-2' : ''
       }`}
       onClick={onSelect}
+      style={{ fontFamily: fonts.body }}
     >
       {/* Animated Gradient Background */}
-      <div className="absolute inset-0 animated-gradient-bg" />
+      <div 
+        className="absolute inset-0 animated-gradient-bg" 
+        style={{ 
+          background: `linear-gradient(135deg, ${colors.primary}40 0%, ${colors.secondary}60 50%, ${colors.accent}40 100%)`,
+        }}
+      />
       
       {/* Background Image (if exists) */}
       {heroContent.background_image && (
@@ -59,10 +67,19 @@ export function HeroSection({
       {/* Grid Pattern */}
       <div className="absolute inset-0 grid-pattern opacity-30" />
 
-      {/* Floating Orbs */}
-      <div className="floating-orb w-[500px] h-[500px] -top-40 -right-40 bg-purple-500/20 animate-pulse-slow" />
-      <div className="floating-orb w-[600px] h-[600px] -bottom-60 -left-60 bg-cyan-500/15 animate-pulse-slow" style={{ animationDelay: '2s' }} />
-      <div className="floating-orb w-[300px] h-[300px] top-1/3 right-1/4 bg-pink-500/10 animate-pulse-slow" style={{ animationDelay: '4s' }} />
+      {/* Floating Orbs - using theme colors */}
+      <div 
+        className="floating-orb w-[500px] h-[500px] -top-40 -right-40 animate-pulse-slow" 
+        style={{ backgroundColor: `${colors.primary}30` }}
+      />
+      <div 
+        className="floating-orb w-[600px] h-[600px] -bottom-60 -left-60 animate-pulse-slow" 
+        style={{ backgroundColor: `${colors.accent}20`, animationDelay: '2s' }}
+      />
+      <div 
+        className="floating-orb w-[300px] h-[300px] top-1/3 right-1/4 animate-pulse-slow" 
+        style={{ backgroundColor: `${colors.secondary}15`, animationDelay: '4s' }}
+      />
 
       {/* Noise Texture */}
       <div className="absolute inset-0 noise-texture" />
@@ -72,8 +89,11 @@ export function HeroSection({
         <div className="max-w-5xl mx-auto text-center space-y-8">
           
           {/* Animated Badge */}
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-dark border border-white/20 animate-fade-in-down">
-            <Sparkles className="w-4 h-4 text-cyan-400" />
+          <div 
+            className="inline-flex items-center gap-2 px-5 py-2.5 glass-dark border border-white/20 animate-fade-in-down"
+            style={{ borderRadius: getButtonRadius() }}
+          >
+            <Sparkles className="w-4 h-4" style={{ color: colors.accent }} />
             <EditableText
               value={heroContent.badge_text || 'חדש! הצטרפו אלינו היום'}
               onChange={(value) => updateContent('badge_text', value)}
@@ -91,6 +111,7 @@ export function HeroSection({
               isEditing={isEditing}
               className="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white leading-tight tracking-tight drop-shadow-2xl"
               as="h1"
+              style={{ fontFamily: fonts.heading }}
             />
           </div>
           
@@ -110,7 +131,12 @@ export function HeroSection({
             {/* Primary CTA - Glassmorphism Button */}
             <Button 
               size="lg"
-              className="group relative overflow-hidden bg-white text-gray-900 hover:bg-white/90 text-lg px-10 py-7 rounded-full font-bold shadow-2xl shadow-black/30 transition-all duration-300 hover:scale-105 hover:shadow-white/20"
+              className="group relative overflow-hidden text-lg px-10 py-7 font-bold shadow-2xl shadow-black/30 transition-all duration-300 hover:scale-105 hover:shadow-white/20"
+              style={{ 
+                backgroundColor: colors.primary,
+                color: '#ffffff',
+                borderRadius: getButtonRadius(),
+              }}
             >
               <span className="relative z-10 flex items-center gap-2">
                 <EditableText
@@ -122,14 +148,18 @@ export function HeroSection({
                 <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
               </span>
               {/* Animated gradient on hover */}
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity" />
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity"
+                style={{ background: `linear-gradient(to right, ${colors.accent}, ${colors.primary})` }}
+              />
             </Button>
 
             {/* Secondary CTA - Glass Button */}
             <Button 
               size="lg"
               variant="outline"
-              className="group bg-white/5 backdrop-blur-md border-white/30 text-white hover:bg-white/15 hover:border-white/50 text-lg px-10 py-7 rounded-full font-medium transition-all duration-300"
+              className="group bg-white/5 backdrop-blur-md border-white/30 text-white hover:bg-white/15 hover:border-white/50 text-lg px-10 py-7 font-medium transition-all duration-300"
+              style={{ borderRadius: getButtonRadius() }}
             >
               <EditableText
                 value={heroContent.secondary_cta_text || 'צפו בדוגמאות'}
@@ -146,8 +176,11 @@ export function HeroSection({
               {[1, 2, 3, 4, 5].map((i) => (
                 <div 
                   key={i} 
-                  className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 border-2 border-white/30 flex items-center justify-center text-white text-xs font-bold"
-                  style={{ zIndex: 5 - i }}
+                  className="w-10 h-10 rounded-full border-2 border-white/30 flex items-center justify-center text-white text-xs font-bold"
+                  style={{ 
+                    zIndex: 5 - i,
+                    background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.accent})`,
+                  }}
                 >
                   {String.fromCharCode(64 + i)}
                 </div>
@@ -175,7 +208,12 @@ export function HeroSection({
             onSelect={(url) => updateContent('background_image', url)}
             currentImage={heroContent.background_image}
           >
-            <Button size="sm" variant="secondary" className="glass-dark text-white border-white/20 hover:bg-white/20">
+            <Button 
+              size="sm" 
+              variant="secondary" 
+              className="glass-dark text-white border-white/20 hover:bg-white/20"
+              style={{ borderRadius: getButtonRadius() }}
+            >
               <ImageIcon className="h-4 w-4 ml-2" />
               {heroContent.background_image ? 'החלף רקע' : 'הוסף רקע'}
             </Button>

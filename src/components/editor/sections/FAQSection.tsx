@@ -3,6 +3,7 @@ import { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Plus, Minus, Trash2, HelpCircle, MessageCircle } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface FAQItem {
   question: string;

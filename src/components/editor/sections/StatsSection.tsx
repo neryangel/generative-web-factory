@@ -3,6 +3,7 @@ import { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { Sparkles, Users, Globe, Award, TrendingUp, Plus, Trash2 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface StatItem {
   value: number;

@@ -3,6 +3,7 @@ import { EditableText } from '../EditableText';
 import { Card, CardContent } from '@/components/ui/card';
 import * as LucideIcons from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface FeatureItem {
   icon?: string;
@@ -26,6 +27,7 @@ export function FeaturesSection({
   const featuresContent = content as FeaturesContent;
   const sectionRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const { colors, fonts, getCardRadius, getButtonRadius } = useTheme();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -73,15 +75,18 @@ export function FeaturesSection({
 
   const features = featuresContent.items?.length ? featuresContent.items : defaultFeatures;
 
-  // Gradient colors for each card
-  const gradientColors = [
-    'from-purple-500 to-pink-500',
-    'from-cyan-500 to-blue-500',
-    'from-orange-500 to-red-500',
-    'from-green-500 to-emerald-500',
-    'from-violet-500 to-purple-500',
-    'from-rose-500 to-pink-500',
-  ];
+  // Generate gradient colors based on theme
+  const getGradientForIndex = (index: number) => {
+    const gradients = [
+      `linear-gradient(to bottom right, ${colors.primary}, ${colors.accent})`,
+      `linear-gradient(to bottom right, ${colors.accent}, ${colors.primary})`,
+      `linear-gradient(to bottom right, ${colors.secondary}, ${colors.primary})`,
+      `linear-gradient(to bottom right, ${colors.primary}, ${colors.secondary})`,
+      `linear-gradient(to bottom right, ${colors.accent}, ${colors.secondary})`,
+      `linear-gradient(to bottom right, ${colors.secondary}, ${colors.accent})`,
+    ];
+    return gradients[index % gradients.length];
+  };
 
   return (
     <section 
@@ -90,18 +95,32 @@ export function FeaturesSection({
         isSelected ? 'ring-2 ring-primary ring-offset-2' : ''
       }`}
       onClick={onSelect}
+      style={{ fontFamily: fonts.body }}
     >
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/30 to-background" />
       
       {/* Decorative elements */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+      <div 
+        className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl" 
+        style={{ backgroundColor: `${colors.primary}10` }}
+      />
+      <div 
+        className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl" 
+        style={{ backgroundColor: `${colors.accent}10` }}
+      />
 
       <div className="relative max-w-7xl mx-auto">
         {/* Section Header */}
         <div className={`text-center mb-20 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+          <div 
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium mb-6"
+            style={{ 
+              backgroundColor: `${colors.primary}15`,
+              color: colors.primary,
+              borderRadius: getButtonRadius(),
+            }}
+          >
             <LucideIcons.Sparkles className="w-4 h-4" />
             <span>למה לבחור בנו</span>
           </div>
@@ -111,6 +130,7 @@ export function FeaturesSection({
             isEditing={isEditing}
             className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
             as="h2"
+            style={{ fontFamily: fonts.heading }}
           />
           <EditableText
             value={featuresContent.subtitle || 'הכלים המתקדמים ביותר ליצירת נוכחות דיגיטלית מרשימה'}
@@ -125,7 +145,7 @@ export function FeaturesSection({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => {
             const Icon = getIcon(feature.icon);
-            const gradientClass = gradientColors[index % gradientColors.length];
+            const gradient = getGradientForIndex(index);
             
             return (
               <Card 
@@ -135,21 +155,34 @@ export function FeaturesSection({
                 }`}
                 style={{ 
                   transitionDelay: `${index * 100}ms`,
-                  boxShadow: '0 4px 20px -5px hsl(var(--primary) / 0.1)'
+                  boxShadow: `0 4px 20px -5px ${colors.primary}20`,
+                  borderRadius: getCardRadius(),
                 }}
               >
                 {/* Gradient glow on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
+                <div 
+                  className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500"
+                  style={{ background: gradient }}
+                />
                 
                 {/* Top gradient line */}
-                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${gradientClass} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                <div 
+                  className="absolute top-0 left-0 right-0 h-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: gradient }}
+                />
                 
                 <CardContent className="p-8">
                   {/* Icon with gradient background */}
-                  <div className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${gradientClass} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-lg`}>
+                  <div 
+                    className="relative w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-lg"
+                    style={{ background: gradient }}
+                  >
                     <Icon className="w-8 h-8 text-white" />
                     {/* Glow effect */}
-                    <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${gradientClass} blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500`} />
+                    <div 
+                      className="absolute inset-0 rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500"
+                      style={{ background: gradient }}
+                    />
                   </div>
 
                   {/* Title */}
@@ -157,8 +190,9 @@ export function FeaturesSection({
                     value={feature.title || `תכונה ${index + 1}`}
                     onChange={(value) => updateItem(index, 'title', value)}
                     isEditing={isEditing}
-                    className="text-xl font-bold mb-3 group-hover:text-primary transition-colors"
+                    className="text-xl font-bold mb-3 transition-colors"
                     as="h3"
+                    style={{ fontFamily: fonts.heading }}
                   />
 
                   {/* Description */}
@@ -171,7 +205,10 @@ export function FeaturesSection({
                   />
 
                   {/* Arrow indicator on hover */}
-                  <div className="mt-6 flex items-center gap-2 text-primary opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
+                  <div 
+                    className="mt-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0"
+                    style={{ color: colors.primary }}
+                  >
                     <span className="text-sm font-medium">למידע נוסף</span>
                     <LucideIcons.ArrowLeft className="w-4 h-4" />
                   </div>
