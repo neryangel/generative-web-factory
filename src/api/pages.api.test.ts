@@ -51,7 +51,7 @@ vi.mock('@/integrations/supabase/client', () => ({
             },
           };
         },
-        insert: (data: unknown) => {
+        insert: (data: Record<string, unknown>) => {
           mockInsert(data);
           return {
             select: () => ({

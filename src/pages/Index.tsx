@@ -1,7 +1,10 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import Navbar from '@/components/landing/Navbar';
 import HeroSection from '@/components/landing/HeroSection';
 import Footer from '@/components/landing/Footer';
+import { SmoothScrollProvider } from '@/components/effects/SmoothScroll';
+import { MagneticCursor } from '@/components/effects/MagneticCursor';
+import { Preloader } from '@/components/effects/Preloader';
 
 // Lazy load below-the-fold sections for better Core Web Vitals
 const PortfolioSection = lazy(() => import('@/components/landing/PortfolioSection'));
@@ -27,39 +30,52 @@ const SectionSkeleton = () => (
 );
 
 const Index = () => {
+  const [isPreloading, setIsPreloading] = useState(true);
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Skip to main content link for accessibility */}
-      <a href="#main-content" className="skip-to-content">
-        דלג לתוכן הראשי
-      </a>
+    <SmoothScrollProvider>
+      {/* Premium Preloader */}
+      <Preloader 
+        onComplete={() => setIsPreloading(false)} 
+        minDuration={1500}
+      />
       
-      <Navbar />
+      {/* Custom Magnetic Cursor */}
+      <MagneticCursor />
       
-      <main id="main-content" role="main" aria-label="תוכן ראשי">
-        {/* Hero is loaded eagerly - above the fold */}
-        <HeroSection />
+      <div className={`min-h-screen bg-background transition-opacity duration-500 ${isPreloading ? 'opacity-0' : 'opacity-100'}`}>
+        {/* Skip to main content link for accessibility */}
+        <a href="#main-content" className="skip-to-content">
+          דלג לתוכן הראשי
+        </a>
         
-        {/* Lazy loaded sections with suspense boundaries */}
-        <Suspense fallback={<SectionSkeleton />}>
-          <PortfolioSection />
-        </Suspense>
+        <Navbar />
         
-        <Suspense fallback={<SectionSkeleton />}>
-          <FeaturesSection />
-        </Suspense>
+        <main id="main-content" role="main" aria-label="תוכן ראשי">
+          {/* Hero is loaded eagerly - above the fold */}
+          <HeroSection />
+          
+          {/* Lazy loaded sections with suspense boundaries */}
+          <Suspense fallback={<SectionSkeleton />}>
+            <PortfolioSection />
+          </Suspense>
+          
+          <Suspense fallback={<SectionSkeleton />}>
+            <FeaturesSection />
+          </Suspense>
+          
+          <Suspense fallback={<SectionSkeleton />}>
+            <FAQSection />
+          </Suspense>
+          
+          <Suspense fallback={<SectionSkeleton />}>
+            <ContactSection />
+          </Suspense>
+        </main>
         
-        <Suspense fallback={<SectionSkeleton />}>
-          <FAQSection />
-        </Suspense>
-        
-        <Suspense fallback={<SectionSkeleton />}>
-          <ContactSection />
-        </Suspense>
-      </main>
-      
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </SmoothScrollProvider>
   );
 };
 

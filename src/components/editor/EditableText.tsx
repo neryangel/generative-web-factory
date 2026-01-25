@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, CSSProperties } from 'react';
+import { useState, useRef, useEffect, CSSProperties, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface EditableTextProps {
@@ -6,12 +6,12 @@ interface EditableTextProps {
   onChange?: (value: string) => void;
   isEditing?: boolean;
   className?: string;
-  as?: 'h1' | 'h2' | 'h3' | 'p' | 'span';
+  as?: 'h1' | 'h2' | 'h3' | 'p' | 'span' | 'div';
   placeholder?: string;
   style?: CSSProperties;
 }
 
-export function EditableText({
+export const EditableText = forwardRef<HTMLElement, EditableTextProps>(({
   value,
   onChange,
   isEditing = false,
@@ -19,7 +19,7 @@ export function EditableText({
   as: Component = 'span',
   placeholder = 'לחץ לעריכה...',
   style,
-}: EditableTextProps) {
+}, ref) => {
   const [isActive, setIsActive] = useState(false);
   const [localValue, setLocalValue] = useState(value);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -55,7 +55,7 @@ export function EditableText({
 
   if (!isEditing) {
     return (
-      <Component className={className} style={style}>
+      <Component className={className} style={style} ref={ref as any}>
         {value || placeholder}
       </Component>
     );
@@ -89,9 +89,15 @@ export function EditableText({
         'border border-transparent hover:border-primary/30'
       )}
       style={style}
-      onClick={() => setIsActive(true)}
+      ref={ref as any}
+      onClick={(e) => {
+        e.stopPropagation();
+        setIsActive(true);
+      }}
     >
       {value || <span className="text-muted-foreground italic">{placeholder}</span>}
     </Component>
   );
-}
+});
+
+EditableText.displayName = 'EditableText';

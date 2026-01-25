@@ -175,10 +175,18 @@ export function FAQSection({
                     : 'glass-dark border border-white/10 hover:border-white/20'
                 }`}
               >
-                {/* Question */}
-                <button
+                {/* Question - Using div instead of button when editing */}
+                <div
                   onClick={() => setOpenIndex(isOpen ? null : realIndex)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-right"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setOpenIndex(isOpen ? null : realIndex);
+                    }
+                  }}
+                  className="w-full px-6 py-5 flex items-center justify-between text-right cursor-pointer"
                 >
                   <div className="flex items-center gap-4 flex-1">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
@@ -195,18 +203,26 @@ export function FAQSection({
                       className={`text-lg font-semibold transition-colors ${
                         isOpen ? 'text-white' : 'text-white/80'
                       }`}
-                      as="span"
+                      as="div"
                     />
                   </div>
                   
                   <div className="flex items-center gap-3">
                     {isEditing && (
-                      <button
+                      <div
+                        role="button"
+                        tabIndex={0}
                         onClick={(e) => { e.stopPropagation(); removeItem(realIndex); }}
-                        className="p-2 rounded-lg hover:bg-red-500/20 text-red-400"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.stopPropagation();
+                            removeItem(realIndex);
+                          }
+                        }}
+                        className="p-2 rounded-lg hover:bg-red-500/20 text-red-400 cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4" />
-                      </button>
+                      </div>
                     )}
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                       isOpen 
@@ -220,7 +236,7 @@ export function FAQSection({
                       )}
                     </div>
                   </div>
-                </button>
+                </div>
 
                 {/* Answer */}
                 <div 
