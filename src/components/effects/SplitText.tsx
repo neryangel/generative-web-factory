@@ -1,5 +1,5 @@
 import { motion, Variants, useReducedMotion } from 'framer-motion';
-import { ReactNode, useMemo } from 'react';
+import { ReactNode } from 'react';
 
 interface SplitTextProps {
   children: string;
@@ -68,13 +68,28 @@ export function SplitText({
   children,
   className = '',
   variant = 'words',
-  staggerDelay = 0.03,
   initialDelay = 0,
-  as: Component = 'div',
+  as = 'div',
 }: SplitTextProps) {
   const prefersReducedMotion = useReducedMotion();
 
-  const elements = useMemo(() => {
+  // Fallback for reduced motion
+  if (prefersReducedMotion) {
+    const Tag = as;
+    return (
+      <motion.div
+        className={className}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: initialDelay }}
+      >
+        {children}
+      </motion.div>
+    );
+  }
+
+  const renderContent = () => {
     if (variant === 'chars') {
       return children.split('').map((char, i) => (
         <motion.span
@@ -129,29 +144,13 @@ export function SplitText({
     }
 
     return children;
-  }, [children, variant]);
+  };
 
-  // Fallback for reduced motion
-  if (prefersReducedMotion) {
-    const MotionComponent = motion[Component];
-    return (
-      <MotionComponent
-        className={className}
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: initialDelay }}
-      >
-        {children}
-      </MotionComponent>
-    );
-  }
-
-  const MotionComponent = motion[Component];
+  // Use a simple wrapper div instead of dynamic motion component
   return (
-    <MotionComponent className={className}>
-      {elements}
-    </MotionComponent>
+    <div className={className}>
+      {renderContent()}
+    </div>
   );
 }
 
@@ -162,20 +161,18 @@ interface WordRevealProps {
   delay?: number;
 }
 
-export function WordReveal({ children, className = '', as: Tag = 'span', delay = 0 }: WordRevealProps) {
+export function WordReveal({ children, className = '', delay = 0 }: WordRevealProps) {
   const prefersReducedMotion = useReducedMotion();
   const words = children.split(' ');
 
   if (prefersReducedMotion) {
-    return <Tag className={className}>{children}</Tag>;
+    return <span className={className}>{children}</span>;
   }
-
-  const MotionTag = motion[Tag];
   
   return (
-    <MotionTag className={className}>
+    <span className={className}>
       {words.map((word, i) => (
-        <motion.span
+        <span
           key={i}
           className="inline-block overflow-hidden"
           style={{ marginRight: '0.25em' }}
@@ -193,9 +190,9 @@ export function WordReveal({ children, className = '', as: Tag = 'span', delay =
           >
             {word}
           </motion.span>
-        </motion.span>
+        </span>
       ))}
-    </MotionTag>
+    </span>
   );
 }
 
