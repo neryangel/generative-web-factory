@@ -6,6 +6,10 @@ import { CTASection } from './sections/CTASection';
 import { ContactSection } from './sections/ContactSection';
 import { AboutSection } from './sections/AboutSection';
 import { FooterSection } from './sections/FooterSection';
+import { PricingSection } from './sections/PricingSection';
+import { TeamSection } from './sections/TeamSection';
+import { FAQSection } from './sections/FAQSection';
+import { StatsSection } from './sections/StatsSection';
 
 export interface SectionContent {
   [key: string]: unknown;
@@ -32,6 +36,10 @@ const sectionComponents: Record<string, React.ComponentType<SectionProps>> = {
   contact: ContactSection,
   about: AboutSection,
   footer: FooterSection,
+  pricing: PricingSection,
+  team: TeamSection,
+  faq: FAQSection,
+  stats: StatsSection,
 };
 
 export function SectionRenderer(props: SectionProps) {
