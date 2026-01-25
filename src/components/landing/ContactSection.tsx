@@ -89,10 +89,10 @@ const ContactSection = React.forwardRef<HTMLElement>((_, ref) => {
       if (typeof ref === 'function') ref(el);
       else if (ref) ref.current = el;
       (sectionRef as React.MutableRefObject<HTMLElement | null>).current = el;
-    }} id="contact" dir="rtl" className="py-24 bg-card/30 relative overflow-hidden">
-      {/* Animated Decorative Elements */}
+    }} id="contact" dir="rtl" className="py-16 md:py-24 bg-card/30 relative overflow-hidden">
+      {/* Animated Decorative Elements - Hidden on mobile */}
       <motion.div 
-        className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
+        className="absolute top-0 right-0 w-48 md:w-96 h-48 md:h-96 bg-primary/5 rounded-full blur-3xl hidden sm:block"
         animate={{ 
           scale: [1, 1.1, 1],
           opacity: [0.5, 0.8, 0.5]
@@ -100,7 +100,7 @@ const ContactSection = React.forwardRef<HTMLElement>((_, ref) => {
         transition={{ duration: 8, repeat: Infinity }}
       />
       <motion.div 
-        className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
+        className="absolute bottom-0 left-0 w-48 md:w-96 h-48 md:h-96 bg-primary/5 rounded-full blur-3xl hidden sm:block"
         animate={{ 
           scale: [1.1, 1, 1.1],
           opacity: [0.3, 0.6, 0.3]
@@ -108,9 +108,9 @@ const ContactSection = React.forwardRef<HTMLElement>((_, ref) => {
         transition={{ duration: 10, repeat: Infinity }}
       />
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 md:mb-16">
           <motion.p 
             className="text-xs tracking-wider text-primary mb-4"
             initial={{ opacity: 0, y: 20 }}
@@ -120,7 +120,7 @@ const ContactSection = React.forwardRef<HTMLElement>((_, ref) => {
             צרו קשר
           </motion.p>
           <motion.h2 
-            className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground"
+            className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-foreground"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.1 }}
@@ -129,32 +129,32 @@ const ContactSection = React.forwardRef<HTMLElement>((_, ref) => {
           </motion.h2>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20 max-w-6xl mx-auto">
           {/* Contact Info */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="bg-card border border-primary/20 rounded-xl p-8 h-full hover:border-primary/40 transition-colors duration-300">
-              <h3 className="font-serif text-2xl text-foreground mb-8">פרטי התקשרות</h3>
+            <div className="bg-card border border-primary/20 rounded-xl p-5 sm:p-6 md:p-8 h-full hover:border-primary/40 transition-colors duration-300">
+              <h3 className="font-serif text-xl sm:text-2xl text-foreground mb-6 md:mb-8">פרטי התקשרות</h3>
               
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {contactInfo.map((item, index) => (
                   <motion.div 
                     key={index} 
-                    className="flex items-start gap-4 group"
+                    className="flex items-start gap-3 sm:gap-4 group"
                     initial={{ opacity: 0, x: 20 }}
                     animate={isInView ? { opacity: 1, x: 0 } : {}}
                     transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
                     whileHover={{ x: -5 }}
                   >
-                    <div className="w-12 h-12 rounded-full border border-primary/30 flex items-center justify-center flex-shrink-0 group-hover:border-primary group-hover:bg-primary/10 transition-all duration-300">
-                      <item.icon className="w-5 h-5 text-primary" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-primary/30 flex items-center justify-center flex-shrink-0 group-hover:border-primary group-hover:bg-primary/10 transition-all duration-300">
+                      <item.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
-                      <p className="text-foreground group-hover:text-primary transition-colors">{item.value}</p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">{item.label}</p>
+                      <p className="text-sm sm:text-base text-foreground group-hover:text-primary transition-colors">{item.value}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -195,8 +195,8 @@ const ContactSection = React.forwardRef<HTMLElement>((_, ref) => {
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid sm:grid-cols-2 gap-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
