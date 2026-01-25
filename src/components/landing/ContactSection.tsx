@@ -15,105 +15,37 @@ const ContactSection = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Message sent successfully! We\'ll get back to you soon.');
+    toast.success('ההודעה נשלחה בהצלחה! נחזור אליכם בהקדם.');
     setFormData({ name: '', email: '', phone: '', message: '' });
   };
 
   const contactInfo = [
-    { icon: Phone, label: 'Phone', value: '+972 3-123-4567' },
-    { icon: Mail, label: 'Email', value: 'hello@amdir.co.il' },
-    { icon: MapPin, label: 'Address', value: 'Tel Aviv, Israel' },
-    { icon: Clock, label: 'Hours', value: 'Sun-Thu 9:00 - 18:00' },
+    { icon: Phone, label: 'טלפון', value: '03-123-4567' },
+    { icon: Mail, label: 'אימייל', value: 'hello@amdir.co.il' },
+    { icon: MapPin, label: 'כתובת', value: 'תל אביב, ישראל' },
+    { icon: Clock, label: 'שעות פעילות', value: 'א׳-ה׳ 9:00 - 18:00' },
   ];
 
   return (
-    <section id="contact" className="py-24 bg-card/30 relative overflow-hidden">
+    <section id="contact" dir="rtl" className="py-24 bg-card/30 relative overflow-hidden">
       {/* Decorative Elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary mb-4">Get in Touch</p>
+          <p className="text-xs tracking-wider text-primary mb-4">צרו קשר</p>
           <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground">
-            Let's Create Something Amazing
+            בואו ניצור משהו מדהים ביחד
           </h2>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 max-w-6xl mx-auto">
-          {/* Contact Form */}
-          <div className="order-2 lg:order-1">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div>
-                  <label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">
-                    Full Name
-                  </label>
-                  <Input
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="John Doe"
-                    className="bg-background border-primary/20 focus:border-primary h-12"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">
-                    Email
-                  </label>
-                  <Input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="john@example.com"
-                    className="bg-background border-primary/20 focus:border-primary h-12"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">
-                  Phone Number
-                </label>
-                <Input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="+972 50-000-0000"
-                  className="bg-background border-primary/20 focus:border-primary h-12"
-                />
-              </div>
-              
-              <div>
-                <label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">
-                  Your Message
-                </label>
-                <Textarea
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder="Tell us about your project..."
-                  className="bg-background border-primary/20 focus:border-primary min-h-[150px] resize-none"
-                  required
-                />
-              </div>
-              
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 uppercase tracking-wider text-sm py-6"
-              >
-                <Send className="w-4 h-4 mr-2" />
-                Send Message
-              </Button>
-            </form>
-          </div>
-
           {/* Contact Info */}
-          <div className="order-1 lg:order-2">
+          <div>
             <div className="bg-card border border-primary/20 rounded-lg p-8 h-full">
-              <h3 className="font-serif text-2xl text-foreground mb-8">Contact Information</h3>
+              <h3 className="font-serif text-2xl text-foreground mb-8">פרטי התקשרות</h3>
               
               <div className="space-y-6">
                 {contactInfo.map((item, index) => (
@@ -122,7 +54,7 @@ const ContactSection = () => {
                       <item.icon className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">{item.label}</p>
+                      <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
                       <p className="text-foreground">{item.value}</p>
                     </div>
                   </div>
@@ -131,9 +63,9 @@ const ContactSection = () => {
 
               {/* Social Links */}
               <div className="mt-12 pt-8 border-t border-primary/10">
-                <p className="text-xs uppercase tracking-wider text-muted-foreground mb-4">Follow Us</p>
+                <p className="text-xs text-muted-foreground mb-4">עקבו אחרינו</p>
                 <div className="flex gap-4">
-                  {['Facebook', 'Instagram', 'LinkedIn'].map((social) => (
+                  {['פייסבוק', 'אינסטגרם', 'לינקדאין'].map((social) => (
                     <a
                       key={social}
                       href="#"
@@ -145,6 +77,74 @@ const ContactSection = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Contact Form */}
+          <div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid sm:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-2 block">
+                    שם מלא
+                  </label>
+                  <Input
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="ישראל ישראלי"
+                    className="bg-background border-primary/20 focus:border-primary h-12"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-2 block">
+                    אימייל
+                  </label>
+                  <Input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="israel@example.com"
+                    className="bg-background border-primary/20 focus:border-primary h-12"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-xs text-muted-foreground mb-2 block">
+                  מספר טלפון
+                </label>
+                <Input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="050-000-0000"
+                  className="bg-background border-primary/20 focus:border-primary h-12"
+                />
+              </div>
+              
+              <div>
+                <label className="text-xs text-muted-foreground mb-2 block">
+                  ההודעה שלכם
+                </label>
+                <Textarea
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  placeholder="ספרו לנו על הפרויקט שלכם..."
+                  className="bg-background border-primary/20 focus:border-primary min-h-[150px] resize-none"
+                  required
+                />
+              </div>
+              
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 text-sm py-6"
+              >
+                <Send className="w-4 h-4 ml-2" />
+                שליחת הודעה
+              </Button>
+            </form>
           </div>
         </div>
       </div>

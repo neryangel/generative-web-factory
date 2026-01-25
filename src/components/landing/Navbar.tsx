@@ -20,11 +20,11 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { label: 'Home', href: '#hero' },
-    { label: 'Portfolio', href: '#portfolio' },
-    { label: 'Services', href: '#features' },
-    { label: 'FAQ', href: '#faq' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'בית', href: '#hero' },
+    { label: 'עבודות', href: '#portfolio' },
+    { label: 'שירותים', href: '#features' },
+    { label: 'שאלות נפוצות', href: '#faq' },
+    { label: 'צור קשר', href: '#contact' },
   ];
 
   const scrollToSection = (href: string) => {
@@ -37,6 +37,7 @@ const Navbar = () => {
 
   return (
     <header
+      dir="rtl"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
           ? 'bg-background/95 backdrop-blur-md border-b border-primary/10'
@@ -47,13 +48,13 @@ const Navbar = () => {
         {/* Logo */}
         <Link to="/" className="flex flex-col items-start group">
           <span className="text-2xl font-serif font-bold gold-text tracking-wider">AMDIR</span>
-          <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Digital Agency</span>
+          <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">סוכנות דיגיטלית</span>
         </Link>
 
         {/* Tagline - Desktop Only */}
         <div className="hidden lg:block absolute left-1/2 -translate-x-1/2">
-          <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
-            Crafting Premium Digital Experiences
+          <span className="text-xs tracking-wider text-muted-foreground">
+            יוצרים חוויות דיגיטליות יוקרתיות
           </span>
         </div>
 
@@ -63,7 +64,7 @@ const Navbar = () => {
             <button
               key={link.href}
               onClick={() => scrollToSection(link.href)}
-              className="text-sm uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors duration-300"
+              className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
             >
               {link.label}
             </button>
@@ -76,17 +77,17 @@ const Navbar = () => {
             <Button
               onClick={() => navigate('/dashboard')}
               variant="outline"
-              className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 uppercase tracking-wider text-xs px-6"
+              className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 text-sm px-6"
             >
-              Dashboard
+              לדשבורד
             </Button>
           ) : (
             <Button
               onClick={() => navigate('/dashboard')}
               variant="outline"
-              className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 uppercase tracking-wider text-xs px-6"
+              className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 text-sm px-6"
             >
-              Get a Free Quote
+              קבלו הצעת מחיר
             </Button>
           )}
         </div>
@@ -98,13 +99,13 @@ const Navbar = () => {
               <Menu className="w-6 h-6" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-72 bg-background border-primary/20">
-            <div className="flex flex-col gap-6 mt-8">
+          <SheetContent side="left" className="w-72 bg-background border-primary/20">
+            <div className="flex flex-col gap-6 mt-8" dir="rtl">
               {navLinks.map((link) => (
                 <button
                   key={link.href}
                   onClick={() => scrollToSection(link.href)}
-                  className="text-lg uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors text-left"
+                  className="text-lg text-muted-foreground hover:text-primary transition-colors text-right"
                 >
                   {link.label}
                 </button>
@@ -116,9 +117,9 @@ const Navbar = () => {
                     setIsOpen(false);
                   }}
                   variant="outline"
-                  className="w-full border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground uppercase tracking-wider text-xs"
+                  className="w-full border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground text-sm"
                 >
-                  {user ? 'Dashboard' : 'Get a Free Quote'}
+                  {user ? 'לדשבורד' : 'קבלו הצעת מחיר'}
                 </Button>
               </div>
             </div>
