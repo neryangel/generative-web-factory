@@ -13,14 +13,36 @@ import {
   Loader2, 
   Sparkles, 
   FileText,
-  Check
+  Check,
+  Wand2,
+  AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Template = Tables<'templates'>;
 
 type CreateMode = 'template' | 'ai';
+
+interface AIBlueprint {
+  siteName: string;
+  settings?: {
+    primaryColor?: string;
+    secondaryColor?: string;
+    fontFamily?: string;
+    direction?: string;
+  };
+  pages: {
+    slug: string;
+    title: string;
+    isHomepage?: boolean;
+    sections: {
+      type: string;
+      content: Record<string, unknown>;
+    }[];
+  }[];
+}
 
 export default function NewSite() {
   const navigate = useNavigate();
@@ -30,6 +52,9 @@ export default function NewSite() {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState(false);
   const [templatesLoading, setTemplatesLoading] = useState(true);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [generatedBlueprint, setGeneratedBlueprint] = useState<AIBlueprint | null>(null);
 
   // Form fields
   const [siteName, setSiteName] = useState('');
@@ -68,6 +93,132 @@ export default function NewSite() {
   const handleNameChange = (value: string) => {
     setSiteName(value);
     setSiteSlug(generateSlug(value));
+  };
+
+  const handleGenerateWithAI = async () => {
+    if (!brief.trim() || brief.trim().length < 10) {
+      toast.error('נא לספק תיאור מפורט יותר (לפחות 10 תווים)');
+      return;
+    }
+
+    setAiGenerating(true);
+    setAiError(null);
+    setGeneratedBlueprint(null);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-site`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ brief: brief.trim() }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'שגיאה ביצירת האתר');
+      }
+
+      if (!data.blueprint) {
+        throw new Error('לא התקבל מבנה אתר תקין');
+      }
+
+      setGeneratedBlueprint(data.blueprint);
+      
+      // Auto-fill site name from blueprint
+      if (data.blueprint.siteName) {
+        setSiteName(data.blueprint.siteName);
+        setSiteSlug(generateSlug(data.blueprint.siteName));
+      }
+
+      toast.success('מבנה האתר נוצר בהצלחה!');
+    } catch (error: any) {
+      console.error('AI generation error:', error);
+      setAiError(error.message || 'שגיאה ביצירת האתר');
+      toast.error(error.message || 'שגיאה ביצירת האתר');
+    } finally {
+      setAiGenerating(false);
+    }
+  };
+
+  const handleCreateFromAI = async () => {
+    if (!currentTenant || !generatedBlueprint || !siteName.trim() || !siteSlug.trim()) return;
+
+    setLoading(true);
+    try {
+      // Create site
+      const { data: site, error: siteError } = await supabase
+        .from('sites')
+        .insert({
+          tenant_id: currentTenant.id,
+          name: siteName.trim(),
+          slug: siteSlug.trim(),
+          status: 'draft',
+          settings: generatedBlueprint.settings || {},
+        })
+        .select()
+        .single();
+
+      if (siteError) throw siteError;
+
+      // Create pages and sections from blueprint
+      for (let i = 0; i < generatedBlueprint.pages.length; i++) {
+        const pageBlueprint = generatedBlueprint.pages[i];
+        
+        const { data: page, error: pageError } = await supabase
+          .from('pages')
+          .insert({
+            site_id: site.id,
+            tenant_id: currentTenant.id,
+            slug: pageBlueprint.slug,
+            title: pageBlueprint.title,
+            sort_order: i,
+            is_homepage: pageBlueprint.isHomepage || pageBlueprint.slug === 'home',
+            seo: {},
+          })
+          .select()
+          .single();
+
+        if (pageError) throw pageError;
+
+        // Create sections
+        if (pageBlueprint.sections && page) {
+          const sectionsToInsert = pageBlueprint.sections.map((sectionBlueprint, j) => ({
+            page_id: page.id,
+            tenant_id: currentTenant.id,
+            type: sectionBlueprint.type,
+            variant: 'default',
+            content: JSON.parse(JSON.stringify(sectionBlueprint.content || {})),
+            sort_order: j,
+          }));
+
+          const { error: sectionsError } = await supabase
+            .from('sections')
+            .insert(sectionsToInsert as any);
+
+          if (sectionsError) {
+            console.error('Error creating sections:', sectionsError);
+          }
+        }
+      }
+
+      toast.success('האתר נוצר בהצלחה!');
+      navigate(`/dashboard/sites/${site.id}`);
+    } catch (error: any) {
+      console.error('Error creating site:', error);
+      if (error.message?.includes('duplicate')) {
+        toast.error('שם האתר כבר קיים, נסה שם אחר');
+      } else {
+        toast.error('שגיאה ביצירת האתר');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCreateFromTemplate = async () => {
@@ -154,13 +305,29 @@ export default function NewSite() {
     }
   };
 
+  const resetAIMode = () => {
+    setGeneratedBlueprint(null);
+    setAiError(null);
+    setSiteName('');
+    setSiteSlug('');
+  };
+
   return (
     <DashboardLayout>
       <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
         {/* Back Button */}
         <Button 
           variant="ghost" 
-          onClick={() => mode ? setMode(null) : navigate('/dashboard/sites')}
+          onClick={() => {
+            if (mode === 'ai' && generatedBlueprint) {
+              resetAIMode();
+            } else if (mode) {
+              setMode(null);
+              resetAIMode();
+            } else {
+              navigate('/dashboard/sites');
+            }
+          }}
           className="gap-2"
         >
           <ArrowRight className="h-4 w-4" />
@@ -192,7 +359,8 @@ export default function NewSite() {
               </Card>
 
               <Card 
-                className="cursor-pointer hover:shadow-lg transition-all hover:border-accent group opacity-60"
+                className="cursor-pointer hover:shadow-lg transition-all hover:border-accent group"
+                onClick={() => setMode('ai')}
               >
                 <CardHeader className="text-center pb-2">
                   <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-4 bg-accent/10 group-hover:bg-accent/20 transition-colors">
@@ -202,10 +370,148 @@ export default function NewSite() {
                   <CardDescription>
                     תאר את העסק שלך וה-AI יבנה אתר מותאם אישית
                   </CardDescription>
-                  <p className="text-xs text-muted-foreground mt-2">(בקרוב)</p>
                 </CardHeader>
               </Card>
             </div>
+          </>
+        )}
+
+        {/* AI Mode - Brief Input */}
+        {mode === 'ai' && !generatedBlueprint && (
+          <>
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold mb-2">תאר את העסק שלך</h1>
+              <p className="text-muted-foreground">ה-AI יבנה אתר מותאם אישית על בסיס התיאור שלך</p>
+            </div>
+
+            <Card>
+              <CardContent className="p-6 space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="brief">תיאור העסק</Label>
+                  <Textarea
+                    id="brief"
+                    placeholder="לדוגמה: מסעדה איטלקית משפחתית בתל אביב, מתמחה בפסטה טרייה ופיצות מעץ. אווירה חמימה ואינטימית, מתאימה לזוגות ומשפחות..."
+                    value={brief}
+                    onChange={(e) => setBrief(e.target.value)}
+                    className="min-h-[150px] text-right"
+                    dir="rtl"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    ככל שתספק יותר פרטים, האתר יהיה מותאם יותר לעסק שלך
+                  </p>
+                </div>
+
+                {aiError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{aiError}</AlertDescription>
+                  </Alert>
+                )}
+
+                <Button 
+                  onClick={handleGenerateWithAI}
+                  disabled={aiGenerating || brief.trim().length < 10}
+                  className="w-full"
+                  size="lg"
+                >
+                  {aiGenerating ? (
+                    <>
+                      <Loader2 className="ml-2 h-5 w-5 animate-spin" />
+                      יוצר את האתר...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="ml-2 h-5 w-5" />
+                      צור אתר עם AI
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        {/* AI Mode - Blueprint Generated */}
+        {mode === 'ai' && generatedBlueprint && (
+          <>
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold mb-2">האתר מוכן! 🎉</h1>
+              <p className="text-muted-foreground">
+                נוצרו {generatedBlueprint.pages.length} עמודים עם{' '}
+                {generatedBlueprint.pages.reduce((acc, p) => acc + (p.sections?.length || 0), 0)} סקשנים
+              </p>
+            </div>
+
+            <Card className="mb-4">
+              <CardHeader>
+                <CardTitle className="text-lg">סיכום האתר</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {generatedBlueprint.pages.map((page, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                      {idx + 1}
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-medium">{page.title}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {page.sections?.length || 0} סקשנים: {page.sections?.map(s => s.type).join(', ')}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6 space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="siteName">שם האתר</Label>
+                  <Input
+                    id="siteName"
+                    placeholder="לדוגמה: המסעדה שלי"
+                    value={siteName}
+                    onChange={(e) => handleNameChange(e.target.value)}
+                    className="text-right"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="siteSlug">כתובת האתר (URL)</Label>
+                  <div className="flex items-center gap-2" dir="ltr">
+                    <Input
+                      id="siteSlug"
+                      placeholder="my-restaurant"
+                      value={siteSlug}
+                      onChange={(e) => setSiteSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                      className="text-left"
+                    />
+                    <span className="text-muted-foreground text-sm whitespace-nowrap">.amdir.app</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button 
+                    onClick={handleCreateFromAI}
+                    disabled={loading || !siteName.trim() || !siteSlug.trim()}
+                    className="flex-1"
+                  >
+                    {loading ? (
+                      <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Check className="ml-2 h-4 w-4" />
+                    )}
+                    צור אתר
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={resetAIMode}
+                  >
+                    התחל מחדש
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </>
         )}
 
@@ -260,7 +566,7 @@ export default function NewSite() {
           </>
         )}
 
-        {/* Site Details Form */}
+        {/* Site Details Form - Template */}
         {mode === 'template' && selectedTemplate && (
           <>
             <div className="text-center mb-8">
