@@ -8,38 +8,38 @@ import {
 const FAQSection = () => {
   const faqs = [
     {
-      question: 'What services do you offer?',
-      answer: 'We provide comprehensive digital solutions including web design, development, branding, SEO optimization, and ongoing maintenance. Our team crafts custom solutions tailored to your specific business needs.',
+      question: 'אילו שירותים אתם מציעים?',
+      answer: 'אנחנו מספקים פתרונות דיגיטליים מקיפים כולל עיצוב אתרים, פיתוח, מיתוג, אופטימיזציית SEO ותחזוקה שוטפת. הצוות שלנו יוצר פתרונות מותאמים אישית לצרכים העסקיים הספציפיים שלכם.',
     },
     {
-      question: 'How long does a typical project take?',
-      answer: 'Project timelines vary based on scope and complexity. A standard website typically takes 4-8 weeks, while more complex projects may require 12-16 weeks. We provide detailed timelines during our initial consultation.',
+      question: 'כמה זמן לוקח פרויקט טיפוסי?',
+      answer: 'לוחות הזמנים של הפרויקטים משתנים בהתאם להיקף ולמורכבות. אתר סטנדרטי לוקח בדרך כלל 4-8 שבועות, בעוד פרויקטים מורכבים יותר עשויים לדרוש 12-16 שבועות. אנחנו מספקים לוחות זמנים מפורטים בפגישת הייעוץ הראשונית.',
     },
     {
-      question: 'What is your pricing structure?',
-      answer: 'Our pricing is project-based and depends on your specific requirements. We offer transparent pricing with no hidden fees. Contact us for a free quote tailored to your needs.',
+      question: 'מהו מבנה התמחור שלכם?',
+      answer: 'התמחור שלנו מבוסס על פרויקט ותלוי בדרישות הספציפיות שלכם. אנחנו מציעים תמחור שקוף ללא עלויות נסתרות. צרו איתנו קשר לקבלת הצעת מחיר מותאמת לצרכים שלכם.',
     },
     {
-      question: 'Do you provide ongoing support?',
-      answer: 'Yes, we offer comprehensive maintenance and support packages to ensure your digital presence remains secure, updated, and performing optimally. Our team is available for any questions or updates you may need.',
+      question: 'האם אתם מספקים תמיכה שוטפת?',
+      answer: 'כן, אנחנו מציעים חבילות תחזוקה ותמיכה מקיפות כדי להבטיח שהנוכחות הדיגיטלית שלכם תישאר מאובטחת, מעודכנת ופועלת בצורה אופטימלית. הצוות שלנו זמין לכל שאלה או עדכון שתצטרכו.',
     },
     {
-      question: 'Can you work with existing websites?',
-      answer: 'Absolutely. Whether you need a complete redesign or incremental improvements, we can work with your existing platform. We evaluate your current setup and recommend the best path forward.',
+      question: 'האם אתם יכולים לעבוד עם אתרים קיימים?',
+      answer: 'בהחלט. בין אם אתם צריכים עיצוב מחדש מלא או שיפורים הדרגתיים, אנחנו יכולים לעבוד עם הפלטפורמה הקיימת שלכם. אנחנו מעריכים את המצב הנוכחי וממליצים על הדרך הטובה ביותר להתקדם.',
     },
   ];
 
   return (
-    <section id="faq" className="py-24 bg-background relative overflow-hidden">
+    <section id="faq" dir="rtl" className="py-24 bg-background relative overflow-hidden">
       {/* Decorative Line */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-24 bg-gradient-to-b from-transparent via-primary/30 to-transparent" />
 
       <div className="container mx-auto px-6">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary mb-4">Support</p>
+          <p className="text-xs tracking-wider text-primary mb-4">תמיכה</p>
           <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground">
-            Frequently Asked Questions
+            שאלות נפוצות
           </h2>
         </div>
 
@@ -52,10 +52,10 @@ const FAQSection = () => {
                 value={`item-${index}`}
                 className="border border-primary/20 rounded-lg px-6 bg-card/30 data-[state=open]:border-primary/40 transition-colors"
               >
-                <AccordionTrigger className="text-left text-foreground hover:text-primary hover:no-underline py-6 text-base md:text-lg">
+                <AccordionTrigger className="text-right text-foreground hover:text-primary hover:no-underline py-6 text-base md:text-lg">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-6 leading-relaxed">
+                <AccordionContent className="text-muted-foreground pb-6 leading-relaxed text-right">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>

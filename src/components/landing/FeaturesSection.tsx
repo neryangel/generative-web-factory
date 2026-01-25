@@ -38,33 +38,33 @@ const FeaturesSection = () => {
   const features: Feature[] = [
     {
       icon: MousePointer2,
-      title: 'Visual Builder',
-      description: 'Drag and drop elements with ease. No code required.',
+      title: 'בנייה ויזואלית',
+      description: 'גררו ושחררו אלמנטים בקלות. ללא קוד, ללא מאמץ.',
     },
     {
       icon: LayoutTemplate,
-      title: 'Premium Templates',
-      description: 'Dozens of professionally designed templates ready to use.',
+      title: 'תבניות פרימיום',
+      description: 'עשרות תבניות מעוצבות מקצועית מוכנות לשימוש.',
     },
     {
       icon: Smartphone,
-      title: 'Fully Responsive',
-      description: 'Your site looks perfect on every device and screen size.',
+      title: 'רספונסיביות מלאה',
+      description: 'האתר שלכם נראה מושלם בכל מכשיר ובכל גודל מסך.',
     },
     {
       icon: Zap,
-      title: 'Lightning Fast',
-      description: 'Optimized performance and fast loading for great UX.',
+      title: 'מהירות בזק',
+      description: 'ביצועים מותאמים וטעינה מהירה לחוויית משתמש מעולה.',
     },
     {
       icon: Users,
-      title: 'Team Management',
-      description: 'Manage multiple users and organizations in one place.',
+      title: 'ניהול צוותים',
+      description: 'נהלו מספר משתמשים וארגונים במקום אחד.',
     },
     {
       icon: Languages,
-      title: 'Multi-Language',
-      description: 'Full RTL support, Hebrew interface and 24/7 local support.',
+      title: 'תמיכה בעברית',
+      description: 'RTL מלא, ממשק בעברית ותמיכה מקומית 24/7.',
     },
   ];
 
@@ -72,24 +72,25 @@ const FeaturesSection = () => {
     <section
       id="features"
       ref={sectionRef}
+      dir="rtl"
       className="relative py-24 bg-card/30"
     >
       <div className="container mx-auto px-6 relative z-10">
         {/* Header */}
         <div className="text-center mb-16">
           <p
-            className={`text-xs uppercase tracking-[0.3em] text-primary mb-4 transition-all duration-700 ${
+            className={`text-xs tracking-wider text-primary mb-4 transition-all duration-700 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
           >
-            Our Services
+            השירותים שלנו
           </p>
           <h2
             className={`font-serif text-3xl md:text-4xl lg:text-5xl text-foreground transition-all duration-700 delay-100 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
           >
-            What We Offer
+            מה אנחנו מציעים
           </h2>
         </div>
 
@@ -119,7 +120,7 @@ const FeaturesSection = () => {
                 </p>
 
                 {/* Hover Line */}
-                <div className="absolute bottom-0 left-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-500" />
+                <div className="absolute bottom-0 right-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-500" />
               </div>
             );
           })}
