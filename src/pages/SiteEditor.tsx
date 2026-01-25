@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SectionContent } from '@/components/editor/SectionRenderer';
 import { SortableSectionList } from '@/components/editor/SortableSectionList';
 import { SortablePreviewSection } from '@/components/editor/SortablePreviewSection';
+import { AddSectionButton } from '@/components/editor/AddSectionButton';
 import { SiteSettingsDialog } from '@/components/site/SiteSettingsDialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,9 +32,9 @@ import {
   Monitor,
   Tablet,
   Settings2,
-  Plus,
   Upload,
-  ExternalLink
+  ExternalLink,
+  Plus,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -174,6 +175,11 @@ export default function SiteEditor() {
     // Queue auto-save
     saveSection(sectionId, content);
   }, [saveSection]);
+
+  // Handle new section added
+  const handleSectionAdded = useCallback((section: Section) => {
+    setSections(prev => [...prev, section]);
+  }, []);
 
   // Handle drag start for preview
   const handleDragStart = (event: DragStartEvent) => {
@@ -504,7 +510,15 @@ export default function SiteEditor() {
                 <div className="flex flex-col items-center justify-center h-96 text-muted-foreground">
                   <Plus className="h-12 w-12 mb-4 opacity-30" />
                   <p>אין סקשנים בעמוד זה</p>
-                  <p className="text-sm">הוסף סקשנים מהתפריט הימני</p>
+                  <p className="text-sm mb-4">הוסף סקשנים מהתפריט הימני</p>
+                  {currentPage && currentTenant && (
+                    <AddSectionButton
+                      pageId={currentPage.id}
+                      tenantId={currentTenant.id}
+                      currentSectionsCount={0}
+                      onSectionAdded={handleSectionAdded}
+                    />
+                  )}
                 </div>
               ) : (
                 <DndContext
@@ -558,10 +572,14 @@ export default function SiteEditor() {
                 onReorder={handleDragEnd}
               />
 
-              <Button variant="outline" className="w-full mt-4 gap-2">
-                <Plus className="h-4 w-4" />
-                הוסף סקשן
-              </Button>
+              {currentPage && currentTenant && (
+                <AddSectionButton
+                  pageId={currentPage.id}
+                  tenantId={currentTenant.id}
+                  currentSectionsCount={sections.length}
+                  onSectionAdded={handleSectionAdded}
+                />
+              )}
             </div>
           </aside>
         )}
