@@ -34,7 +34,8 @@ import {
   GripVertical,
   Plus,
   Trash2,
-  Upload
+  Upload,
+  ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
@@ -173,11 +174,16 @@ export default function SiteEditor() {
         .eq('tenant_id', currentTenant.id)
         .in('page_id', (allPages || []).map(p => p.id));
 
-      // Create snapshot
+      // Build snapshot with proper structure for public runtime
+      const pagesWithSections = (allPages || []).map(page => ({
+        ...page,
+        sections: (allSections || []).filter(s => s.page_id === page.id)
+          .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)),
+      }));
+
       const snapshot = {
-        site,
-        pages: allPages,
-        sections: allSections,
+        pages: pagesWithSections,
+        settings: site.settings,
         published_at: new Date().toISOString(),
       };
 
@@ -207,10 +213,30 @@ export default function SiteEditor() {
         .eq('id', site.id);
 
       setSite(prev => prev ? { ...prev, status: 'published' } : null);
-      toast.success(`האתר פורסם בהצלחה! (גרסה ${newVersion})`);
+      
+      // Show success with link to public site
+      toast.success(
+        <div className="flex flex-col gap-1">
+          <span>האתר פורסם בהצלחה! (גרסה {newVersion})</span>
+          <a 
+            href={`/s/${site.slug}`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-primary underline text-sm"
+          >
+            צפה באתר →
+          </a>
+        </div>
+      );
     } catch (error) {
       console.error('Error publishing:', error);
       toast.error('שגיאה בפרסום האתר');
+    }
+  };
+
+  const handleViewPublished = () => {
+    if (site?.slug) {
+      window.open(`/s/${site.slug}`, '_blank');
     }
   };
 
@@ -357,6 +383,24 @@ export default function SiteEditor() {
               </>
             ) : null}
           </div>
+
+          {/* View Published Site */}
+          {site.status === 'published' && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleViewPublished}
+                  className="gap-2"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  צפה באתר
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>פתח את האתר המפורסם בטאב חדש</TooltipContent>
+            </Tooltip>
+          )}
 
           {/* Publish Button */}
           <Button onClick={handlePublish} className="gap-2">

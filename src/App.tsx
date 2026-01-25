@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Sites from "./pages/Sites";
 import NewSite from "./pages/NewSite";
 import SiteEditor from "./pages/SiteEditor";
+import PublicSite from "./pages/PublicSite";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -41,11 +42,17 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
+            {/* Public site routes */}
+            <Route path="/s/:slug" element={<PublicSite />} />
+            <Route path="/s/:slug/:pageSlug" element={<PublicSite />} />
+            
+            {/* Dashboard routes */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/dashboard/sites" element={<ProtectedRoute><Sites /></ProtectedRoute>} />
             <Route path="/dashboard/sites/new" element={<ProtectedRoute><NewSite /></ProtectedRoute>} />
             <Route path="/dashboard/sites/:siteId" element={<ProtectedRoute><SiteEditor /></ProtectedRoute>} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

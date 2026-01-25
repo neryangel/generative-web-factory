@@ -1,1 +1,7 @@
 project_id = "achjbhxncobmcbnjyyat"
+
+[functions.generate-site]
+verify_jwt = false
+
+[functions.get-published-site]
+verify_jwt = false
