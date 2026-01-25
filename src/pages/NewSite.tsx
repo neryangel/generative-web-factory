@@ -315,14 +315,23 @@ export default function NewSite() {
           // Create sections for each page
           if (pageBlueprint.sections && page) {
             for (let j = 0; j < pageBlueprint.sections.length; j++) {
-              const sectionType = pageBlueprint.sections[j];
+              const sectionBlueprint = pageBlueprint.sections[j];
               
-              // Get default content from section registry
-              const { data: sectionDef } = await supabase
-                .from('section_registry')
-                .select('default_content')
-                .eq('type', sectionType)
-                .single();
+              // Support both old format (string) and new format (object with type and content)
+              const isNewFormat = typeof sectionBlueprint === 'object' && sectionBlueprint.type;
+              const sectionType = isNewFormat ? sectionBlueprint.type : sectionBlueprint;
+              const blueprintContent = isNewFormat ? sectionBlueprint.content : null;
+              
+              // If blueprint has content, use it; otherwise get default from registry
+              let sectionContent = blueprintContent;
+              if (!sectionContent) {
+                const { data: sectionDef } = await supabase
+                  .from('section_registry')
+                  .select('default_content')
+                  .eq('type', sectionType)
+                  .maybeSingle();
+                sectionContent = sectionDef?.default_content || {};
+              }
 
               await supabase
                 .from('sections')
@@ -331,7 +340,7 @@ export default function NewSite() {
                   tenant_id: currentTenant.id,
                   type: sectionType,
                   variant: 'default',
-                  content: sectionDef?.default_content || {},
+                  content: sectionContent,
                   sort_order: j,
                 });
             }
