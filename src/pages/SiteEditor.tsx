@@ -3,7 +3,9 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTenant } from '@/hooks/useTenant';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { supabase } from '@/integrations/supabase/client';
-import { SectionRenderer, SectionContent } from '@/components/editor/SectionRenderer';
+import { SectionContent } from '@/components/editor/SectionRenderer';
+import { SortableSectionList } from '@/components/editor/SortableSectionList';
+import { SortablePreviewSection } from '@/components/editor/SortablePreviewSection';
 import { SiteSettingsDialog } from '@/components/site/SiteSettingsDialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,23 +24,35 @@ import {
   ArrowRight, 
   Eye, 
   EyeOff,
-  Save,
   Loader2,
   Check,
   Globe,
   Smartphone,
   Monitor,
   Tablet,
-  Undo2,
-  Redo2,
   Settings2,
-  GripVertical,
   Plus,
-  Trash2,
   Upload,
   ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Site = Tables<'sites'>;
@@ -60,10 +74,23 @@ export default function SiteEditor() {
   const [isEditing, setIsEditing] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('desktop');
   const [loading, setLoading] = useState(true);
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
   
   const { isSaving, lastSaved, saveSection, flushSave } = useAutoSave({
     debounceMs: 1500,
   });
+
+  // DnD sensors for preview area
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Fetch site data
   useEffect(() => {
@@ -147,6 +174,46 @@ export default function SiteEditor() {
     // Queue auto-save
     saveSection(sectionId, content);
   }, [saveSection]);
+
+  // Handle drag start for preview
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragId(event.active.id as string);
+  };
+
+  // Handle drag end - reorder sections
+  const handleDragEnd = async (event: DragEndEvent) => {
+    setActiveDragId(null);
+    
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = sections.findIndex(s => s.id === active.id);
+    const newIndex = sections.findIndex(s => s.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    // Optimistic update
+    const reorderedSections = arrayMove(sections, oldIndex, newIndex);
+    setSections(reorderedSections);
+
+    // Persist to database
+    try {
+      const updates = reorderedSections.map((section, index) => 
+        supabase
+          .from('sections')
+          .update({ sort_order: index })
+          .eq('id', section.id)
+      );
+
+      await Promise.all(updates);
+      toast.success('סדר הסקשנים עודכן');
+    } catch (error) {
+      console.error('Error updating sort order:', error);
+      // Rollback on error
+      setSections(sections);
+      toast.error('שגיאה בעדכון סדר הסקשנים');
+    }
+  };
 
   const handlePublish = async () => {
     if (!site || !currentTenant) return;
@@ -246,6 +313,10 @@ export default function SiteEditor() {
     tablet: '768px',
     mobile: '375px',
   };
+
+  const activeDragSection = activeDragId 
+    ? sections.find(s => s.id === activeDragId) 
+    : null;
 
   if (loading) {
     return (
@@ -436,43 +507,39 @@ export default function SiteEditor() {
                   <p className="text-sm">הוסף סקשנים מהתפריט הימני</p>
                 </div>
               ) : (
-                sections.map((section) => (
-                  <div 
-                    key={section.id}
-                    className={`relative group ${
-                      isEditing && selectedSectionId === section.id 
-                        ? 'outline outline-2 outline-primary outline-offset-2' 
-                        : ''
-                    }`}
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={sections.map(s => s.id)}
+                    strategy={verticalListSortingStrategy}
                   >
-                    {/* Section Controls */}
-                    {isEditing && (
-                      <div className="absolute top-2 left-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                        <Button variant="secondary" size="icon" className="h-8 w-8">
-                          <GripVertical className="h-4 w-4" />
-                        </Button>
-                        <Button variant="secondary" size="icon" className="h-8 w-8">
-                          <Settings2 className="h-4 w-4" />
-                        </Button>
-                        <Button variant="destructive" size="icon" className="h-8 w-8">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    )}
+                    {sections.map((section) => (
+                      <SortablePreviewSection
+                        key={section.id}
+                        section={section}
+                        isSelected={selectedSectionId === section.id}
+                        isEditing={isEditing}
+                        onSelect={() => setSelectedSectionId(section.id)}
+                        onContentChange={(content) => handleContentChange(section.id, content)}
+                      />
+                    ))}
+                  </SortableContext>
 
-                    <SectionRenderer
-                      id={section.id}
-                      type={section.type}
-                      variant={section.variant || 'default'}
-                      content={section.content as Record<string, unknown>}
-                      settings={(section.settings as Record<string, unknown>) || {}}
-                      isEditing={isEditing}
-                      isSelected={selectedSectionId === section.id}
-                      onSelect={() => setSelectedSectionId(section.id)}
-                      onContentChange={(content) => handleContentChange(section.id, content)}
-                    />
-                  </div>
-                ))
+                  <DragOverlay>
+                    {activeDragSection ? (
+                      <div className="bg-card/80 backdrop-blur-sm border-2 border-primary rounded-lg p-4 shadow-2xl">
+                        <span className="font-medium capitalize">{activeDragSection.type}</span>
+                        <span className="text-sm text-muted-foreground mr-2">
+                          ({activeDragSection.variant})
+                        </span>
+                      </div>
+                    ) : null}
+                  </DragOverlay>
+                </DndContext>
               )}
             </div>
           </div>
@@ -484,27 +551,12 @@ export default function SiteEditor() {
             <div className="p-4">
               <h3 className="font-semibold mb-4">סקשנים</h3>
               
-              <div className="space-y-2">
-                {sections.map((section, index) => (
-                  <div
-                    key={section.id}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                      selectedSectionId === section.id 
-                        ? 'border-primary bg-primary/5' 
-                        : 'hover:border-muted-foreground/30 hover:bg-muted/50'
-                    }`}
-                    onClick={() => setSelectedSectionId(section.id)}
-                  >
-                    <div className="flex items-center gap-2">
-                      <GripVertical className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium capitalize">{section.type}</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground mr-6">
-                      {section.variant}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              <SortableSectionList
+                sections={sections}
+                selectedSectionId={selectedSectionId}
+                onSelect={setSelectedSectionId}
+                onReorder={handleDragEnd}
+              />
 
               <Button variant="outline" className="w-full mt-4 gap-2">
                 <Plus className="h-4 w-4" />
