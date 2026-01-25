@@ -38,24 +38,30 @@ const Footer = React.forwardRef<HTMLElement>((_, ref) => {
   ];
 
   return (
-    <footer ref={ref} className="bg-card border-t border-primary/10 py-12" dir="rtl">
-      <div className="container mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+    <footer 
+      ref={ref} 
+      className="bg-card border-t border-primary/10 py-8 sm:py-12" 
+      dir="rtl"
+      role="contentinfo"
+      aria-label="פוטר האתר"
+    >
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8">
           {/* Logo */}
           <motion.div 
-            className="text-2xl font-serif font-bold gold-text"
+            className="text-xl sm:text-2xl font-serif font-bold gold-text"
             whileHover={{ scale: 1.05 }}
           >
             AMDIR
           </motion.div>
 
           {/* Links */}
-          <nav className="flex gap-8">
+          <nav className="flex flex-wrap justify-center gap-4 sm:gap-8" aria-label="ניווט פוטר">
             {footerLinks.map((link, index) => (
               <motion.button
                 key={index}
                 onClick={link.action}
-                className="text-muted-foreground hover:text-primary transition-colors duration-300"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 min-h-[44px] flex items-center"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -73,8 +79,8 @@ const Footer = React.forwardRef<HTMLElement>((_, ref) => {
               variant="outline"
               size="icon"
               onClick={scrollToTop}
-              className="border-primary/30 hover:border-primary hover:bg-primary/10 rounded-full w-10 h-10 transition-all duration-300"
-              aria-label="חזרה למעלה"
+              className="border-primary/30 hover:border-primary hover:bg-primary/10 rounded-full w-10 h-10 min-w-[44px] min-h-[44px] transition-all duration-300"
+              aria-label="חזרה לראש העמוד"
             >
               <ArrowUp className="w-4 h-4 text-primary" />
             </Button>
