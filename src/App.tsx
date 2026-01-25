@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { TenantProvider } from "@/hooks/useTenant";
 import { AuthForm } from "@/components/auth/AuthForm";
+import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Sites from "./pages/Sites";
 import NewSite from "./pages/NewSite";
@@ -48,7 +49,7 @@ const App = () => (
             <Route path="/s/:slug/:pageSlug" element={<PublicSite />} />
             
             {/* Dashboard routes */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/dashboard/sites" element={<ProtectedRoute><Sites /></ProtectedRoute>} />
             <Route path="/dashboard/sites/new" element={<ProtectedRoute><NewSite /></ProtectedRoute>} />
