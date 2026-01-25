@@ -9,6 +9,7 @@ import { AuthForm } from "@/components/auth/AuthForm";
 import Dashboard from "./pages/Dashboard";
 import Sites from "./pages/Sites";
 import NewSite from "./pages/NewSite";
+import SiteEditor from "./pages/SiteEditor";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/dashboard/sites" element={<ProtectedRoute><Sites /></ProtectedRoute>} />
             <Route path="/dashboard/sites/new" element={<ProtectedRoute><NewSite /></ProtectedRoute>} />
+            <Route path="/dashboard/sites/:siteId" element={<ProtectedRoute><SiteEditor /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
