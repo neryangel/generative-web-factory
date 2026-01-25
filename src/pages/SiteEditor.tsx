@@ -10,6 +10,7 @@ import { AddSectionButton } from '@/components/editor/AddSectionButton';
 import { DeleteSectionDialog } from '@/components/editor/DeleteSectionDialog';
 import { SiteSettingsDialog } from '@/components/site/SiteSettingsDialog';
 import { ThemeCustomizer } from '@/components/editor/ThemeCustomizer';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -522,59 +523,61 @@ export default function SiteEditor() {
               maxWidth: '100%',
             }}
           >
-            {/* Preview Frame - only this scrolls */}
-            <div className="flex-1 overflow-y-auto">
-              {sections.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-96 text-muted-foreground">
-                  <Plus className="h-12 w-12 mb-4 opacity-30" />
-                  <p>אין סקשנים בעמוד זה</p>
-                  <p className="text-sm mb-4">הוסף סקשנים מהתפריט הימני</p>
-                  {currentPage && currentTenant && (
-                    <AddSectionButton
-                      pageId={currentPage.id}
-                      tenantId={currentTenant.id}
-                      currentSectionsCount={0}
-                      onSectionAdded={handleSectionAdded}
-                    />
-                  )}
-                </div>
-              ) : (
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragStart={handleDragStart}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext
-                    items={sections.map(s => s.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {sections.map((section) => (
-                      <SortablePreviewSection
-                        key={section.id}
-                        section={section}
-                        isSelected={selectedSectionId === section.id}
-                        isEditing={isEditing}
-                        onSelect={() => setSelectedSectionId(section.id)}
-                        onContentChange={(content) => handleContentChange(section.id, content)}
-                        onDeleteClick={() => setDeletingSectionId(section.id)}
+            {/* Preview Frame - only this scrolls, wrapped with ThemeProvider */}
+            <ThemeProvider settings={site?.settings as Record<string, unknown>}>
+              <div className="flex-1 overflow-y-auto">
+                {sections.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-96 text-muted-foreground">
+                    <Plus className="h-12 w-12 mb-4 opacity-30" />
+                    <p>אין סקשנים בעמוד זה</p>
+                    <p className="text-sm mb-4">הוסף סקשנים מהתפריט הימני</p>
+                    {currentPage && currentTenant && (
+                      <AddSectionButton
+                        pageId={currentPage.id}
+                        tenantId={currentTenant.id}
+                        currentSectionsCount={0}
+                        onSectionAdded={handleSectionAdded}
                       />
-                    ))}
-                  </SortableContext>
+                    )}
+                  </div>
+                ) : (
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={sections.map(s => s.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {sections.map((section) => (
+                        <SortablePreviewSection
+                          key={section.id}
+                          section={section}
+                          isSelected={selectedSectionId === section.id}
+                          isEditing={isEditing}
+                          onSelect={() => setSelectedSectionId(section.id)}
+                          onContentChange={(content) => handleContentChange(section.id, content)}
+                          onDeleteClick={() => setDeletingSectionId(section.id)}
+                        />
+                      ))}
+                    </SortableContext>
 
-                  <DragOverlay>
-                    {activeDragSection ? (
-                      <div className="bg-card/80 backdrop-blur-sm border-2 border-primary rounded-lg p-4 shadow-2xl">
-                        <span className="font-medium capitalize">{activeDragSection.type}</span>
-                        <span className="text-sm text-muted-foreground mr-2">
-                          ({activeDragSection.variant})
-                        </span>
-                      </div>
-                    ) : null}
-                  </DragOverlay>
-                </DndContext>
-              )}
-            </div>
+                    <DragOverlay>
+                      {activeDragSection ? (
+                        <div className="bg-card/80 backdrop-blur-sm border-2 border-primary rounded-lg p-4 shadow-2xl">
+                          <span className="font-medium capitalize">{activeDragSection.type}</span>
+                          <span className="text-sm text-muted-foreground mr-2">
+                            ({activeDragSection.variant})
+                          </span>
+                        </div>
+                      ) : null}
+                    </DragOverlay>
+                  </DndContext>
+                )}
+              </div>
+            </ThemeProvider>
           </div>
         </div>
 

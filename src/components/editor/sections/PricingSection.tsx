@@ -3,6 +3,7 @@ import { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { Button } from '@/components/ui/button';
 import { Check, Sparkles, Zap } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface PricingPlan {
   name: string;

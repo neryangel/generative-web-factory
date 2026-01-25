@@ -4,6 +4,7 @@ import { ImagePickerDialog } from '../ImagePickerDialog';
 import { Button } from '@/components/ui/button';
 import { Image as ImageIcon, Award, Users, TrendingUp, Target, CheckCircle2 } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface Stat {
   value?: string;
@@ -58,6 +59,7 @@ export function AboutSection({
   const aboutContent = content as AboutContent;
   const sectionRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const { colors, fonts, getButtonRadius, getCardRadius } = useTheme();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -128,13 +130,20 @@ export function AboutSection({
         isSelected ? 'ring-2 ring-primary ring-offset-2' : ''
       }`}
       onClick={onSelect}
+      style={{ fontFamily: fonts.body }}
     >
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-muted/30 via-background to-muted/30" />
       
       {/* Decorative shapes */}
-      <div className="absolute top-20 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+      <div 
+        className="absolute top-20 right-0 w-96 h-96 rounded-full blur-3xl"
+        style={{ backgroundColor: `${colors.primary}10` }}
+      />
+      <div 
+        className="absolute bottom-20 left-0 w-96 h-96 rounded-full blur-3xl"
+        style={{ backgroundColor: `${colors.accent}10` }}
+      />
 
       <div className="relative max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -143,10 +152,19 @@ export function AboutSection({
           <div className={`relative transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
             {/* Gradient border effect */}
             <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-r from-primary via-accent to-primary rounded-3xl blur-2xl opacity-20" />
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-primary rounded-2xl" />
+              <div 
+                className="absolute -inset-4 rounded-3xl blur-2xl opacity-20"
+                style={{ background: `linear-gradient(to right, ${colors.primary}, ${colors.accent}, ${colors.primary})` }}
+              />
+              <div 
+                className="absolute -inset-1 rounded-2xl"
+                style={{ background: `linear-gradient(to right, ${colors.primary}, ${colors.accent}, ${colors.primary})` }}
+              />
               
-              <div className="relative rounded-2xl overflow-hidden bg-muted aspect-[4/3]">
+              <div 
+                className="relative overflow-hidden bg-muted aspect-[4/3]"
+                style={{ borderRadius: getCardRadius() }}
+              >
                 {aboutContent.image ? (
                   <img 
                     src={aboutContent.image} 
@@ -154,7 +172,10 @@ export function AboutSection({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
+                  <div 
+                    className="w-full h-full flex items-center justify-center"
+                    style={{ background: `linear-gradient(to bottom right, ${colors.primary}15, ${colors.accent}15)` }}
+                  >
                     <ImageIcon className="w-20 h-20 text-muted-foreground/30" />
                   </div>
                 )}
@@ -162,9 +183,15 @@ export function AboutSection({
             </div>
 
             {/* Floating stats card */}
-            <div className="absolute -bottom-8 -left-8 glass-card p-6 shadow-2xl bg-card/90 backdrop-blur-xl border border-border/50">
+            <div 
+              className="absolute -bottom-8 -left-8 p-6 shadow-2xl bg-card/90 backdrop-blur-xl border border-border/50"
+              style={{ borderRadius: getCardRadius() }}
+            >
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+                <div 
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                  style={{ background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.accent})` }}
+                >
                   <Award className="w-7 h-7 text-white" />
                 </div>
                 <div>
@@ -180,7 +207,12 @@ export function AboutSection({
                   onSelect={(url) => updateContent('image', url)}
                   currentImage={aboutContent.image}
                 >
-                  <Button size="sm" variant="secondary" className="glass">
+                  <Button 
+                    size="sm" 
+                    variant="secondary" 
+                    className="glass"
+                    style={{ borderRadius: getButtonRadius() }}
+                  >
                     <ImageIcon className="h-4 w-4 ml-2" />
                     {aboutContent.image ? 'החלף תמונה' : 'הוסף תמונה'}
                   </Button>
@@ -192,7 +224,14 @@ export function AboutSection({
           {/* Content Side */}
           <div className={`space-y-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`} style={{ transitionDelay: '200ms' }}>
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
+            <div 
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium"
+              style={{ 
+                backgroundColor: `${colors.primary}15`,
+                color: colors.primary,
+                borderRadius: getButtonRadius(),
+              }}
+            >
               <Award className="w-4 h-4" />
               <span>אודות החברה</span>
             </div>
@@ -204,6 +243,7 @@ export function AboutSection({
               isEditing={isEditing}
               className="text-4xl md:text-5xl font-bold leading-tight"
               as="h2"
+              style={{ fontFamily: fonts.heading }}
             />
 
             {/* Description */}
@@ -223,8 +263,11 @@ export function AboutSection({
                   className={`flex items-center gap-3 transition-all duration-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}
                   style={{ transitionDelay: `${300 + index * 100}ms` }}
                 >
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                  <div 
+                    className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: `${colors.primary}15` }}
+                  >
+                    <CheckCircle2 className="w-4 h-4" style={{ color: colors.primary }} />
                   </div>
                   <span className="text-foreground">{feature}</span>
                 </div>
@@ -242,8 +285,11 @@ export function AboutSection({
                     style={{ transitionDelay: `${400 + index * 100}ms` }}
                   >
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                        <Icon className="w-5 h-5 text-primary" />
+                      <div 
+                        className="w-10 h-10 rounded-xl flex items-center justify-center"
+                        style={{ background: `linear-gradient(to bottom right, ${colors.primary}25, ${colors.accent}25)` }}
+                      >
+                        <Icon className="w-5 h-5" style={{ color: colors.primary }} />
                       </div>
                       <div className="text-3xl font-bold">
                         {animatedStats[index]}

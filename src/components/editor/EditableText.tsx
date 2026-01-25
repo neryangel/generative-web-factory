@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, CSSProperties } from 'react';
 import { cn } from '@/lib/utils';
 
 interface EditableTextProps {
@@ -8,6 +8,7 @@ interface EditableTextProps {
   className?: string;
   as?: 'h1' | 'h2' | 'h3' | 'p' | 'span';
   placeholder?: string;
+  style?: CSSProperties;
 }
 
 export function EditableText({
@@ -17,6 +18,7 @@ export function EditableText({
   className,
   as: Component = 'span',
   placeholder = 'לחץ לעריכה...',
+  style,
 }: EditableTextProps) {
   const [isActive, setIsActive] = useState(false);
   const [localValue, setLocalValue] = useState(value);
@@ -53,7 +55,7 @@ export function EditableText({
 
   if (!isEditing) {
     return (
-      <Component className={className}>
+      <Component className={className} style={style}>
         {value || placeholder}
       </Component>
     );
@@ -73,7 +75,7 @@ export function EditableText({
           'min-h-[1.5em]',
           className
         )}
-        style={{ height: 'auto' }}
+        style={{ height: 'auto', ...style }}
         rows={1}
       />
     );
@@ -86,6 +88,7 @@ export function EditableText({
         'cursor-text hover:bg-primary/10 rounded px-1 -mx-1 transition-colors',
         'border border-transparent hover:border-primary/30'
       )}
+      style={style}
       onClick={() => setIsActive(true)}
     >
       {value || <span className="text-muted-foreground italic">{placeholder}</span>}

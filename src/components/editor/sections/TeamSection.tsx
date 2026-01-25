@@ -3,6 +3,7 @@ import { EditableText } from '../EditableText';
 import { ImagePickerDialog } from '../ImagePickerDialog';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Linkedin, Twitter, Mail, Plus, Trash2 } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface TeamMember {
   name: string;

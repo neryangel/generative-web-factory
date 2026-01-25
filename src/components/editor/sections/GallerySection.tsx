@@ -4,6 +4,7 @@ import { ImagePickerDialog } from '../ImagePickerDialog';
 import { Image as ImageIcon, Plus, Trash2, ZoomIn, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRef, useState, useEffect } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface GalleryImage {
   src?: string;

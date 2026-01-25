@@ -3,6 +3,7 @@ import { EditableText } from '../EditableText';
 import { Building2, Facebook, Instagram, Twitter, Linkedin, Youtube, Mail, ArrowUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface SocialLink {
   platform?: string;
@@ -37,6 +38,7 @@ export function FooterSection({
   isSelected 
 }: SectionProps) {
   const footerContent = content as FooterContent;
+  const { colors, fonts, getButtonRadius, getCardRadius } = useTheme();
 
   const updateContent = (key: keyof FooterContent, value: unknown) => {
     onContentChange?.({ ...content, [key]: value });
@@ -48,14 +50,6 @@ export function FooterSection({
     twitter: Twitter,
     linkedin: Linkedin,
     youtube: Youtube,
-  };
-
-  const socialColors: Record<string, string> = {
-    facebook: 'hover:bg-blue-500',
-    instagram: 'hover:bg-gradient-to-br hover:from-purple-500 hover:via-pink-500 hover:to-orange-400',
-    twitter: 'hover:bg-sky-500',
-    linkedin: 'hover:bg-blue-600',
-    youtube: 'hover:bg-red-600',
   };
 
   const defaultSocial = [
@@ -77,6 +71,7 @@ export function FooterSection({
         isSelected ? 'ring-2 ring-primary ring-offset-2' : ''
       }`}
       onClick={onSelect}
+      style={{ fontFamily: fonts.body }}
     >
       {/* Dark gradient background */}
       <div className="absolute inset-0 bg-gradient-to-b from-sidebar via-sidebar to-black" />
@@ -85,8 +80,14 @@ export function FooterSection({
       <div className="absolute inset-0 grid-pattern opacity-5" />
       
       {/* Decorative gradient orbs */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+      <div 
+        className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl"
+        style={{ backgroundColor: `${colors.primary}15` }}
+      />
+      <div 
+        className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl"
+        style={{ backgroundColor: `${colors.accent}10` }}
+      />
 
       {/* Newsletter Section */}
       <div className="relative border-b border-sidebar-border">
@@ -99,6 +100,7 @@ export function FooterSection({
                 isEditing={isEditing}
                 className="text-2xl md:text-3xl font-bold text-white mb-2"
                 as="h3"
+                style={{ fontFamily: fonts.heading }}
               />
               <EditableText
                 value={footerContent.newsletter_description || 'הירשמו לניוזלטר שלנו וקבלו עדכונים ישירות למייל'}
@@ -113,10 +115,17 @@ export function FooterSection({
               <Input 
                 placeholder="הזינו את האימייל שלכם" 
                 className="h-12 bg-white/5 border-sidebar-border text-white placeholder:text-white/40 w-full md:w-72"
+                style={{ borderRadius: getButtonRadius() }}
                 onClick={(e) => e.stopPropagation()}
               />
-              <Button className="h-12 px-6 btn-premium">
-                <span className="relative z-10 flex items-center gap-2">
+              <Button 
+                className="h-12 px-6"
+                style={{ 
+                  background: `linear-gradient(to right, ${colors.primary}, ${colors.accent})`,
+                  borderRadius: getButtonRadius(),
+                }}
+              >
+                <span className="relative z-10 flex items-center gap-2 text-white">
                   <Mail className="w-4 h-4" />
                   הרשמה
                 </span>
@@ -132,11 +141,16 @@ export function FooterSection({
           {/* Logo & Tagline */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
-                   style={{ background: 'var(--gradient-primary)' }}>
+              <div 
+                className="w-12 h-12 flex items-center justify-center shadow-lg"
+                style={{ 
+                  background: `linear-gradient(to right, ${colors.primary}, ${colors.accent})`,
+                  borderRadius: getCardRadius(),
+                }}
+              >
                 <Building2 className="w-6 h-6 text-white" />
               </div>
-              <span className="font-bold text-2xl text-white">העסק שלי</span>
+              <span className="font-bold text-2xl text-white" style={{ fontFamily: fonts.heading }}>העסק שלי</span>
             </div>
             <EditableText
               value={footerContent.tagline || 'אנחנו מובילים את התעשייה עם פתרונות חדשניים ושירות מעולה. הצטרפו אלינו למסע להצלחה.'}
@@ -150,13 +164,19 @@ export function FooterSection({
             <div className="flex gap-3">
               {social.map((item, index) => {
                 const Icon = socialIcons[item.platform || 'facebook'] || Facebook;
-                const hoverColor = socialColors[item.platform || 'facebook'] || 'hover:bg-primary';
                 return (
                   <a 
                     key={index}
                     href={item.url || '#'}
-                    className={`group w-11 h-11 rounded-xl bg-sidebar-accent flex items-center justify-center transition-all duration-300 ${hoverColor} hover:scale-110 hover:shadow-lg`}
+                    className="group w-11 h-11 bg-sidebar-accent flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                    style={{ borderRadius: getCardRadius() }}
                     onClick={(e) => e.stopPropagation()}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLElement).style.backgroundColor = colors.primary;
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.backgroundColor = '';
+                    }}
                   >
                     <Icon className="w-5 h-5 text-sidebar-foreground/70 group-hover:text-white transition-colors" />
                   </a>
@@ -167,7 +187,7 @@ export function FooterSection({
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold text-white mb-6 text-lg">קישורים מהירים</h4>
+            <h4 className="font-semibold text-white mb-6 text-lg" style={{ fontFamily: fonts.heading }}>קישורים מהירים</h4>
             <ul className="space-y-4">
               {['דף הבית', 'אודות', 'שירותים', 'בלוג', 'צור קשר'].map((link, i) => (
                 <li key={i}>
@@ -176,7 +196,10 @@ export function FooterSection({
                     className="text-sidebar-foreground/60 hover:text-white transition-colors inline-flex items-center gap-2 group"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <span className="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span 
+                      className="w-1 h-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ backgroundColor: colors.primary }}
+                    />
                     {link}
                   </a>
                 </li>
@@ -186,7 +209,7 @@ export function FooterSection({
 
           {/* Services */}
           <div>
-            <h4 className="font-semibold text-white mb-6 text-lg">שירותים</h4>
+            <h4 className="font-semibold text-white mb-6 text-lg" style={{ fontFamily: fonts.heading }}>שירותים</h4>
             <ul className="space-y-4">
               {['עיצוב אתרים', 'פיתוח אפליקציות', 'שיווק דיגיטלי', 'קידום אורגני', 'ניהול רשתות'].map((link, i) => (
                 <li key={i}>
@@ -195,7 +218,10 @@ export function FooterSection({
                     className="text-sidebar-foreground/60 hover:text-white transition-colors inline-flex items-center gap-2 group"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <span className="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span 
+                      className="w-1 h-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ backgroundColor: colors.primary }}
+                    />
                     {link}
                   </a>
                 </li>
@@ -205,14 +231,14 @@ export function FooterSection({
 
           {/* Contact Info */}
           <div>
-            <h4 className="font-semibold text-white mb-6 text-lg">יצירת קשר</h4>
+            <h4 className="font-semibold text-white mb-6 text-lg" style={{ fontFamily: fonts.heading }}>יצירת קשר</h4>
             <ul className="space-y-4 text-sidebar-foreground/60">
               <li className="flex items-start gap-3">
-                <Mail className="w-5 h-5 mt-0.5 text-primary" />
+                <Mail className="w-5 h-5 mt-0.5" style={{ color: colors.primary }} />
                 <span>hello@example.com</span>
               </li>
               <li className="flex items-start gap-3">
-                <Building2 className="w-5 h-5 mt-0.5 text-primary" />
+                <Building2 className="w-5 h-5 mt-0.5" style={{ color: colors.primary }} />
                 <span>תל אביב, ישראל</span>
               </li>
             </ul>
@@ -237,6 +263,7 @@ export function FooterSection({
             size="sm"
             onClick={(e) => { e.stopPropagation(); scrollToTop(); }}
             className="group flex items-center gap-2 text-sidebar-foreground/40 hover:text-white hover:bg-white/10"
+            style={{ borderRadius: getButtonRadius() }}
           >
             <span>חזרה למעלה</span>
             <ArrowUp className="w-4 h-4 transition-transform group-hover:-translate-y-1" />

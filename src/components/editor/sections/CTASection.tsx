@@ -3,6 +3,7 @@ import { EditableText } from '../EditableText';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Sparkles, Zap, Star } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface CTAContent {
   headline?: string;
@@ -23,6 +24,7 @@ export function CTASection({
   const ctaContent = content as CTAContent;
   const sectionRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const { colors, fonts, getButtonRadius } = useTheme();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -53,9 +55,16 @@ export function CTASection({
         isSelected ? 'ring-2 ring-primary ring-offset-2' : ''
       }`}
       onClick={onSelect}
+      style={{ fontFamily: fonts.body }}
     >
-      {/* Animated Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-[length:200%_100%] animate-gradient" />
+      {/* Animated Gradient Background using theme colors */}
+      <div 
+        className="absolute inset-0 bg-[length:200%_100%] animate-gradient"
+        style={{ 
+          background: `linear-gradient(to right, ${colors.primary}, ${colors.accent}, ${colors.primary})`,
+          backgroundSize: '200% 100%',
+        }}
+      />
       
       {/* Mesh overlay */}
       <div className="absolute inset-0 opacity-50" style={{ background: 'var(--gradient-mesh)' }} />
@@ -90,8 +99,11 @@ export function CTASection({
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto text-center">
         {/* Badge */}
-        <div className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
-          <Sparkles className="w-4 h-4 text-yellow-300" />
+        <div 
+          className={`inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 mb-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
+          style={{ borderRadius: getButtonRadius() }}
+        >
+          <Sparkles className="w-4 h-4" style={{ color: colors.accent }} />
           <span className="text-white/90 text-sm font-medium">הצטרפו עכשיו וקבלו 30% הנחה</span>
         </div>
 
@@ -103,6 +115,7 @@ export function CTASection({
             isEditing={isEditing}
             className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight"
             as="h2"
+            style={{ fontFamily: fonts.heading }}
           />
         </div>
 
@@ -121,7 +134,11 @@ export function CTASection({
         <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '300ms' }}>
           <Button 
             size="lg"
-            className="group relative overflow-hidden bg-white text-purple-600 hover:bg-white/95 text-lg px-12 py-8 rounded-full font-bold shadow-2xl shadow-black/30 transition-all duration-300 hover:scale-105"
+            className="group relative overflow-hidden bg-white text-lg px-12 py-8 font-bold shadow-2xl shadow-black/30 transition-all duration-300 hover:scale-105"
+            style={{ 
+              borderRadius: getButtonRadius(),
+              color: colors.primary,
+            }}
           >
             <span className="relative z-10 flex items-center gap-3">
               <EditableText
@@ -134,10 +151,16 @@ export function CTASection({
             </span>
             
             {/* Animated shine effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-200/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            <div 
+              className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
+              style={{ background: `linear-gradient(to right, transparent, ${colors.primary}30, transparent)` }}
+            />
             
             {/* Pulse ring */}
-            <div className="absolute inset-0 rounded-full animate-ping opacity-20 bg-white" style={{ animationDuration: '2s' }} />
+            <div 
+              className="absolute inset-0 animate-ping opacity-20 bg-white" 
+              style={{ animationDuration: '2s', borderRadius: getButtonRadius() }} 
+            />
           </Button>
 
           {/* Secondary text */}
@@ -157,8 +180,12 @@ export function CTASection({
               {[1, 2, 3].map((i) => (
                 <div 
                   key={i}
-                  className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-purple-400 border-2 border-purple-600 flex items-center justify-center text-xs font-bold text-white"
-                  style={{ zIndex: 3 - i }}
+                  className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold text-white"
+                  style={{ 
+                    zIndex: 3 - i,
+                    background: `linear-gradient(to bottom right, ${colors.accent}, ${colors.primary})`,
+                    borderColor: colors.primary,
+                  }}
                 >
                   {String.fromCharCode(64 + i)}
                 </div>
@@ -169,7 +196,7 @@ export function CTASection({
           
           <div className="flex items-center gap-1 text-white/60">
             {[1, 2, 3, 4, 5].map((i) => (
-              <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              <Star key={i} className="w-4 h-4" style={{ fill: colors.accent, color: colors.accent }} />
             ))}
             <span className="text-sm mr-2">4.9/5</span>
           </div>
