@@ -1,6 +1,8 @@
 import { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { Button } from '@/components/ui/button';
+import { ImagePickerDialog } from '../ImagePickerDialog';
+import { ImageIcon } from 'lucide-react';
 
 interface HeroContent {
   headline?: string;
@@ -33,7 +35,7 @@ export function HeroSection({
       style={{
         backgroundImage: heroContent.background_image 
           ? `url(${heroContent.background_image})` 
-          : 'var(--gradient-primary)',
+          : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -43,6 +45,26 @@ export function HeroSection({
         className="absolute inset-0 bg-foreground/60"
         style={{ opacity: heroContent.overlay_opacity ?? 0.5 }}
       />
+
+      {/* Background Image Picker (Edit Mode Only) */}
+      {isEditing && (
+        <div className="absolute top-4 left-4 z-20">
+          <ImagePickerDialog
+            onSelect={(url) => updateContent('background_image', url)}
+            currentImage={heroContent.background_image}
+          >
+            <Button 
+              size="sm" 
+              variant="secondary" 
+              className="gap-2 shadow-lg"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ImageIcon className="h-4 w-4" />
+              {heroContent.background_image ? 'החלף רקע' : 'הוסף רקע'}
+            </Button>
+          </ImagePickerDialog>
+        </div>
+      )}
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
