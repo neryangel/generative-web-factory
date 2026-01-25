@@ -12,7 +12,6 @@ interface Feature {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
-  gradient: string;
 }
 
 const FeaturesSection = () => {
@@ -39,39 +38,33 @@ const FeaturesSection = () => {
   const features: Feature[] = [
     {
       icon: MousePointer2,
-      title: 'בנייה ויזואלית',
-      description: 'גררו ושחררו אלמנטים בקלות. ללא קוד, ללא מאמץ.',
-      gradient: 'from-blue-500 to-cyan-500',
+      title: 'Visual Builder',
+      description: 'Drag and drop elements with ease. No code required.',
     },
     {
       icon: LayoutTemplate,
-      title: 'תבניות מקצועיות',
-      description: 'עשרות תבניות מעוצבות מוכנות לשימוש מיידי.',
-      gradient: 'from-purple-500 to-pink-500',
+      title: 'Premium Templates',
+      description: 'Dozens of professionally designed templates ready to use.',
     },
     {
       icon: Smartphone,
-      title: 'רספונסיביות מלאה',
-      description: 'האתר שלכם נראה מושלם בכל מכשיר ובכל גודל מסך.',
-      gradient: 'from-orange-500 to-red-500',
+      title: 'Fully Responsive',
+      description: 'Your site looks perfect on every device and screen size.',
     },
     {
       icon: Zap,
-      title: 'מהירות בזק',
-      description: 'ביצועים אופטימליים וטעינה מהירה לחוויה מעולה.',
-      gradient: 'from-yellow-500 to-orange-500',
+      title: 'Lightning Fast',
+      description: 'Optimized performance and fast loading for great UX.',
     },
     {
       icon: Users,
-      title: 'ניהול צוותים',
-      description: 'נהלו מספר משתמשים וארגונים במקום אחד.',
-      gradient: 'from-green-500 to-emerald-500',
+      title: 'Team Management',
+      description: 'Manage multiple users and organizations in one place.',
     },
     {
       icon: Languages,
-      title: 'תמיכה בעברית',
-      description: 'RTL מלא, ממשק בעברית ותמיכה מקומית 24/7.',
-      gradient: 'from-primary to-accent',
+      title: 'Multi-Language',
+      description: 'Full RTL support, Hebrew interface and 24/7 local support.',
     },
   ];
 
@@ -79,62 +72,54 @@ const FeaturesSection = () => {
     <section
       id="features"
       ref={sectionRef}
-      className="relative py-24 overflow-hidden"
+      className="relative py-24 bg-card/30"
     >
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background" />
-      <div className="floating-orb w-72 h-72 top-20 -right-36 from-primary/20 to-accent/20" />
-      <div className="floating-orb w-64 h-64 bottom-20 -left-32 from-accent/15 to-primary/15" style={{ animationDelay: '3s' }} />
-
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-6 relative z-10">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2
-            className={`text-3xl md:text-5xl font-bold mb-4 transition-all duration-700 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
-          >
-            <span className="gradient-text">כל מה שצריך</span> לאתר מושלם
-          </h2>
           <p
-            className={`text-lg text-muted-foreground max-w-2xl mx-auto transition-all duration-700 delay-100 ${
+            className={`text-xs uppercase tracking-[0.3em] text-primary mb-4 transition-all duration-700 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
           >
-            כלים מתקדמים שהופכים את בניית האתר לפשוטה ומהנה
+            Our Services
           </p>
+          <h2
+            className={`font-serif text-3xl md:text-4xl lg:text-5xl text-foreground transition-all duration-700 delay-100 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
+            What We Offer
+          </h2>
         </div>
 
-        {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
               <div
                 key={index}
-                className={`group relative p-8 rounded-3xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 ${
+                className={`group relative p-8 rounded-lg bg-background border border-primary/10 hover:border-primary/30 transition-all duration-500 ${
                   isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
-                {/* Gradient Top Line on Hover */}
-                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-t-3xl" />
-
                 {/* Icon */}
-                <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${feature.gradient} mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
-                  <Icon className="w-6 h-6 text-white" />
+                <div className="w-14 h-14 rounded-full border border-primary/30 flex items-center justify-center mb-6 group-hover:border-primary group-hover:bg-primary/10 transition-all duration-300">
+                  <Icon className="w-6 h-6 text-primary" />
                 </div>
 
                 {/* Content */}
-                <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">
+                <h3 className="font-serif text-xl text-foreground mb-3 group-hover:text-primary transition-colors">
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed text-sm">
                   {feature.description}
                 </p>
 
-                {/* Glow Effect */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity -z-10 blur-xl" />
+                {/* Hover Line */}
+                <div className="absolute bottom-0 left-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-500" />
               </div>
             );
           })}

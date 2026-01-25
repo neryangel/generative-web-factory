@@ -1,10 +1,9 @@
 import Navbar from '@/components/landing/Navbar';
 import HeroSection from '@/components/landing/HeroSection';
-import LogosSection from '@/components/landing/LogosSection';
+import PortfolioSection from '@/components/landing/PortfolioSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
-import HowItWorksSection from '@/components/landing/HowItWorksSection';
-import StatsSection from '@/components/landing/StatsSection';
-import CTASection from '@/components/landing/CTASection';
+import FAQSection from '@/components/landing/FAQSection';
+import ContactSection from '@/components/landing/ContactSection';
 import Footer from '@/components/landing/Footer';
 
 const Index = () => {
@@ -13,11 +12,10 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
-        <LogosSection />
+        <PortfolioSection />
         <FeaturesSection />
-        <HowItWorksSection />
-        <StatsSection />
-        <CTASection />
+        <FAQSection />
+        <ContactSection />
       </main>
       <Footer />
     </div>
