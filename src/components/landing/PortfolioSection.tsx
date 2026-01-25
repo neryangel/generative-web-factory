@@ -42,10 +42,15 @@ const PortfolioSection = () => {
   };
 
   return (
-    <section ref={sectionRef} id="portfolio" dir="rtl" className="py-16 md:py-24 bg-background relative overflow-hidden">
+    <section 
+      ref={sectionRef} 
+      id="portfolio" 
+      dir="rtl" 
+      className="py-16 md:py-24 bg-background relative overflow-hidden"
+      aria-labelledby="portfolio-heading"
+    >
       {/* Background Decoration */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-      
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" aria-hidden="true" />
       {/* Section Header */}
       <div className="container mx-auto px-4 sm:px-6 mb-10 md:mb-16">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6">
@@ -59,6 +64,7 @@ const PortfolioSection = () => {
               העבודות שלנו
             </motion.p>
             <motion.h2 
+              id="portfolio-heading"
               className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-foreground"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -74,12 +80,15 @@ const PortfolioSection = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
+            role="group"
+            aria-label="ניווט בתיק עבודות"
           >
             <Button
               variant="outline"
               size="icon"
               onClick={() => scroll('right')}
-              className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-full w-10 h-10 md:w-12 md:h-12 transition-all duration-300 hover:scale-110"
+              className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-full w-10 h-10 md:w-12 md:h-12 transition-all duration-300 hover:scale-110 min-w-[44px] min-h-[44px]"
+              aria-label="הפרויקט הקודם"
             >
               <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
             </Button>
@@ -87,7 +96,8 @@ const PortfolioSection = () => {
               variant="outline"
               size="icon"
               onClick={() => scroll('left')}
-              className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-full w-10 h-10 md:w-12 md:h-12 transition-all duration-300 hover:scale-110"
+              className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-full w-10 h-10 md:w-12 md:h-12 transition-all duration-300 hover:scale-110 min-w-[44px] min-h-[44px]"
+              aria-label="הפרויקט הבא"
             >
               <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />
             </Button>
