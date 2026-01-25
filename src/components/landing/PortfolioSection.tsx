@@ -1,6 +1,13 @@
 import { useState, useRef } from 'react';
 import { ArrowRight, ArrowLeft, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { motion, useInView } from 'framer-motion';
+
+import portfolioHotel from '@/assets/portfolio-hotel.jpg';
+import portfolioFashion from '@/assets/portfolio-fashion.jpg';
+import portfolioTech from '@/assets/portfolio-tech.jpg';
+import portfolioRestaurant from '@/assets/portfolio-restaurant.jpg';
+import portfolioRealestate from '@/assets/portfolio-realestate.jpg';
 
 interface Project {
   id: number;
@@ -12,13 +19,15 @@ interface Project {
 const PortfolioSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
   const projects: Project[] = [
-    { id: 1, title: 'מלון יוקרה', category: 'אירוח', image: '/placeholder.svg' },
-    { id: 2, title: 'מותג אופנה', category: 'מסחר אלקטרוני', image: '/placeholder.svg' },
-    { id: 3, title: 'סטארטאפ טכנולוגי', category: 'SaaS', image: '/placeholder.svg' },
-    { id: 4, title: 'רשת מסעדות', category: 'מזון ומשקאות', image: '/placeholder.svg' },
-    { id: 5, title: 'נדל"ן', category: 'נכסים', image: '/placeholder.svg' },
+    { id: 1, title: 'מלון יוקרה', category: 'אירוח', image: portfolioHotel },
+    { id: 2, title: 'מותג אופנה', category: 'מסחר אלקטרוני', image: portfolioFashion },
+    { id: 3, title: 'סטארטאפ טכנולוגי', category: 'SaaS', image: portfolioTech },
+    { id: 4, title: 'רשת מסעדות', category: 'מזון ומשקאות', image: portfolioRestaurant },
+    { id: 5, title: 'נדל"ן', category: 'נכסים', image: portfolioRealestate },
   ];
 
   const scroll = (direction: 'left' | 'right') => {
@@ -33,24 +42,44 @@ const PortfolioSection = () => {
   };
 
   return (
-    <section id="portfolio" dir="rtl" className="py-24 bg-background relative overflow-hidden">
+    <section ref={sectionRef} id="portfolio" dir="rtl" className="py-24 bg-background relative overflow-hidden">
+      {/* Background Decoration */}
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+      
       {/* Section Header */}
       <div className="container mx-auto px-6 mb-16">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
-            <p className="text-xs tracking-wider text-primary mb-4">העבודות שלנו</p>
-            <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground">
+            <motion.p 
+              className="text-xs tracking-wider text-primary mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6 }}
+            >
+              העבודות שלנו
+            </motion.p>
+            <motion.h2 
+              className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
               תיק עבודות נבחר
-            </h2>
+            </motion.h2>
           </div>
           
           {/* Navigation Arrows */}
-          <div className="flex items-center gap-3">
+          <motion.div 
+            className="flex items-center gap-3"
+            initial={{ opacity: 0, x: -20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             <Button
               variant="outline"
               size="icon"
               onClick={() => scroll('right')}
-              className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-full w-12 h-12"
+              className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-full w-12 h-12 transition-all duration-300 hover:scale-110"
             >
               <ArrowRight className="w-5 h-5" />
             </Button>
@@ -58,12 +87,21 @@ const PortfolioSection = () => {
               variant="outline"
               size="icon"
               onClick={() => scroll('left')}
-              className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-full w-12 h-12"
+              className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-full w-12 h-12 transition-all duration-300 hover:scale-110"
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-          </div>
+          </motion.div>
         </div>
+
+        <motion.p 
+          className="text-muted-foreground mt-4 max-w-xl"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          אנחנו מתמחים ביצירת חוויות דיגיטליות יוקרתיות. הנה כמה מהפרויקטים שלנו.
+        </motion.p>
       </div>
 
       {/* Portfolio Carousel */}
@@ -77,43 +115,68 @@ const PortfolioSection = () => {
         <div className="flex-shrink-0 w-[calc((100vw-1280px)/2)]" />
         
         {projects.map((project, index) => (
-          <div
+          <motion.div
             key={project.id}
             className="flex-shrink-0 w-80 md:w-96 group"
             style={{ scrollSnapAlign: 'start' }}
+            initial={{ opacity: 0, y: 50 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.1 * index }}
+            whileHover={{ y: -10 }}
           >
-            <div className="relative bg-card border border-primary/10 rounded-lg overflow-hidden transition-all duration-500 hover:border-primary/40">
+            <div className="relative bg-card border border-primary/10 rounded-lg overflow-hidden transition-all duration-500 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/10">
               {/* Image */}
               <div className="aspect-[4/3] bg-gradient-to-br from-muted to-background relative overflow-hidden">
-                <img 
+                <motion.img 
                   src={project.image} 
                   alt={project.title}
-                  className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                  className="w-full h-full object-cover"
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.6 }}
                 />
                 
                 {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500" />
                 
                 {/* Project Number */}
-                <span className="absolute top-4 right-4 text-xs text-muted-foreground">
+                <motion.span 
+                  className="absolute top-4 right-4 text-xs text-muted-foreground font-mono"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 + index * 0.1 }}
+                >
                   0{index + 1}
-                </span>
+                </motion.span>
                 
                 {/* Link Icon */}
-                <div className="absolute top-4 left-4 w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-background/80 backdrop-blur-sm">
+                <motion.div 
+                  className="absolute top-4 left-4 w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center bg-background/80 backdrop-blur-sm cursor-pointer"
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileHover={{ scale: 1.2, rotate: 45 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.6 + index * 0.1 }}
+                >
                   <ExternalLink className="w-4 h-4 text-primary" />
-                </div>
+                </motion.div>
               </div>
               
               {/* Info */}
               <div className="p-6" dir="rtl">
-                <p className="text-xs text-primary mb-2">{project.category}</p>
-                <h3 className="font-serif text-xl text-foreground group-hover:text-primary transition-colors">
+                <p className="text-xs text-primary mb-2 uppercase tracking-wider">{project.category}</p>
+                <h3 className="font-serif text-xl text-foreground group-hover:text-primary transition-colors duration-300">
                   {project.title}
                 </h3>
               </div>
+
+              {/* Bottom Line Animation */}
+              <motion.div 
+                className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-primary to-primary/50"
+                initial={{ width: 0 }}
+                whileHover={{ width: "100%" }}
+                transition={{ duration: 0.3 }}
+              />
             </div>
-          </div>
+          </motion.div>
         ))}
         
         {/* Spacer for last item */}
@@ -123,7 +186,7 @@ const PortfolioSection = () => {
       {/* Dots Navigation */}
       <div className="flex justify-center gap-2 mt-8">
         {projects.map((_, index) => (
-          <button
+          <motion.button
             key={index}
             onClick={() => {
               if (scrollRef.current) {
@@ -131,9 +194,11 @@ const PortfolioSection = () => {
                 setCurrentIndex(index);
               }
             }}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === currentIndex ? 'bg-primary w-8' : 'bg-primary/30'
+            className={`h-2 rounded-full transition-all duration-300 ${
+              index === currentIndex ? 'bg-primary w-8' : 'bg-primary/30 w-2'
             }`}
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
           />
         ))}
       </div>
