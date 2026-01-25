@@ -7,6 +7,7 @@ import { SectionContent } from '@/components/editor/SectionRenderer';
 import { SortableSectionList } from '@/components/editor/SortableSectionList';
 import { SortablePreviewSection } from '@/components/editor/SortablePreviewSection';
 import { AddSectionButton } from '@/components/editor/AddSectionButton';
+import { DeleteSectionDialog } from '@/components/editor/DeleteSectionDialog';
 import { SiteSettingsDialog } from '@/components/site/SiteSettingsDialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -72,6 +73,7 @@ export default function SiteEditor() {
   const [sections, setSections] = useState<Section[]>([]);
   const [currentPage, setCurrentPage] = useState<Page | null>(null);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const [deletingSectionId, setDeletingSectionId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('desktop');
   const [loading, setLoading] = useState(true);
@@ -180,6 +182,19 @@ export default function SiteEditor() {
   const handleSectionAdded = useCallback((section: Section) => {
     setSections(prev => [...prev, section]);
   }, []);
+
+  // Handle section deleted
+  const handleSectionDeleted = useCallback((sectionId: string) => {
+    setSections(prev => prev.filter(s => s.id !== sectionId));
+    if (selectedSectionId === sectionId) {
+      setSelectedSectionId(null);
+    }
+  }, [selectedSectionId]);
+
+  // Get section to delete for dialog
+  const sectionToDelete = deletingSectionId 
+    ? sections.find(s => s.id === deletingSectionId) 
+    : null;
 
   // Handle drag start for preview
   const handleDragStart = (event: DragStartEvent) => {
@@ -539,6 +554,7 @@ export default function SiteEditor() {
                         isEditing={isEditing}
                         onSelect={() => setSelectedSectionId(section.id)}
                         onContentChange={(content) => handleContentChange(section.id, content)}
+                        onDeleteClick={() => setDeletingSectionId(section.id)}
                       />
                     ))}
                   </SortableContext>
@@ -584,6 +600,15 @@ export default function SiteEditor() {
           </aside>
         )}
       </div>
+
+      {/* Delete Section Dialog */}
+      <DeleteSectionDialog
+        open={!!deletingSectionId}
+        onOpenChange={(open) => !open && setDeletingSectionId(null)}
+        sectionId={deletingSectionId || ''}
+        sectionType={sectionToDelete?.type || ''}
+        onDeleted={handleSectionDeleted}
+      />
     </div>
   );
 }
