@@ -46,7 +46,7 @@ interface AIBlueprint {
 
 export default function NewSite() {
   const navigate = useNavigate();
-  const { currentTenant } = useTenant();
+  const { currentTenant, loading: tenantLoading } = useTenant();
   const [mode, setMode] = useState<CreateMode | null>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
@@ -60,6 +60,35 @@ export default function NewSite() {
   const [siteName, setSiteName] = useState('');
   const [siteSlug, setSiteSlug] = useState('');
   const [brief, setBrief] = useState('');
+
+  // Show loading while tenant is being fetched
+  if (tenantLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Show error if no tenant exists
+  if (!currentTenant) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+          <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+          <h2 className="text-2xl font-bold mb-2">לא נמצא ארגון</h2>
+          <p className="text-muted-foreground mb-6 max-w-md">
+            כדי ליצור אתר, יש צורך בארגון פעיל. נסה לרענן את הדף או צור קשר עם התמיכה.
+          </p>
+          <Button onClick={() => window.location.reload()}>
+            רענן את הדף
+          </Button>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   useEffect(() => {
     async function fetchTemplates() {
