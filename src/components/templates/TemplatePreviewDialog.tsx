@@ -29,6 +29,15 @@ const sectionTypeLabels: Record<string, string> = {
   contact: 'צור קשר',
   cta: 'קריאה לפעולה',
   footer: 'פוטר',
+  stats: 'סטטיסטיקות',
+  team: 'צוות',
+  pricing: 'מחירים',
+  faq: 'שאלות נפוצות',
+};
+
+// Helper to extract section type from both old (string) and new (object) formats
+const getSectionType = (section: string | { type: string }): string => {
+  return typeof section === 'object' && section.type ? section.type : String(section);
 };
 
 export function TemplatePreviewDialog({ 
@@ -58,6 +67,17 @@ export function TemplatePreviewDialog({
 
         <ScrollArea className="max-h-[50vh] pr-4">
           <div className="space-y-6">
+            {/* Thumbnail Preview */}
+            {template.thumbnail_url && (
+              <div className="relative aspect-video rounded-lg overflow-hidden border bg-muted">
+                <img 
+                  src={template.thumbnail_url} 
+                  alt={template.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
             {/* Description */}
             <p className="text-muted-foreground">{template.description}</p>
 
@@ -121,16 +141,19 @@ export function TemplatePreviewDialog({
                     </div>
                     
                     <div className="flex flex-wrap gap-2">
-                      {page.sections?.map((section: string, sIdx: number) => (
-                        <Badge 
-                          key={sIdx} 
-                          variant="outline" 
-                          className="text-xs gap-1"
-                        >
-                          <Layers className="h-3 w-3" />
-                          {sectionTypeLabels[section] || section}
-                        </Badge>
-                      ))}
+                      {page.sections?.map((section: string | { type: string }, sIdx: number) => {
+                        const sectionType = getSectionType(section);
+                        return (
+                          <Badge 
+                            key={sIdx} 
+                            variant="outline" 
+                            className="text-xs gap-1"
+                          >
+                            <Layers className="h-3 w-3" />
+                            {sectionTypeLabels[sectionType] || sectionType}
+                          </Badge>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
