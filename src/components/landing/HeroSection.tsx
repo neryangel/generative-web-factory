@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Play, Sparkles, CheckCircle2, ChevronDown } from 'lucide-react';
+import { ArrowRight, Users, Briefcase } from 'lucide-react';
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -12,132 +11,128 @@ const HeroSection = () => {
     setIsVisible(true);
   }, []);
 
-  const trustIndicators = [
-    'ללא כרטיס אשראי',
-    'התחילו תוך 30 שניות',
-    'תמיכה בעברית מלאה',
-  ];
-
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16"
+      className="relative min-h-screen flex items-center overflow-hidden pt-20"
     >
-      {/* Animated Background */}
-      <div className="absolute inset-0 animated-gradient-bg opacity-50" />
+      {/* Background */}
+      <div className="absolute inset-0 bg-background" />
       
-      {/* Mesh Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
-      
-      {/* Grid Pattern */}
-      <div className="absolute inset-0 grid-pattern opacity-30" />
-      
-      {/* Noise Texture */}
-      <div className="absolute inset-0 noise-texture" />
-
-      {/* Floating Orbs */}
-      <div className="floating-orb w-96 h-96 -top-48 -right-48 from-primary/30 to-accent/30" />
-      <div className="floating-orb w-80 h-80 top-1/3 -left-40 from-accent/20 to-primary/20" style={{ animationDelay: '2s' }} />
-      <div className="floating-orb w-64 h-64 bottom-20 right-1/4 from-primary/25 to-accent/25" style={{ animationDelay: '4s' }} />
+      {/* Decorative Gold Line */}
+      <svg 
+        className="absolute top-1/2 left-0 w-full h-auto opacity-10 pointer-events-none" 
+        viewBox="0 0 1200 200" 
+        fill="none"
+      >
+        <path 
+          d="M0 100 Q 300 20, 600 100 T 1200 100" 
+          stroke="hsl(40 55% 50%)" 
+          strokeWidth="1" 
+          fill="none"
+        />
+        <path 
+          d="M0 120 Q 300 40, 600 120 T 1200 120" 
+          stroke="hsl(40 55% 50%)" 
+          strokeWidth="0.5" 
+          fill="none"
+        />
+      </svg>
 
       {/* Content */}
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          
+          {/* Left - Portfolio Card */}
           <div
-            className={`mb-6 transition-all duration-700 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            className={`order-2 lg:order-1 transition-all duration-1000 ${
+              isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'
             }`}
           >
-            <Badge
-              variant="outline"
-              className="px-4 py-2 text-sm border-primary/50 bg-primary/10 backdrop-blur-sm"
-            >
-              <Sparkles className="w-4 h-4 ml-2 text-primary" />
-              הפלטפורמה המובילה לבניית אתרים בישראל
-            </Badge>
+            <div className="relative group">
+              {/* Card Glow */}
+              <div className="absolute -inset-4 bg-primary/10 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              {/* Card */}
+              <div className="relative bg-card border border-primary/20 rounded-lg overflow-hidden">
+                {/* Image Placeholder */}
+                <div className="aspect-[4/3] bg-gradient-to-br from-muted to-background flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Briefcase className="w-10 h-10 text-primary" />
+                    </div>
+                    <p className="text-muted-foreground text-sm">Featured Project</p>
+                  </div>
+                </div>
+                
+                {/* Card Info */}
+                <div className="p-6 border-t border-primary/10">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-serif text-lg text-foreground">Premium Website</h3>
+                      <p className="text-xs uppercase tracking-wider text-muted-foreground mt-1">Web Design</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all duration-300">
+                      <ArrowRight className="w-4 h-4 text-primary group-hover:text-primary-foreground transition-colors" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Main Headline */}
-          <h1
-            className={`text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight transition-all duration-700 delay-100 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
-          >
-            <span className="block">בנו אתרים</span>
-            <span className="gradient-text">מדהימים בלחיצת כפתור</span>
-          </h1>
-
-          {/* Sub-headline */}
-          <p
-            className={`text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 transition-all duration-700 delay-200 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
-          >
-            AMDIR מאפשר לכם ליצור אתרים מקצועיים ויפהפיים בדקות ספורות,
-            ללא צורך בקוד או ידע טכני. פשוט, מהיר, מרשים.
-          </p>
-
-          {/* CTA Buttons */}
+          {/* Right - Content */}
           <div
-            className={`flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 transition-all duration-700 delay-300 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            className={`order-1 lg:order-2 text-center lg:text-left transition-all duration-1000 delay-200 ${
+              isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
             }`}
           >
+            {/* Main Headline */}
+            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium leading-[1.1] mb-6">
+              <span className="block text-foreground">Elevate Your</span>
+              <span className="gold-text">Brand Online.</span>
+            </h1>
+
+            {/* Description */}
+            <p className="text-muted-foreground text-lg max-w-md mx-auto lg:mx-0 mb-10">
+              We craft stunning digital experiences that captivate audiences and drive results.
+            </p>
+
+            {/* Stats */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-8 mb-10">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full border border-primary/30 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <p className="text-2xl font-serif gold-text">500+</p>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground">Satisfied Clients</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full border border-primary/30 flex items-center justify-center">
+                  <Briefcase className="w-5 h-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <p className="text-2xl font-serif gold-text">100+</p>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground">Projects/Month</p>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA */}
             <Button
               size="lg"
               onClick={() => navigate('/dashboard')}
-              className="group relative px-8 py-6 text-lg bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all shadow-2xl shadow-primary/30 hover:shadow-primary/40 hover:scale-105"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 uppercase tracking-wider text-sm px-10 py-6 shadow-lg shadow-primary/20"
             >
-              <span className="relative z-10 flex items-center gap-2">
-                התחילו בחינם
-                <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-              </span>
-              {/* Shimmer effect */}
-              <div className="absolute inset-0 rounded-md overflow-hidden">
-                <div className="shimmer" />
-              </div>
+              Start Your Project
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            
-            <Button
-              size="lg"
-              variant="outline"
-              className="px-8 py-6 text-lg border-border/50 hover:bg-muted/50 backdrop-blur-sm group"
-            >
-              <Play className="w-5 h-5 ml-2 transition-transform group-hover:scale-110" />
-              צפו בדמו
-            </Button>
-          </div>
-
-          {/* Trust Indicators */}
-          <div
-            className={`flex flex-wrap items-center justify-center gap-6 transition-all duration-700 delay-500 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
-          >
-            {trustIndicators.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-2 text-sm text-muted-foreground"
-              >
-                <CheckCircle2 className="w-4 h-4 text-primary" />
-                {item}
-              </div>
-            ))}
           </div>
         </div>
       </div>
-
-      {/* Scroll Indicator */}
-      <button
-        onClick={() => {
-          document.querySelector('#logos')?.scrollIntoView({ behavior: 'smooth' });
-        }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground hover:text-foreground transition-colors animate-bounce"
-      >
-        <span className="text-xs">גללו למטה</span>
-        <ChevronDown className="w-5 h-5" />
-      </button>
     </section>
   );
 };
