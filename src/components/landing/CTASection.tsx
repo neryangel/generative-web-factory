@@ -1,29 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Sparkles, CheckCircle2 } from 'lucide-react';
+import { motion, useInView } from 'framer-motion';
 
 const CTASection = () => {
-  const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
 
   const benefits = [
     'ללא כרטיס אשראי',
@@ -35,108 +19,143 @@ const CTASection = () => {
     <section
       id="pricing"
       ref={sectionRef}
+      dir="rtl"
       className="relative py-24 overflow-hidden"
     >
-      {/* Animated Background */}
-      <div className="absolute inset-0 animated-gradient-bg opacity-70" />
+      {/* Animated Background Orbs */}
+      <motion.div 
+        className="absolute top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
+        animate={{ 
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3],
+          x: [0, 50, 0]
+        }}
+        transition={{ duration: 12, repeat: Infinity }}
+      />
+      <motion.div 
+        className="absolute bottom-0 left-1/4 w-80 h-80 bg-primary/5 rounded-full blur-3xl"
+        animate={{ 
+          scale: [1.2, 1, 1.2],
+          opacity: [0.2, 0.4, 0.2],
+          x: [0, -30, 0]
+        }}
+        transition={{ duration: 10, repeat: Infinity }}
+      />
       
-      {/* Mesh Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background" />
+      {/* Decorative Lines */}
+      <svg 
+        className="absolute inset-0 w-full h-full opacity-10 pointer-events-none" 
+        viewBox="0 0 1200 400"
+      >
+        <motion.path 
+          d="M0 200 Q 300 50, 600 200 T 1200 200" 
+          stroke="hsl(var(--primary))" 
+          strokeWidth="1" 
+          fill="none"
+          initial={{ pathLength: 0 }}
+          animate={isInView ? { pathLength: 1 } : {}}
+          transition={{ duration: 2, ease: "easeInOut" }}
+        />
+        <motion.path 
+          d="M0 220 Q 300 70, 600 220 T 1200 220" 
+          stroke="hsl(var(--primary))" 
+          strokeWidth="0.5" 
+          fill="none"
+          initial={{ pathLength: 0 }}
+          animate={isInView ? { pathLength: 1 } : {}}
+          transition={{ duration: 2.5, ease: "easeInOut", delay: 0.3 }}
+        />
+      </svg>
 
-      {/* Floating Orbs */}
-      <div className="floating-orb w-80 h-80 top-0 left-1/4 from-primary/30 to-accent/30" />
-      <div className="floating-orb w-64 h-64 bottom-0 right-1/3 from-accent/25 to-primary/25" style={{ animationDelay: '2s' }} />
-
-      {/* Floating Particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 rounded-full bg-primary/40 animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${i * 0.5}s`,
-              animationDuration: `${3 + Math.random() * 2}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
           {/* Badge */}
-          <div
-            className={`mb-6 transition-all duration-700 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
+          <motion.div
+            className="mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 backdrop-blur-sm border border-primary/30">
+            <motion.div 
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30"
+              whileHover={{ scale: 1.05 }}
+            >
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium">הצטרפו עכשיו</span>
-            </div>
-          </div>
+              <span className="text-sm text-primary font-medium">הצטרפו עכשיו</span>
+            </motion.div>
+          </motion.div>
 
           {/* Headline */}
-          <h2
-            className={`text-3xl md:text-5xl lg:text-6xl font-bold mb-6 transition-all duration-700 delay-100 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
+          <motion.h2
+            className="font-serif text-3xl md:text-5xl lg:text-6xl text-foreground mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.1 }}
           >
-            מוכנים <span className="gradient-text">להתחיל?</span>
-          </h2>
+            מוכנים <span className="gold-text">להתחיל?</span>
+          </motion.h2>
 
           {/* Description */}
-          <p
-            className={`text-lg md:text-xl text-muted-foreground mb-8 transition-all duration-700 delay-200 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
+          <motion.p
+            className="text-lg md:text-xl text-muted-foreground mb-10"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
             הצטרפו לאלפי העסקים שכבר בנו את הנוכחות הדיגיטלית שלהם עם AMDIR
-          </p>
+          </motion.p>
 
           {/* CTA Button */}
-          <div
-            className={`mb-8 transition-all duration-700 delay-300 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
+          <motion.div
+            className="mb-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Button
-              size="lg"
-              onClick={() => navigate('/dashboard')}
-              className="group relative px-10 py-7 text-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all shadow-2xl shadow-primary/40 hover:shadow-primary/60 hover:scale-105"
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <span className="relative z-10 flex items-center gap-3">
-                התחילו בחינם עכשיו
-                <ArrowLeft className="w-6 h-6 transition-transform group-hover:-translate-x-1" />
-              </span>
-              
-              {/* Shimmer */}
-              <div className="absolute inset-0 rounded-md overflow-hidden">
-                <div className="shimmer" />
-              </div>
-
-              {/* Pulse Ring */}
-              <div className="absolute inset-0 rounded-md animate-ping bg-primary/20 opacity-75" style={{ animationDuration: '2s' }} />
-            </Button>
-          </div>
+              <Button
+                size="lg"
+                onClick={() => navigate('/dashboard')}
+                className="relative px-12 py-7 text-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 overflow-hidden group"
+              >
+                <span className="relative z-10 flex items-center gap-3">
+                  התחילו בחינם עכשיו
+                  <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                </span>
+                
+                {/* Shimmer Effect */}
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full"
+                  animate={{ translateX: ["100%", "-100%"] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                />
+              </Button>
+            </motion.div>
+          </motion.div>
 
           {/* Benefits */}
-          <div
-            className={`flex flex-wrap items-center justify-center gap-6 transition-all duration-700 delay-500 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
+          <motion.div
+            className="flex flex-wrap items-center justify-center gap-6"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.6, delay: 0.5 }}
           >
             {benefits.map((benefit, index) => (
-              <div
+              <motion.div
                 key={index}
                 className="flex items-center gap-2 text-sm text-muted-foreground"
+                initial={{ opacity: 0, x: -20 }}
+                animate={isInView ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
               >
                 <CheckCircle2 className="w-4 h-4 text-primary" />
                 {benefit}
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

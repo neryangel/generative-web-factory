@@ -1,26 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Building2, Briefcase, Store, Landmark, Warehouse, ShoppingBag } from 'lucide-react';
+import { motion, useInView } from 'framer-motion';
 
 const LogosSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const isInView = useInView(sectionRef, { once: true, margin: "-50px" });
 
   const logos = [
     { icon: Building2, name: 'חברות טכנולוגיה' },
@@ -35,42 +19,52 @@ const LogosSection = () => {
     <section
       id="logos"
       ref={sectionRef}
-      className="relative py-16 bg-gradient-to-b from-background via-muted/30 to-background overflow-hidden"
+      dir="rtl"
+      className="relative py-16 bg-background overflow-hidden"
     >
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 grid-pattern opacity-10" />
+      {/* Decorative Lines */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
-      <div className="container mx-auto px-4 relative z-10">
-        <p
-          className={`text-center text-sm text-muted-foreground mb-10 transition-all duration-700 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}
+      <div className="container mx-auto px-6 relative z-10">
+        <motion.p
+          className="text-center text-sm text-muted-foreground mb-10"
+          initial={{ opacity: 0, y: 10 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
         >
           אלפי עסקים מכל הסוגים כבר סומכים עלינו
-        </p>
+        </motion.p>
 
-        <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
+        <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
           {logos.map((logo, index) => {
             const Icon = logo.icon;
             return (
-              <div
+              <motion.div
                 key={index}
-                className={`flex flex-col items-center gap-2 group transition-all duration-500 ${
-                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
+                className="flex flex-col items-center gap-2 group cursor-pointer"
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: index * 0.08 }}
+                whileHover={{ y: -5 }}
               >
-                <div className="p-4 rounded-2xl bg-muted/50 backdrop-blur-sm border border-border/50 transition-all group-hover:bg-primary/10 group-hover:border-primary/30 group-hover:scale-110">
-                  <Icon className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors" />
-                </div>
-                <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                <motion.div 
+                  className="w-16 h-16 rounded-full border border-primary/20 flex items-center justify-center bg-card/50 group-hover:border-primary/50 group-hover:bg-primary/10 transition-all duration-300"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <Icon className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+                </motion.div>
+                <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   {logo.name}
                 </span>
-              </div>
+              </motion.div>
             );
           })}
         </div>
       </div>
+      
+      {/* Bottom Border */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
     </section>
   );
 };

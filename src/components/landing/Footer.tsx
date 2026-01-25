@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Footer = React.forwardRef<HTMLElement>((_, ref) => {
   const [showCookieConsent, setShowCookieConsent] = useState(false);
@@ -9,7 +9,8 @@ const Footer = React.forwardRef<HTMLElement>((_, ref) => {
   useEffect(() => {
     const consent = localStorage.getItem('cookie-consent');
     if (!consent) {
-      setShowCookieConsent(true);
+      const timer = setTimeout(() => setShowCookieConsent(true), 1500);
+      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -37,71 +38,102 @@ const Footer = React.forwardRef<HTMLElement>((_, ref) => {
   ];
 
   return (
-    <footer ref={ref} className="bg-card border-t border-border py-12" dir="rtl">
+    <footer ref={ref} className="bg-card border-t border-primary/10 py-12" dir="rtl">
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
           {/* Logo */}
-          <div className="text-2xl font-serif font-bold gold-text">
+          <motion.div 
+            className="text-2xl font-serif font-bold gold-text"
+            whileHover={{ scale: 1.05 }}
+          >
             AMDIR
-          </div>
+          </motion.div>
 
           {/* Links */}
           <nav className="flex gap-8">
             {footerLinks.map((link, index) => (
-              <button
+              <motion.button
                 key={index}
                 onClick={link.action}
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-primary transition-colors duration-300"
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.95 }}
               >
                 {link.label}
-              </button>
+              </motion.button>
             ))}
           </nav>
 
           {/* Back to Top */}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={scrollToTop}
-            className="gold-border hover:bg-[hsl(var(--gold))]/10"
-            aria-label="חזרה למעלה"
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
           >
-            <ArrowUp className="w-5 h-5 gold-text" />
-          </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={scrollToTop}
+              className="border-primary/30 hover:border-primary hover:bg-primary/10 rounded-full w-10 h-10 transition-all duration-300"
+              aria-label="חזרה למעלה"
+            >
+              <ArrowUp className="w-4 h-4 text-primary" />
+            </Button>
+          </motion.div>
         </div>
 
         {/* Divider */}
-        <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="border-t border-primary/10 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground text-sm">
             © {new Date().getFullYear()} AMDIR. כל הזכויות שמורות.
           </p>
           <div className="flex gap-6 text-sm text-muted-foreground">
-            <button onClick={() => scrollToSection('contact')} className="hover:text-foreground transition-colors">
+            <motion.button 
+              onClick={() => scrollToSection('contact')} 
+              className="hover:text-primary transition-colors duration-300"
+              whileHover={{ x: -3 }}
+            >
               מדיניות פרטיות
-            </button>
-            <button onClick={() => scrollToSection('contact')} className="hover:text-foreground transition-colors">
+            </motion.button>
+            <motion.button 
+              onClick={() => scrollToSection('contact')} 
+              className="hover:text-primary transition-colors duration-300"
+              whileHover={{ x: -3 }}
+            >
               תנאי שימוש
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
 
       {/* Cookie Consent */}
-      {showCookieConsent && (
-        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 z-50">
-          <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-muted-foreground text-sm text-center sm:text-right">
-              אנחנו משתמשים בעוגיות כדי לשפר את חווית הגלישה שלך באתר.
-            </p>
-            <Button
-              onClick={handleAcceptCookies}
-              className="bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(var(--gold-light))] text-background hover:opacity-90"
-            >
-              אישור
-            </Button>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showCookieConsent && (
+          <motion.div 
+            className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-primary/20 p-4 z-50"
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: "spring", damping: 25 }}
+          >
+            <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-muted-foreground text-sm text-center sm:text-right">
+                אנחנו משתמשים בעוגיות כדי לשפר את חווית הגלישה שלך באתר.
+              </p>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  onClick={handleAcceptCookies}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300"
+                >
+                  אישור
+                </Button>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </footer>
   );
 });
