@@ -135,14 +135,18 @@ const PortfolioSection = () => {
             whileHover={{ y: -10 }}
           >
             <div className="relative bg-card border border-primary/10 rounded-lg overflow-hidden transition-all duration-500 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/10">
-              {/* Image */}
-              <div className="aspect-[4/3] bg-gradient-to-br from-muted to-background relative overflow-hidden">
+              {/* Image with Clip-Path Reveal */}
+              <motion.div 
+                className="aspect-[4/3] bg-gradient-to-br from-muted to-background relative overflow-hidden"
+                initial={{ clipPath: 'inset(100% 0 0 0)' }}
+                whileInView={{ clipPath: 'inset(0% 0 0 0)' }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1], delay: 0.1 * index }}
+              >
                 <motion.img 
                   src={project.image} 
                   alt={project.title}
-                  className="w-full h-full object-cover"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.6 }}
+                  className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:filter group-hover:saturate-[1.1]"
                 />
                 
                 {/* Overlay */}
@@ -168,7 +172,7 @@ const PortfolioSection = () => {
                 >
                   <ExternalLink className="w-4 h-4 text-primary" />
                 </motion.div>
-              </div>
+              </motion.div>
               
               {/* Info */}
               <div className="p-4 sm:p-6" dir="rtl">
