@@ -1,16 +1,23 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Users, Briefcase } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import portfolioHotel from '@/assets/portfolio-hotel.jpg';
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const prefersReducedMotion = useReducedMotion();
+  
+  // Animation variants that respect reduced motion preference
+  const fadeInUp = prefersReducedMotion 
+    ? {} 
+    : { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 } };
 
   return (
     <section
       id="hero"
       dir="rtl"
+      aria-labelledby="hero-heading"
       className="relative min-h-screen flex items-center overflow-hidden pt-24 pb-12 md:pt-20 md:pb-0"
     >
       {/* Background */}
@@ -73,17 +80,16 @@ const HeroSection = () => {
           >
             {/* Main Headline */}
             <motion.h1 
+              id="hero-heading"
               className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium leading-[1.15] mb-4 md:mb-6"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              {...fadeInUp}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.8, delay: 0.2 }}
             >
               <span className="block text-foreground">הרימו את</span>
               <motion.span 
                 className="gold-text block"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
+                {...fadeInUp}
+                transition={{ duration: prefersReducedMotion ? 0 : 0.8, delay: 0.4 }}
               >
                 המותג שלכם לגבהים.
               </motion.span>
@@ -92,9 +98,9 @@ const HeroSection = () => {
             {/* Description */}
             <motion.p 
               className="text-muted-foreground text-base md:text-lg max-w-md mx-auto lg:mx-0 lg:mr-0 mb-6 md:mb-10"
-              initial={{ opacity: 0 }}
+              initial={prefersReducedMotion ? {} : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.8, delay: 0.6 }}
             >
               אנחנו יוצרים חוויות דיגיטליות מרהיבות שמושכות קהלים ומניעות תוצאות.
             </motion.p>

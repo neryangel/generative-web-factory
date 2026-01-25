@@ -1,22 +1,63 @@
+import { Suspense, lazy } from 'react';
 import Navbar from '@/components/landing/Navbar';
 import HeroSection from '@/components/landing/HeroSection';
-import PortfolioSection from '@/components/landing/PortfolioSection';
-import FeaturesSection from '@/components/landing/FeaturesSection';
-import FAQSection from '@/components/landing/FAQSection';
-import ContactSection from '@/components/landing/ContactSection';
 import Footer from '@/components/landing/Footer';
+
+// Lazy load below-the-fold sections for better Core Web Vitals
+const PortfolioSection = lazy(() => import('@/components/landing/PortfolioSection'));
+const FeaturesSection = lazy(() => import('@/components/landing/FeaturesSection'));
+const FAQSection = lazy(() => import('@/components/landing/FAQSection'));
+const ContactSection = lazy(() => import('@/components/landing/ContactSection'));
+
+// Loading fallback with skeleton
+const SectionSkeleton = () => (
+  <div className="py-24 bg-background">
+    <div className="container mx-auto px-6">
+      <div className="animate-pulse space-y-8">
+        <div className="h-8 bg-card/50 rounded w-1/3 mx-auto" />
+        <div className="h-4 bg-card/50 rounded w-2/3 mx-auto" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-64 bg-card/50 rounded-xl" />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip to main content link for accessibility */}
+      <a href="#main-content" className="skip-to-content">
+        דלג לתוכן הראשי
+      </a>
+      
       <Navbar />
-      <main>
+      
+      <main id="main-content" role="main" aria-label="תוכן ראשי">
+        {/* Hero is loaded eagerly - above the fold */}
         <HeroSection />
-        <PortfolioSection />
-        <FeaturesSection />
-        <FAQSection />
-        <ContactSection />
+        
+        {/* Lazy loaded sections with suspense boundaries */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <PortfolioSection />
+        </Suspense>
+        
+        <Suspense fallback={<SectionSkeleton />}>
+          <FeaturesSection />
+        </Suspense>
+        
+        <Suspense fallback={<SectionSkeleton />}>
+          <FAQSection />
+        </Suspense>
+        
+        <Suspense fallback={<SectionSkeleton />}>
+          <ContactSection />
+        </Suspense>
       </main>
+      
       <Footer />
     </div>
   );
