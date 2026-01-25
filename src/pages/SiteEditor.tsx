@@ -514,16 +514,16 @@ export default function SiteEditor() {
       {/* Editor Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Main Preview Area */}
-        <div className="flex-1 overflow-auto p-4 flex justify-center">
+        <div className="flex-1 overflow-hidden p-4 flex justify-center">
           <div 
-            className="bg-card shadow-xl rounded-lg overflow-hidden transition-all duration-300"
+            className="bg-card shadow-xl rounded-lg overflow-hidden transition-all duration-300 h-full flex flex-col"
             style={{ 
               width: viewModeWidths[viewMode],
               maxWidth: '100%',
             }}
           >
-            {/* Preview Frame */}
-            <div className="min-h-[calc(100vh-8rem)] overflow-auto">
+            {/* Preview Frame - only this scrolls */}
+            <div className="flex-1 overflow-y-auto">
               {sections.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-96 text-muted-foreground">
                   <Plus className="h-12 w-12 mb-4 opacity-30" />
@@ -580,9 +580,9 @@ export default function SiteEditor() {
 
         {/* Right Sidebar - Section List & Theme */}
         {isEditing && (
-          <aside className="w-72 bg-card border-r shrink-0 overflow-auto">
-            {/* Tabs */}
-            <div className="flex border-b">
+          <aside className="w-72 bg-card border-r shrink-0 flex flex-col overflow-hidden">
+            {/* Tabs - fixed at top */}
+            <div className="flex border-b shrink-0">
               <button
                 onClick={() => setSelectedSectionId(null)}
                 className={`flex-1 py-3 px-4 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
@@ -603,7 +603,8 @@ export default function SiteEditor() {
               </button>
             </div>
 
-            <div className="p-4">
+            {/* Sidebar content - scrollable */}
+            <div className="flex-1 overflow-y-auto p-4">
               {selectedSectionId === 'theme' ? (
                 <ThemeCustomizer site={site} onUpdate={setSite} />
               ) : (
