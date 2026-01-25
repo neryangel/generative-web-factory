@@ -37,55 +37,45 @@ const Navbar = () => {
 
   return (
     <header
-      dir="rtl"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
           ? 'bg-background/95 backdrop-blur-md border-b border-primary/10'
           : 'bg-transparent'
       }`}
     >
-      <nav className="container mx-auto px-6 h-20 flex items-center justify-between">
+      <nav className="container mx-auto px-6 h-20 flex items-center justify-between" dir="rtl">
         {/* Logo */}
-        <Link to="/" className="flex flex-col items-start group">
+        <Link to="/" className="flex flex-col items-start group flex-shrink-0">
           <span className="text-2xl font-serif font-bold gold-text tracking-wider">AMDIR</span>
           <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">סוכנות דיגיטלית</span>
         </Link>
 
-        {/* Tagline - Desktop Only */}
-        <div className="hidden lg:block absolute left-1/2 -translate-x-1/2">
-          <span className="text-xs tracking-wider text-muted-foreground">
-            יוצרים חוויות דיגיטליות יוקרתיות
-          </span>
-        </div>
-
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-8">
+        {/* Desktop Navigation - Center */}
+        <div className="hidden lg:flex items-center gap-6 flex-1 justify-center">
           {navLinks.map((link) => (
             <button
               key={link.href}
               onClick={() => scrollToSection(link.href)}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
+              className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 whitespace-nowrap"
             >
               {link.label}
             </button>
           ))}
         </div>
 
-        {/* CTA Button */}
-        <div className="hidden md:block">
+        {/* CTA Button - Left side */}
+        <div className="hidden md:flex items-center gap-4 flex-shrink-0">
           {user ? (
             <Button
               onClick={() => navigate('/dashboard')}
-              variant="outline"
-              className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 text-sm px-6"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 text-sm px-6"
             >
               לדשבורד
             </Button>
           ) : (
             <Button
               onClick={() => navigate('/dashboard')}
-              variant="outline"
-              className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 text-sm px-6"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 text-sm px-6"
             >
               קבלו הצעת מחיר
             </Button>
@@ -95,12 +85,16 @@ const Navbar = () => {
         {/* Mobile Menu */}
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon" className="text-primary">
+            <Button variant="ghost" size="icon" className="text-primary flex-shrink-0">
               <Menu className="w-6 h-6" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-72 bg-background border-primary/20">
+          <SheetContent side="right" className="w-72 bg-background border-primary/20">
             <div className="flex flex-col gap-6 mt-8" dir="rtl">
+              <Link to="/" className="flex flex-col items-start mb-4" onClick={() => setIsOpen(false)}>
+                <span className="text-2xl font-serif font-bold gold-text tracking-wider">AMDIR</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">סוכנות דיגיטלית</span>
+              </Link>
               {navLinks.map((link) => (
                 <button
                   key={link.href}
@@ -116,8 +110,7 @@ const Navbar = () => {
                     navigate('/dashboard');
                     setIsOpen(false);
                   }}
-                  variant="outline"
-                  className="w-full border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground text-sm"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm"
                 >
                   {user ? 'לדשבורד' : 'קבלו הצעת מחיר'}
                 </Button>
