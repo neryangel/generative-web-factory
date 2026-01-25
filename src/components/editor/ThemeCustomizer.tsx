@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { 
@@ -57,7 +56,7 @@ const defaultColors = {
   accent: '#06b6d4',
 };
 
-export function ThemeCustomizer({ site, onUpdate }: ThemeCustomizerProps) {
+export const ThemeCustomizer = forwardRef<HTMLDivElement, ThemeCustomizerProps>(function ThemeCustomizer({ site, onUpdate }, ref) {
   const [isSaving, setIsSaving] = useState(false);
   const [theme, setTheme] = useState<ThemeSettings>(() => {
     const settings = site.settings as Record<string, unknown> || {};
@@ -133,7 +132,7 @@ export function ThemeCustomizer({ site, onUpdate }: ThemeCustomizerProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div ref={ref} className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="font-semibold flex items-center gap-2">
@@ -374,4 +373,4 @@ export function ThemeCustomizer({ site, onUpdate }: ThemeCustomizerProps) {
       </div>
     </div>
   );
-}
+});
