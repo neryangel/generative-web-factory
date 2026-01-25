@@ -24,7 +24,7 @@ export function CreateTenantDialog({ children, onSuccess }: CreateTenantDialogPr
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(false);
-  const { createTenant, setCurrentTenant } = useTenant();
+  const { createTenant } = useTenant();
 
   const generateSlug = (name: string) => {
     return name
@@ -46,13 +46,14 @@ export function CreateTenantDialog({ children, onSuccess }: CreateTenantDialogPr
 
     setLoading(true);
     try {
-      const { data, error } = await createTenant(name.trim(), slug.trim());
+      const { error } = await createTenant(name.trim(), slug.trim());
       
       if (error) {
+        console.error('Tenant creation error:', error);
         if (error.message.includes('duplicate')) {
           toast.error('שם הארגון כבר קיים, נסה שם אחר');
         } else {
-          toast.error('שגיאה ביצירת הארגון');
+          toast.error(`שגיאה ביצירת הארגון: ${error.message}`);
         }
         return;
       }
