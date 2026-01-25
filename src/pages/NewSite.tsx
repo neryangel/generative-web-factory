@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTenant } from '@/hooks/useTenant';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { TemplateCard } from '@/components/templates/TemplateCard';
+import { TemplatePreviewDialog } from '@/components/templates/TemplatePreviewDialog';
+import { TemplateCategoryFilter, type TemplateCategory } from '@/components/templates/TemplateCategoryFilter';
 import { 
   ArrowRight, 
   Loader2, 
@@ -50,11 +53,13 @@ export default function NewSite() {
   const [mode, setMode] = useState<CreateMode | null>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState(false);
   const [templatesLoading, setTemplatesLoading] = useState(true);
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [generatedBlueprint, setGeneratedBlueprint] = useState<AIBlueprint | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<TemplateCategory>('all');
 
   // Form fields
   const [siteName, setSiteName] = useState('');
@@ -109,6 +114,20 @@ export default function NewSite() {
 
     fetchTemplates();
   }, []);
+
+  // Calculate category counts
+  const categoryCounts = useMemo(() => {
+    return templates.reduce((acc, template) => {
+      acc[template.category] = (acc[template.category] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [templates]);
+
+  // Filter templates by category
+  const filteredTemplates = useMemo(() => {
+    if (selectedCategory === 'all') return templates;
+    return templates.filter(t => t.category === selectedCategory);
+  }, [templates, selectedCategory]);
 
   const generateSlug = (name: string) => {
     return name
@@ -341,18 +360,26 @@ export default function NewSite() {
     setSiteSlug('');
   };
 
+  const handleSelectTemplate = (template: Template) => {
+    setSelectedTemplate(template);
+    setPreviewTemplate(null);
+  };
+
   return (
     <DashboardLayout>
-      <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+      <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
         {/* Back Button */}
         <Button 
           variant="ghost" 
           onClick={() => {
             if (mode === 'ai' && generatedBlueprint) {
               resetAIMode();
+            } else if (mode === 'template' && selectedTemplate) {
+              setSelectedTemplate(null);
             } else if (mode) {
               setMode(null);
               resetAIMode();
+              setSelectedTemplate(null);
             } else {
               navigate('/dashboard/sites');
             }
@@ -552,10 +579,19 @@ export default function NewSite() {
               <p className="text-muted-foreground">בחר את התבנית שהכי מתאימה לעסק שלך</p>
             </div>
 
+            {/* Category Filter */}
+            <div className="mb-6">
+              <TemplateCategoryFilter
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                categoryCounts={categoryCounts}
+              />
+            </div>
+
             {templatesLoading ? (
-              <div className="grid gap-4 md:grid-cols-2">
-                {[1, 2].map((i) => (
-                  <Card key={i}>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {[1, 2, 3].map((i) => (
+                  <Card key={i} className="overflow-hidden">
                     <div className="h-48 bg-muted animate-pulse" />
                     <CardContent className="p-4 space-y-2">
                       <div className="h-5 w-2/3 bg-muted rounded animate-pulse" />
@@ -564,31 +600,32 @@ export default function NewSite() {
                   </Card>
                 ))}
               </div>
-            ) : templates.length === 0 ? (
+            ) : filteredTemplates.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">אין תבניות זמינות כרגע</p>
+                <p className="text-muted-foreground">
+                  {selectedCategory === 'all' 
+                    ? 'אין תבניות זמינות כרגע' 
+                    : 'אין תבניות בקטגוריה זו'}
+                </p>
+                {selectedCategory !== 'all' && (
+                  <Button 
+                    variant="link" 
+                    onClick={() => setSelectedCategory('all')}
+                    className="mt-2"
+                  >
+                    הצג את כל התבניות
+                  </Button>
+                )}
               </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2">
-                {templates.map((template) => (
-                  <Card 
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {filteredTemplates.map((template) => (
+                  <TemplateCard
                     key={template.id}
-                    className="cursor-pointer hover:shadow-lg transition-all hover:border-primary overflow-hidden"
-                    onClick={() => setSelectedTemplate(template)}
-                  >
-                    <div className="h-48 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                      <FileText className="h-16 w-16 text-primary/30" />
-                    </div>
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold text-lg">{template.name}</h3>
-                      <p className="text-sm text-muted-foreground">{template.description}</p>
-                      <div className="mt-2">
-                        <span className="text-xs px-2 py-1 rounded-full bg-secondary text-secondary-foreground">
-                          {template.category}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
+                    template={template}
+                    onSelect={handleSelectTemplate}
+                    onPreview={setPreviewTemplate}
+                  />
                 ))}
               </div>
             )}
@@ -657,6 +694,14 @@ export default function NewSite() {
           </>
         )}
       </div>
+
+      {/* Template Preview Dialog */}
+      <TemplatePreviewDialog
+        template={previewTemplate}
+        open={!!previewTemplate}
+        onOpenChange={(open) => !open && setPreviewTemplate(null)}
+        onSelect={handleSelectTemplate}
+      />
     </DashboardLayout>
   );
 }
