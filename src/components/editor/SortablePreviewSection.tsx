@@ -12,16 +12,20 @@ interface SortablePreviewSectionProps {
   section: Section;
   isSelected: boolean;
   isEditing: boolean;
+  isDeleting?: boolean;
   onSelect: () => void;
   onContentChange: (content: SectionContent) => void;
+  onDeleteClick: () => void;
 }
 
 export function SortablePreviewSection({
   section,
   isSelected,
   isEditing,
+  isDeleting,
   onSelect,
   onContentChange,
+  onDeleteClick,
 }: SortablePreviewSectionProps) {
   const {
     attributes,
@@ -34,7 +38,7 @@ export function SortablePreviewSection({
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: transition || 'all 300ms ease',
   };
 
   return (
@@ -42,9 +46,10 @@ export function SortablePreviewSection({
       ref={setNodeRef}
       style={style}
       className={cn(
-        'relative group transition-all duration-200',
+        'relative group transition-all duration-300',
         isEditing && isSelected && 'outline outline-2 outline-primary outline-offset-2',
-        isDragging && 'opacity-50 z-50'
+        isDragging && 'opacity-50 z-50',
+        isDeleting && 'animate-fade-out opacity-0 scale-95'
       )}
     >
       {/* Section Controls */}
@@ -62,7 +67,15 @@ export function SortablePreviewSection({
           <Button variant="secondary" size="icon" className="h-8 w-8">
             <Settings2 className="h-4 w-4" />
           </Button>
-          <Button variant="destructive" size="icon" className="h-8 w-8">
+          <Button 
+            variant="destructive" 
+            size="icon" 
+            className="h-8 w-8"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeleteClick();
+            }}
+          >
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
