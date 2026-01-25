@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { 
   MousePointer2, 
   LayoutTemplate, 
@@ -7,6 +7,7 @@ import {
   Users, 
   Languages 
 } from 'lucide-react';
+import { motion, useInView } from 'framer-motion';
 
 interface Feature {
   icon: React.ComponentType<{ className?: string }>;
@@ -15,25 +16,8 @@ interface Feature {
 }
 
 const FeaturesSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
   const features: Feature[] = [
     {
@@ -68,63 +52,122 @@ const FeaturesSection = () => {
     },
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: [0.25, 0.46, 0.45, 0.94] as const
+      }
+    }
+  };
+
   return (
     <section
       id="features"
       ref={sectionRef}
       dir="rtl"
-      className="relative py-24 bg-card/30"
+      className="relative py-24 bg-card/30 overflow-hidden"
     >
+      {/* Background Decorations */}
+      <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 left-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+
       <div className="container mx-auto px-6 relative z-10">
         {/* Header */}
         <div className="text-center mb-16">
-          <p
-            className={`text-xs tracking-wider text-primary mb-4 transition-all duration-700 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
+          <motion.p
+            className="text-xs tracking-wider text-primary mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
           >
             השירותים שלנו
-          </p>
-          <h2
-            className={`font-serif text-3xl md:text-4xl lg:text-5xl text-foreground transition-all duration-700 delay-100 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
+          </motion.p>
+          <motion.h2
+            className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.1 }}
           >
             מה אנחנו מציעים
-          </h2>
+          </motion.h2>
+          <motion.p
+            className="text-muted-foreground max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            פתרונות דיגיטליים מקצה לקצה שיקחו את העסק שלכם לשלב הבא
+          </motion.p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+        >
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <div
+              <motion.div
                 key={index}
-                className={`group relative p-8 rounded-lg bg-background border border-primary/10 hover:border-primary/30 transition-all duration-500 ${
-                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
+                className="group relative p-8 rounded-xl bg-background border border-primary/10 hover:border-primary/30 transition-all duration-500"
+                variants={itemVariants}
+                whileHover={{ 
+                  y: -8,
+                  boxShadow: "0 20px 40px -20px hsl(var(--primary) / 0.2)"
+                }}
               >
+                {/* Glow Effect */}
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
                 {/* Icon */}
-                <div className="w-14 h-14 rounded-full border border-primary/30 flex items-center justify-center mb-6 group-hover:border-primary group-hover:bg-primary/10 transition-all duration-300">
+                <motion.div 
+                  className="relative w-14 h-14 rounded-full border border-primary/30 flex items-center justify-center mb-6 group-hover:border-primary group-hover:bg-primary/10 transition-all duration-300"
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                >
                   <Icon className="w-6 h-6 text-primary" />
-                </div>
+                </motion.div>
 
                 {/* Content */}
-                <h3 className="font-serif text-xl text-foreground mb-3 group-hover:text-primary transition-colors">
+                <h3 className="relative font-serif text-xl text-foreground mb-3 group-hover:text-primary transition-colors duration-300">
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed text-sm">
+                <p className="relative text-muted-foreground leading-relaxed text-sm">
                   {feature.description}
                 </p>
 
-                {/* Hover Line */}
-                <div className="absolute bottom-0 right-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-500" />
-              </div>
+                {/* Corner Decoration */}
+                <div className="absolute top-4 left-4 w-2 h-2 border-t border-l border-primary/20 group-hover:border-primary/50 transition-colors duration-300" />
+                <div className="absolute bottom-4 right-4 w-2 h-2 border-b border-r border-primary/20 group-hover:border-primary/50 transition-colors duration-300" />
+
+                {/* Bottom Line */}
+                <motion.div 
+                  className="absolute bottom-0 right-0 h-0.5 bg-primary"
+                  initial={{ width: 0 }}
+                  whileHover={{ width: "100%" }}
+                  transition={{ duration: 0.4 }}
+                />
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
