@@ -4,6 +4,7 @@ import { useTenant } from '@/hooks/useTenant';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { supabase } from '@/integrations/supabase/client';
 import { SectionRenderer, SectionContent } from '@/components/editor/SectionRenderer';
+import { SiteSettingsDialog } from '@/components/site/SiteSettingsDialog';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -277,6 +278,11 @@ export default function SiteEditor() {
             }`}>
               {site.status === 'published' ? 'פורסם' : 'טיוטה'}
             </span>
+            <SiteSettingsDialog site={site} onUpdate={setSite}>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Settings2 className="h-4 w-4" />
+              </Button>
+            </SiteSettingsDialog>
           </div>
         </div>
 
