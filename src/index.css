@@ -109,14 +109,59 @@
     @apply border-border;
   }
 
+  /* Smooth scroll - respects reduced motion preference */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', 'Heebo', sans-serif;
+    /* Prevent layout shifts */
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Hebrew/RTL text */
   [dir="rtl"], .rtl {
     font-family: 'Heebo', 'Inter', sans-serif;
+  }
+  
+  /* Focus visible for accessibility (WCAG 2.2) */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+  
+  /* Skip to content link for screen readers */
+  .skip-to-content {
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md;
+  }
+  
+  /* Ensure minimum touch target size (WCAG 2.5.8) */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Exception for inline links */
+  p a, li a, span a {
+    min-height: auto;
+    min-width: auto;
   }
 }
 

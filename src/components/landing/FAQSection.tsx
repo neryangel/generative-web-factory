@@ -35,23 +35,29 @@ const FAQSection = () => {
   ];
 
   return (
-    <section ref={sectionRef} id="faq" dir="rtl" className="py-24 bg-background relative overflow-hidden">
+    <section 
+      ref={sectionRef} 
+      id="faq" 
+      dir="rtl" 
+      className="py-16 md:py-24 bg-background relative overflow-hidden"
+      aria-labelledby="faq-heading"
+    >
       {/* Decorative Line */}
       <motion.div 
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-24 bg-gradient-to-b from-transparent via-primary/30 to-transparent"
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-24 bg-gradient-to-b from-transparent via-primary/30 to-transparent hidden sm:block"
         initial={{ scaleY: 0 }}
         animate={isInView ? { scaleY: 1 } : {}}
         transition={{ duration: 0.8 }}
       />
 
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
+      {/* Background Glow - Hidden on mobile for performance */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-primary/5 rounded-full blur-3xl hidden sm:block" />
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 md:mb-16">
           <motion.p 
-            className="text-xs tracking-wider text-primary mb-4"
+            className="text-xs tracking-wider text-primary mb-3 md:mb-4"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
@@ -59,7 +65,8 @@ const FAQSection = () => {
             תמיכה
           </motion.p>
           <motion.h2 
-            className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground"
+            id="faq-heading"
+            className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-foreground"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.1 }}
@@ -68,9 +75,9 @@ const FAQSection = () => {
           </motion.h2>
         </div>
 
-        {/* FAQ Accordion */}
-        <div className="max-w-3xl mx-auto">
-          <Accordion type="single" collapsible className="space-y-4">
+        {/* FAQ Accordion with proper accessibility */}
+        <div className="max-w-3xl mx-auto" role="region" aria-label="שאלות נפוצות">
+          <Accordion type="single" collapsible className="space-y-3 md:space-y-4">
             {faqs.map((faq, index) => (
               <motion.div
                 key={index}
@@ -80,12 +87,15 @@ const FAQSection = () => {
               >
                 <AccordionItem
                   value={`item-${index}`}
-                  className="border border-primary/20 rounded-lg px-6 bg-card/30 data-[state=open]:border-primary/40 data-[state=open]:bg-card/50 transition-all duration-300 hover:border-primary/30"
+                  className="border border-primary/20 rounded-lg px-4 sm:px-6 bg-card/30 data-[state=open]:border-primary/40 data-[state=open]:bg-card/50 transition-all duration-300 hover:border-primary/30"
                 >
-                  <AccordionTrigger className="text-right text-foreground hover:text-primary hover:no-underline py-6 text-base md:text-lg font-medium">
+                  <AccordionTrigger 
+                    className="text-right text-foreground hover:text-primary hover:no-underline py-4 sm:py-6 text-sm sm:text-base md:text-lg font-medium min-h-[44px]"
+                    aria-label={`${faq.question} - לחץ להרחבה`}
+                  >
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pb-6 leading-relaxed text-right">
+                  <AccordionContent className="text-muted-foreground pb-4 sm:pb-6 leading-relaxed text-right text-sm sm:text-base">
                     {faq.answer}
                   </AccordionContent>
                 </AccordionItem>
