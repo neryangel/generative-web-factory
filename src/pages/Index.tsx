@@ -7,8 +7,12 @@ import { MagneticCursor } from '@/components/effects/MagneticCursor';
 import { Preloader } from '@/components/effects/Preloader';
 
 // Lazy load below-the-fold sections for better Core Web Vitals
+const ClientLogosMarquee = lazy(() => import('@/components/landing/ClientLogosMarquee'));
 const PortfolioSection = lazy(() => import('@/components/landing/PortfolioSection'));
 const FeaturesSection = lazy(() => import('@/components/landing/FeaturesSection'));
+const HowItWorksSection = lazy(() => import('@/components/landing/HowItWorksSection'));
+const TestimonialsSection = lazy(() => import('@/components/landing/TestimonialsSection'));
+const StatsSection = lazy(() => import('@/components/landing/StatsSection'));
 const FAQSection = lazy(() => import('@/components/landing/FAQSection'));
 const ContactSection = lazy(() => import('@/components/landing/ContactSection'));
 
@@ -43,7 +47,7 @@ const Index = () => {
       {/* Custom Magnetic Cursor */}
       <MagneticCursor />
       
-      <div className={`min-h-screen bg-background transition-opacity duration-500 ${isPreloading ? 'opacity-0' : 'opacity-100'}`}>
+      <div className={`min-h-screen bg-background noise-texture transition-opacity duration-500 ${isPreloading ? 'opacity-0' : 'opacity-100'}`}>
         {/* Skip to main content link for accessibility */}
         <a href="#main-content" className="skip-to-content">
           דלג לתוכן הראשי
@@ -55,19 +59,42 @@ const Index = () => {
           {/* Hero is loaded eagerly - above the fold */}
           <HeroSection />
           
-          {/* Lazy loaded sections with suspense boundaries */}
+          {/* Client Logos Marquee */}
+          <Suspense fallback={<SectionSkeleton />}>
+            <ClientLogosMarquee />
+          </Suspense>
+          
+          {/* Portfolio */}
           <Suspense fallback={<SectionSkeleton />}>
             <PortfolioSection />
           </Suspense>
           
+          {/* Features */}
           <Suspense fallback={<SectionSkeleton />}>
             <FeaturesSection />
           </Suspense>
           
+          {/* How It Works */}
+          <Suspense fallback={<SectionSkeleton />}>
+            <HowItWorksSection />
+          </Suspense>
+          
+          {/* Testimonials - Social Proof */}
+          <Suspense fallback={<SectionSkeleton />}>
+            <TestimonialsSection />
+          </Suspense>
+          
+          {/* Stats */}
+          <Suspense fallback={<SectionSkeleton />}>
+            <StatsSection />
+          </Suspense>
+          
+          {/* FAQ */}
           <Suspense fallback={<SectionSkeleton />}>
             <FAQSection />
           </Suspense>
           
+          {/* Contact */}
           <Suspense fallback={<SectionSkeleton />}>
             <ContactSection />
           </Suspense>

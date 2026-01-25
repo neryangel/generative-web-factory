@@ -5,6 +5,7 @@ interface MarqueeProps {
   children: ReactNode;
   speed?: number;
   direction?: 'left' | 'right';
+  reverse?: boolean; // Alias for direction='right'
   pauseOnHover?: boolean;
   className?: string;
   repeat?: number;
@@ -14,6 +15,7 @@ export function Marquee({
   children,
   speed = 30,
   direction = 'left',
+  reverse = false,
   pauseOnHover = true,
   className = '',
   repeat = 4,
@@ -21,7 +23,9 @@ export function Marquee({
   const prefersReducedMotion = useReducedMotion();
 
   const duration = 100 / speed;
-  const directionMultiplier = direction === 'left' ? -1 : 1;
+  // reverse prop is an alias for direction='right'
+  const actualDirection = reverse ? 'right' : direction;
+  const directionMultiplier = actualDirection === 'left' ? -1 : 1;
 
   if (prefersReducedMotion) {
     return (
