@@ -11,14 +11,14 @@ const HeroSection = () => {
     <section
       id="hero"
       dir="rtl"
-      className="relative min-h-screen flex items-center overflow-hidden pt-20"
+      className="relative min-h-screen flex items-center overflow-hidden pt-24 pb-12 md:pt-20 md:pb-0"
     >
       {/* Background */}
       <div className="absolute inset-0 bg-background" />
       
-      {/* Animated Gradient Orbs */}
+      {/* Animated Gradient Orbs - Hidden on mobile for performance */}
       <motion.div 
-        className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
+        className="absolute top-1/4 right-1/4 w-48 md:w-96 h-48 md:h-96 bg-primary/5 rounded-full blur-3xl hidden sm:block"
         animate={{ 
           scale: [1, 1.2, 1],
           opacity: [0.3, 0.5, 0.3]
@@ -26,7 +26,7 @@ const HeroSection = () => {
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div 
-        className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-primary/10 rounded-full blur-3xl"
+        className="absolute bottom-1/4 left-1/4 w-40 md:w-80 h-40 md:h-80 bg-primary/10 rounded-full blur-3xl hidden sm:block"
         animate={{ 
           scale: [1.2, 1, 1.2],
           opacity: [0.2, 0.4, 0.2]
@@ -61,8 +61,8 @@ const HeroSection = () => {
       </svg>
 
       {/* Content */}
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20 items-center">
           
           {/* Right - Content (First in RTL) */}
           <motion.div
@@ -73,7 +73,7 @@ const HeroSection = () => {
           >
             {/* Main Headline */}
             <motion.h1 
-              className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium leading-[1.1] mb-6"
+              className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium leading-[1.15] mb-4 md:mb-6"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -91,7 +91,7 @@ const HeroSection = () => {
 
             {/* Description */}
             <motion.p 
-              className="text-muted-foreground text-lg max-w-md mx-auto lg:mx-0 lg:mr-0 mb-10"
+              className="text-muted-foreground text-base md:text-lg max-w-md mx-auto lg:mx-0 lg:mr-0 mb-6 md:mb-10"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.6 }}
@@ -101,36 +101,36 @@ const HeroSection = () => {
 
             {/* Stats */}
             <motion.div 
-              className="flex flex-wrap items-center justify-center lg:justify-start gap-8 mb-10"
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 md:gap-8 mb-6 md:mb-10"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.8 }}
             >
               <motion.div 
-                className="flex items-center gap-3"
+                className="flex items-center gap-2 sm:gap-3"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <div className="w-12 h-12 rounded-full border border-primary/30 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-primary/30 flex items-center justify-center">
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-serif gold-text">+500</p>
-                  <p className="text-xs text-muted-foreground">לקוחות מרוצים</p>
+                  <p className="text-xl sm:text-2xl font-serif gold-text">+500</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">לקוחות מרוצים</p>
                 </div>
               </motion.div>
               
               <motion.div 
-                className="flex items-center gap-3"
+                className="flex items-center gap-2 sm:gap-3"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <div className="w-12 h-12 rounded-full border border-primary/30 flex items-center justify-center">
-                  <Briefcase className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-primary/30 flex items-center justify-center">
+                  <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-serif gold-text">+100</p>
-                  <p className="text-xs text-muted-foreground">פרויקטים בחודש</p>
+                  <p className="text-xl sm:text-2xl font-serif gold-text">+100</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">פרויקטים בחודש</p>
                 </div>
               </motion.div>
             </motion.div>
@@ -144,7 +144,7 @@ const HeroSection = () => {
               <Button
                 size="lg"
                 onClick={() => navigate('/dashboard')}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 text-sm px-10 py-6 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 text-xs sm:text-sm px-6 sm:px-10 py-5 sm:py-6 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1"
               >
                 התחילו את הפרויקט שלכם
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -157,9 +157,10 @@ const HeroSection = () => {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
+            className="order-first lg:order-last"
           >
             <motion.div 
-              className="relative group"
+              className="relative group max-w-sm mx-auto lg:max-w-none"
               whileHover={{ y: -10 }}
               transition={{ type: "spring", stiffness: 200 }}
             >

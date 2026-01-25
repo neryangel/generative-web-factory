@@ -42,13 +42,13 @@ const PortfolioSection = () => {
   };
 
   return (
-    <section ref={sectionRef} id="portfolio" dir="rtl" className="py-24 bg-background relative overflow-hidden">
+    <section ref={sectionRef} id="portfolio" dir="rtl" className="py-16 md:py-24 bg-background relative overflow-hidden">
       {/* Background Decoration */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
       
       {/* Section Header */}
-      <div className="container mx-auto px-6 mb-16">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+      <div className="container mx-auto px-4 sm:px-6 mb-10 md:mb-16">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6">
           <div>
             <motion.p 
               className="text-xs tracking-wider text-primary mb-4"
@@ -59,7 +59,7 @@ const PortfolioSection = () => {
               העבודות שלנו
             </motion.p>
             <motion.h2 
-              className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground"
+              className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-foreground"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.1 }}
@@ -79,17 +79,17 @@ const PortfolioSection = () => {
               variant="outline"
               size="icon"
               onClick={() => scroll('right')}
-              className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-full w-12 h-12 transition-all duration-300 hover:scale-110"
+              className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-full w-10 h-10 md:w-12 md:h-12 transition-all duration-300 hover:scale-110"
             >
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
             </Button>
             <Button
               variant="outline"
               size="icon"
               onClick={() => scroll('left')}
-              className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-full w-12 h-12 transition-all duration-300 hover:scale-110"
+              className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-full w-10 h-10 md:w-12 md:h-12 transition-all duration-300 hover:scale-110"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />
             </Button>
           </motion.div>
         </div>
@@ -107,17 +107,17 @@ const PortfolioSection = () => {
       {/* Portfolio Carousel */}
       <div 
         ref={scrollRef}
-        className="flex gap-6 overflow-x-auto scrollbar-hide px-6 pb-4"
+        className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide px-4 sm:px-6 pb-4"
         style={{ scrollSnapType: 'x mandatory' }}
         dir="ltr"
       >
-        {/* Spacer for first item */}
-        <div className="flex-shrink-0 w-[calc((100vw-1280px)/2)]" />
+        {/* Spacer for first item - Hidden on mobile */}
+        <div className="flex-shrink-0 w-2 sm:w-4 lg:w-[calc((100vw-1280px)/2)]" />
         
         {projects.map((project, index) => (
           <motion.div
             key={project.id}
-            className="flex-shrink-0 w-80 md:w-96 group"
+            className="flex-shrink-0 w-[280px] sm:w-80 md:w-96 group"
             style={{ scrollSnapAlign: 'start' }}
             initial={{ opacity: 0, y: 50 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -161,9 +161,9 @@ const PortfolioSection = () => {
               </div>
               
               {/* Info */}
-              <div className="p-6" dir="rtl">
-                <p className="text-xs text-primary mb-2 uppercase tracking-wider">{project.category}</p>
-                <h3 className="font-serif text-xl text-foreground group-hover:text-primary transition-colors duration-300">
+              <div className="p-4 sm:p-6" dir="rtl">
+                <p className="text-[10px] sm:text-xs text-primary mb-1 sm:mb-2 uppercase tracking-wider">{project.category}</p>
+                <h3 className="font-serif text-lg sm:text-xl text-foreground group-hover:text-primary transition-colors duration-300">
                   {project.title}
                 </h3>
               </div>
@@ -179,8 +179,8 @@ const PortfolioSection = () => {
           </motion.div>
         ))}
         
-        {/* Spacer for last item */}
-        <div className="flex-shrink-0 w-[calc((100vw-1280px)/2)]" />
+        {/* Spacer for last item - Hidden on mobile */}
+        <div className="flex-shrink-0 w-2 sm:w-4 lg:w-[calc((100vw-1280px)/2)]" />
       </div>
 
       {/* Dots Navigation */}

@@ -79,15 +79,15 @@ const FeaturesSection = () => {
       id="features"
       ref={sectionRef}
       dir="rtl"
-      className="relative py-24 bg-card/30 overflow-hidden"
+      className="relative py-16 md:py-24 bg-card/30 overflow-hidden"
     >
-      {/* Background Decorations */}
-      <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 left-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      {/* Background Decorations - Hidden on mobile for performance */}
+      <div className="absolute top-20 right-10 w-48 md:w-72 h-48 md:h-72 bg-primary/5 rounded-full blur-3xl hidden sm:block" />
+      <div className="absolute bottom-20 left-10 w-64 md:w-96 h-64 md:h-96 bg-primary/5 rounded-full blur-3xl hidden sm:block" />
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 md:mb-16">
           <motion.p
             className="text-xs tracking-wider text-primary mb-4"
             initial={{ opacity: 0, y: 20 }}
@@ -97,7 +97,7 @@ const FeaturesSection = () => {
             השירותים שלנו
           </motion.p>
           <motion.h2
-            className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground mb-4"
+            className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-foreground mb-3 md:mb-4"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.1 }}
@@ -116,7 +116,7 @@ const FeaturesSection = () => {
 
         {/* Features Grid */}
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8"
           variants={containerVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
@@ -126,7 +126,7 @@ const FeaturesSection = () => {
             return (
               <motion.div
                 key={index}
-                className="group relative p-8 rounded-xl bg-background border border-primary/10 hover:border-primary/30 transition-all duration-500"
+                className="group relative p-5 sm:p-6 md:p-8 rounded-xl bg-background border border-primary/10 hover:border-primary/30 transition-all duration-500"
                 variants={itemVariants}
                 whileHover={{ 
                   y: -8,
@@ -138,18 +138,18 @@ const FeaturesSection = () => {
 
                 {/* Icon */}
                 <motion.div 
-                  className="relative w-14 h-14 rounded-full border border-primary/30 flex items-center justify-center mb-6 group-hover:border-primary group-hover:bg-primary/10 transition-all duration-300"
+                  className="relative w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full border border-primary/30 flex items-center justify-center mb-4 md:mb-6 group-hover:border-primary group-hover:bg-primary/10 transition-all duration-300"
                   whileHover={{ rotate: 360 }}
                   transition={{ duration: 0.6 }}
                 >
-                  <Icon className="w-6 h-6 text-primary" />
+                  <Icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                 </motion.div>
 
                 {/* Content */}
-                <h3 className="relative font-serif text-xl text-foreground mb-3 group-hover:text-primary transition-colors duration-300">
+                <h3 className="relative font-serif text-lg sm:text-xl text-foreground mb-2 md:mb-3 group-hover:text-primary transition-colors duration-300">
                   {feature.title}
                 </h3>
-                <p className="relative text-muted-foreground leading-relaxed text-sm">
+                <p className="relative text-muted-foreground leading-relaxed text-xs sm:text-sm">
                   {feature.description}
                 </p>
 
