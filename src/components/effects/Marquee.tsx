@@ -13,7 +13,7 @@ interface MarqueeProps {
 
 export function Marquee({
   children,
-  speed = 30,
+  speed = 10,
   direction = 'left',
   reverse = false,
   pauseOnHover = true,
@@ -22,7 +22,8 @@ export function Marquee({
 }: MarqueeProps) {
   const prefersReducedMotion = useReducedMotion();
 
-  const duration = 100 / speed;
+  // Slower, more professional animation (speed=10 → 60s loop)
+  const duration = 600 / speed;
   // reverse prop is an alias for direction='right'
   const actualDirection = reverse ? 'right' : direction;
   const directionMultiplier = actualDirection === 'left' ? -1 : 1;
