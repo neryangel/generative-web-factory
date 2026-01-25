@@ -105,22 +105,15 @@ const ClientLogosMarquee = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-50px" });
 
-  const logosRow1: ClientLogo[] = [
+  const allLogos: ClientLogo[] = [
     { Logo: GoogleLogo, name: 'Google' },
     { Logo: MetaLogo, name: 'Meta' },
     { Logo: SpotifyLogo, name: 'Spotify' },
-    { Logo: SlackLogo, name: 'Slack' },
-    { Logo: NotionLogo, name: 'Notion' },
-    { Logo: FigmaLogo, name: 'Figma' },
-  ];
-
-  const logosRow2: ClientLogo[] = [
     { Logo: WixLogo, name: 'Wix' },
+    { Logo: SlackLogo, name: 'Slack' },
     { Logo: MondayLogo, name: 'Monday.com' },
+    { Logo: FigmaLogo, name: 'Figma' },
     { Logo: FiverrLogo, name: 'Fiverr' },
-    { Logo: JFrogLogo, name: 'JFrog' },
-    { Logo: ElementorLogo, name: 'Elementor' },
-    { Logo: LemonadeLogo, name: 'Lemonade' },
   ];
 
   const LogoItem = ({ logo }: { logo: ClientLogo }) => {
@@ -158,37 +151,18 @@ const ClientLogosMarquee = () => {
         </motion.p>
       </div>
 
-      {/* Marquee Row 1 - Right to Left (slow: ~75s loop) */}
+      {/* Single Marquee Row - Very slow: ~150s loop */}
       <motion.div
-        className="mb-8"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
         <Marquee
-          speed={8}
+          speed={4}
           pauseOnHover
           className="py-4"
         >
-          {logosRow1.map((logo, index) => (
-            <LogoItem key={index} logo={logo} />
-          ))}
-        </Marquee>
-      </motion.div>
-
-      {/* Marquee Row 2 - Left to Right (slow: ~60s loop) */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={isInView ? { opacity: 1 } : {}}
-        transition={{ duration: 0.6, delay: 0.4 }}
-      >
-        <Marquee
-          speed={10}
-          pauseOnHover
-          reverse
-          className="py-4"
-        >
-          {logosRow2.map((logo, index) => (
+          {allLogos.map((logo, index) => (
             <LogoItem key={index} logo={logo} />
           ))}
         </Marquee>
