@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // List of known app domains (not custom domains)
 const APP_DOMAINS = [
   'localhost',
+  'vercel.app',
   'generative-web-factory.vercel.app',
   'amdir.app',
   'www.amdir.app',
@@ -35,7 +36,7 @@ export function middleware(request: NextRequest) {
 
   // This is a custom domain - rewrite to the site route
   // The site route will handle fetching content by domain
-  url.pathname = `/_sites/${domain}${pathname}`;
+  url.pathname = `/sites/${domain}${pathname}`;
 
   return NextResponse.rewrite(url);
 }
