@@ -1,27 +1,33 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Users, Briefcase, Sparkles } from 'lucide-react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
-import { SplitText, WordReveal } from '@/components/effects/SplitText';
+import { WordReveal } from '@/components/effects/SplitText';
 import { useMouseParallax } from '@/hooks/useParallax';
 import portfolioHotel from '@/assets/portfolio-hotel.jpg';
 
 const HeroSection = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
   const mouseParallax = useMouseParallax(0.015);
-  
+
   // Scroll-based parallax for background elements
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
   });
-  
+
   const orbY1 = useTransform(scrollYProgress, [0, 1], [0, 150]);
   const orbY2 = useTransform(scrollYProgress, [0, 1], [0, -100]);
   const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
+
+  const navigateToDashboard = () => {
+    router.push('/dashboard');
+  };
 
   return (
     <section
@@ -33,52 +39,52 @@ const HeroSection = () => {
     >
       {/* Background */}
       <div className="absolute inset-0 bg-background" />
-      
+
       {/* Animated Gradient Orbs with Parallax */}
-      <motion.div 
+      <motion.div
         className="absolute top-1/4 right-1/4 w-48 md:w-96 h-48 md:h-96 bg-primary/5 rounded-full blur-3xl hidden sm:block"
-        style={{ 
+        style={{
           y: prefersReducedMotion ? 0 : orbY1,
           x: mouseParallax.x * 2,
         }}
-        animate={{ 
+        animate={{
           scale: [1, 1.2, 1],
           opacity: [0.3, 0.5, 0.3]
         }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div 
+      <motion.div
         className="absolute bottom-1/4 left-1/4 w-40 md:w-80 h-40 md:h-80 bg-primary/10 rounded-full blur-3xl hidden sm:block"
-        style={{ 
+        style={{
           y: prefersReducedMotion ? 0 : orbY2,
           x: mouseParallax.x * -1.5,
         }}
-        animate={{ 
+        animate={{
           scale: [1.2, 1, 1.2],
           opacity: [0.2, 0.4, 0.2]
         }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
-      
+
       {/* Decorative Gold Lines with Draw Animation */}
-      <svg 
-        className="absolute top-1/2 left-0 w-full h-auto opacity-10 pointer-events-none" 
-        viewBox="0 0 1200 200" 
+      <svg
+        className="absolute top-1/2 left-0 w-full h-auto opacity-10 pointer-events-none"
+        viewBox="0 0 1200 200"
         fill="none"
       >
-        <motion.path 
-          d="M0 100 Q 300 20, 600 100 T 1200 100" 
-          stroke="hsl(40 55% 50%)" 
-          strokeWidth="1" 
+        <motion.path
+          d="M0 100 Q 300 20, 600 100 T 1200 100"
+          stroke="hsl(40 55% 50%)"
+          strokeWidth="1"
           fill="none"
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{ duration: 2, ease: "easeInOut", delay: 0.5 }}
         />
-        <motion.path 
-          d="M0 120 Q 300 40, 600 120 T 1200 120" 
-          stroke="hsl(40 55% 50%)" 
-          strokeWidth="0.5" 
+        <motion.path
+          d="M0 120 Q 300 40, 600 120 T 1200 120"
+          stroke="hsl(40 55% 50%)"
+          strokeWidth="0.5"
           fill="none"
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
@@ -113,7 +119,7 @@ const HeroSection = () => {
       {/* Content */}
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20 items-center">
-          
+
           {/* Right - Content (First in RTL) */}
           <motion.div
             className="text-center lg:text-right"
@@ -133,7 +139,7 @@ const HeroSection = () => {
             </motion.div>
 
             {/* Main Headline with Split Text Animation */}
-            <motion.h1 
+            <motion.h1
               id="hero-heading"
               className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium leading-[1.15] mb-4 md:mb-6"
             >
@@ -155,7 +161,7 @@ const HeroSection = () => {
             </motion.h1>
 
             {/* Description */}
-            <motion.p 
+            <motion.p
               className="text-muted-foreground text-base md:text-lg max-w-md mx-auto lg:mx-0 lg:mr-0 mb-6 md:mb-10"
               initial={{ opacity: 0, filter: 'blur(10px)' }}
               animate={{ opacity: 1, filter: 'blur(0px)' }}
@@ -165,13 +171,13 @@ const HeroSection = () => {
             </motion.p>
 
             {/* Stats with Staggered Animation */}
-            <motion.div 
+            <motion.div
               className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 md:gap-8 mb-6 md:mb-10"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 1.2 }}
             >
-              <motion.div 
+              <motion.div
                 className="flex items-center gap-2 sm:gap-3 group"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 300 }}
@@ -180,7 +186,7 @@ const HeroSection = () => {
                   <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                 </div>
                 <div className="text-right">
-                  <motion.p 
+                  <motion.p
                     className="text-xl sm:text-2xl font-serif gold-text"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -191,8 +197,8 @@ const HeroSection = () => {
                   <p className="text-[10px] sm:text-xs text-muted-foreground">לקוחות מרוצים</p>
                 </div>
               </motion.div>
-              
-              <motion.div 
+
+              <motion.div
                 className="flex items-center gap-2 sm:gap-3 group"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 300 }}
@@ -201,7 +207,7 @@ const HeroSection = () => {
                   <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                 </div>
                 <div className="text-right">
-                  <motion.p 
+                  <motion.p
                     className="text-xl sm:text-2xl font-serif gold-text"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -222,7 +228,7 @@ const HeroSection = () => {
             >
               <Button
                 size="lg"
-                onClick={() => navigate('/dashboard')}
+                onClick={navigateToDashboard}
                 className="relative overflow-hidden bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 text-xs sm:text-sm px-6 sm:px-10 py-5 sm:py-6 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1 group"
               >
                 {/* Shine effect */}
@@ -242,7 +248,7 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="order-first lg:order-last"
           >
-            <motion.div 
+            <motion.div
               className="relative group max-w-sm mx-auto lg:max-w-none perspective-1000"
               whileHover={{ y: -10 }}
               transition={{ type: "spring", stiffness: 200 }}
@@ -253,15 +259,15 @@ const HeroSection = () => {
             >
               {/* Card Glow */}
               <div className="absolute -inset-4 bg-primary/10 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
+
               {/* Animated border */}
               <div className="absolute -inset-[1px] bg-gradient-to-r from-primary/50 via-primary/20 to-primary/50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-gradient-shift" style={{ backgroundSize: '200% 100%' }} />
-              
+
               {/* Card */}
               <div className="relative bg-card border border-primary/20 rounded-lg overflow-hidden shadow-2xl">
                 {/* Image with Parallax Scale */}
                 <div className="aspect-[4/3] relative overflow-hidden">
-                  <motion.img 
+                  <motion.img
                     src={portfolioHotel}
                     alt="פרויקט מוביל - מלון יוקרה"
                     className="w-full h-full object-cover"
@@ -270,7 +276,7 @@ const HeroSection = () => {
                     transition={{ duration: 0.6 }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
-                  
+
                   {/* View indicator on hover */}
                   <motion.div
                     className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -280,9 +286,9 @@ const HeroSection = () => {
                       <span className="text-white text-sm font-medium">צפה</span>
                     </div>
                   </motion.div>
-                  
+
                   {/* Badge */}
-                  <motion.div 
+                  <motion.div
                     className="absolute top-4 right-4 px-3 py-1 bg-primary/90 backdrop-blur-sm rounded-full"
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -291,11 +297,11 @@ const HeroSection = () => {
                     <span className="text-xs text-primary-foreground font-medium">חדש</span>
                   </motion.div>
                 </div>
-                
+
                 {/* Card Info */}
                 <div className="p-6 border-t border-primary/10">
                   <div className="flex items-center justify-between">
-                    <motion.div 
+                    <motion.div
                       className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all duration-300 cursor-pointer"
                       whileHover={{ scale: 1.1, rotate: -45 }}
                     >
@@ -314,7 +320,7 @@ const HeroSection = () => {
       </div>
 
       {/* Scroll Indicator with Enhanced Animation */}
-      <motion.div 
+      <motion.div
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -328,7 +334,7 @@ const HeroSection = () => {
             document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' });
           }}
         >
-          <motion.div 
+          <motion.div
             className="w-1 h-2 bg-primary rounded-full"
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 2, repeat: Infinity }}

@@ -1,5 +1,7 @@
+'use client';
+
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useRouter } from 'next/navigation';
 import { useTenant } from '@/hooks/useTenant';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,8 +15,9 @@ import { toast } from 'sonner';
 import type { Site, Page, Section, ViewMode } from '@/types';
 
 export default function SiteEditor() {
-  const { siteId } = useParams<{ siteId: string }>();
-  const navigate = useNavigate();
+  const params = useParams<{ siteId: string }>();
+  const siteId = params.siteId;
+  const router = useRouter();
   const { currentTenant } = useTenant();
 
   // State
@@ -48,7 +51,7 @@ export default function SiteEditor() {
         if (siteError) throw siteError;
         if (!siteData) {
           toast.error('האתר לא נמצא');
-          navigate('/dashboard/sites');
+          router.push('/dashboard/sites');
           return;
         }
         setSite(siteData);
@@ -75,7 +78,7 @@ export default function SiteEditor() {
     }
 
     fetchData();
-  }, [siteId, currentTenant, navigate]);
+  }, [siteId, currentTenant, router]);
 
   // Fetch sections when page changes
   useEffect(() => {

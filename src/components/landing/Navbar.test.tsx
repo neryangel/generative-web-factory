@@ -1,7 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
 import Navbar from './Navbar';
+
+// Mock Next.js navigation
+const mockPush = vi.fn();
+const mockPathname = '/';
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    replace: vi.fn(),
+    back: vi.fn(),
+  }),
+  usePathname: () => mockPathname,
+}));
+
+// Mock Next.js Link
+vi.mock('next/link', () => ({
+  default: ({ children, href, ...props }: { children: React.ReactNode; href: string }) => (
+    <a href={href} {...props}>{children}</a>
+  ),
+}));
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -12,16 +31,6 @@ vi.mock('framer-motion', () => ({
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
-
-// Mock useAuth hook
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
 
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
@@ -36,11 +45,7 @@ vi.mock('@/hooks/useAuth', () => ({
 
 describe('Navbar', () => {
   const renderNavbar = () => {
-    return render(
-      <BrowserRouter>
-        <Navbar />
-      </BrowserRouter>
-    );
+    return render(<Navbar />);
   };
 
   beforeEach(() => {
@@ -72,7 +77,6 @@ describe('Navbar', () => {
   describe('navigation links', () => {
     it('should render all nav links', () => {
       renderNavbar();
-
       expect(screen.getAllByRole('menuitem').length).toBeGreaterThan(0);
     });
 
@@ -111,7 +115,7 @@ describe('Navbar', () => {
     it('should navigate to dashboard when CTA is clicked', () => {
       renderNavbar();
       fireEvent.click(screen.getByText('קבלו הצעת מחיר'));
-      expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
+      expect(mockPush).toHaveBeenCalledWith('/dashboard');
     });
   });
 

@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -53,7 +55,7 @@ export function EditorHeader({
   return (
     <header className="h-14 bg-card border-b flex items-center justify-between px-4 shrink-0">
       <div className="flex items-center gap-4">
-        <Link to="/dashboard/sites">
+        <Link href="/dashboard/sites">
           <Button variant="ghost" size="icon">
             <ArrowRight className="h-4 w-4" />
           </Button>

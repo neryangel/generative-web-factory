@@ -1,5 +1,8 @@
+'use client';
+
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useTenant } from '@/hooks/useTenant';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { supabase } from '@/integrations/supabase/client';
@@ -68,8 +71,9 @@ type Section = Tables<'sections'>;
 type ViewMode = 'desktop' | 'tablet' | 'mobile';
 
 export default function SiteEditor() {
-  const { siteId } = useParams<{ siteId: string }>();
-  const navigate = useNavigate();
+  const params = useParams<{ siteId: string }>();
+  const siteId = params.siteId;
+  const router = useRouter();
   const { currentTenant } = useTenant();
   
   const [site, setSite] = useState<Site | null>(null);
@@ -116,7 +120,7 @@ export default function SiteEditor() {
         if (siteError) throw siteError;
         if (!siteData) {
           toast.error('האתר לא נמצא');
-          navigate('/dashboard/sites');
+          router.push('/dashboard/sites');
           return;
         }
         setSite(siteData);

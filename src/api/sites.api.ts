@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { parseSupabaseError } from '@/lib/api-error';
 import type { Site, SiteInsert, SiteUpdate } from '@/types';
 
 export const sitesApi = {
@@ -12,7 +13,7 @@ export const sitesApi = {
       .eq('tenant_id', tenantId)
       .order('updated_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data || [];
   },
 
@@ -27,7 +28,7 @@ export const sitesApi = {
       .eq('tenant_id', tenantId)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -41,7 +42,7 @@ export const sitesApi = {
       .eq('slug', slug)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -55,7 +56,7 @@ export const sitesApi = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -70,7 +71,7 @@ export const sitesApi = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -83,7 +84,7 @@ export const sitesApi = {
       .delete()
       .eq('id', siteId);
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
   },
 
   /**
@@ -97,7 +98,7 @@ export const sitesApi = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -116,7 +117,7 @@ export const sitesApi = {
 
     const { data, error } = await query.maybeSingle();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data === null;
   },
 };

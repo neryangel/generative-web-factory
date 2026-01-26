@@ -1,4 +1,8 @@
+'use client';
+
 import { ReactNode } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useTenant } from '@/hooks/useTenant';
 import { Button } from '@/components/ui/button';
@@ -11,18 +15,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { 
-  Building2, 
-  ChevronDown, 
-  Globe, 
-  LayoutDashboard, 
-  LogOut, 
+import {
+  Building2,
+  ChevronDown,
+  Globe,
+  LayoutDashboard,
+  LogOut,
   Plus,
   Settings,
   User,
   Check
 } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -31,7 +34,7 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, signOut } = useAuth();
   const { tenants, currentTenant, setCurrentTenant } = useTenant();
-  const location = useLocation();
+  const pathname = usePathname();
 
   const navItems = [
     { href: '/dashboard', label: 'לוח בקרה', icon: LayoutDashboard },
@@ -46,7 +49,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="container flex h-16 items-center justify-between px-4">
           {/* Logo & Tenant Selector */}
           <div className="flex items-center gap-4">
-            <Link to="/dashboard" className="flex items-center gap-2">
+            <Link href="/dashboard" className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-lg flex items-center justify-center"
                    style={{ background: 'var(--gradient-primary)' }}>
                 <Building2 className="w-5 h-5 text-primary-foreground" />
@@ -97,11 +100,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Navigation */}
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
-              const isActive = location.pathname === item.href;
+              const isActive = pathname === item.href;
               return (
-                <Link key={item.href} to={item.href}>
-                  <Button 
-                    variant={isActive ? 'secondary' : 'ghost'} 
+                <Link key={item.href} href={item.href}>
+                  <Button
+                    variant={isActive ? 'secondary' : 'ghost'}
                     size="sm"
                     className="gap-2"
                   >

@@ -1,5 +1,8 @@
+'use client';
+
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, X } from 'lucide-react';
@@ -11,17 +14,17 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // Optimized scroll handler with throttling
   useEffect(() => {
     let ticking = false;
-    
+
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           setIsScrolled(window.scrollY > 20);
-          
+
           // Update active section based on scroll position
           const sections = ['hero', 'portfolio', 'features', 'faq', 'contact'];
           for (const section of sections) {
@@ -34,13 +37,13 @@ const Navbar = () => {
               }
             }
           }
-          
+
           ticking = false;
         });
         ticking = true;
       }
     };
-    
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -66,6 +69,10 @@ const Navbar = () => {
     setIsOpen(false);
   }, []);
 
+  const navigateToDashboard = useCallback(() => {
+    router.push('/dashboard');
+  }, [router]);
+
   return (
     <header
       role="banner"
@@ -75,19 +82,19 @@ const Navbar = () => {
           : 'bg-transparent'
       }`}
     >
-      <nav 
-        className="container mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between" 
+      <nav
+        className="container mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between"
         dir="rtl"
         role="navigation"
         aria-label="ניווט ראשי"
       >
         {/* Logo */}
-        <Link 
-          to="/" 
+        <Link
+          href="/"
           className="flex flex-col items-start group flex-shrink-0"
           aria-label="AMDIR - דף הבית"
         >
-          <motion.span 
+          <motion.span
             className="text-xl sm:text-2xl font-serif font-bold gold-text tracking-wider"
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300 }}
@@ -104,8 +111,8 @@ const Navbar = () => {
               key={link.href}
               onClick={(e) => scrollToSection(link.href, e)}
               className={`relative px-4 py-2 text-sm transition-colors duration-300 whitespace-nowrap rounded-full ${
-                activeSection === link.id 
-                  ? 'text-primary' 
+                activeSection === link.id
+                  ? 'text-primary'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
               role="menuitem"
@@ -129,14 +136,14 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-4 flex-shrink-0">
           {user ? (
             <Button
-              onClick={() => navigate('/dashboard')}
+              onClick={navigateToDashboard}
               className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 text-sm px-6"
             >
               לדשבורד
             </Button>
           ) : (
             <Button
-              onClick={() => navigate('/dashboard')}
+              onClick={navigateToDashboard}
               className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 text-sm px-6"
             >
               קבלו הצעת מחיר
@@ -147,9 +154,9 @@ const Navbar = () => {
         {/* Mobile Menu */}
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild className="lg:hidden">
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               className="text-primary flex-shrink-0 min-w-[44px] min-h-[44px]"
               aria-label={isOpen ? "סגור תפריט" : "פתח תפריט"}
               aria-expanded={isOpen}
@@ -179,35 +186,35 @@ const Navbar = () => {
               </AnimatePresence>
             </Button>
           </SheetTrigger>
-          <SheetContent 
-            side="right" 
+          <SheetContent
+            side="right"
             className="w-[280px] sm:w-72 bg-background/98 backdrop-blur-xl border-primary/20"
           >
-            <motion.div 
-              className="flex flex-col gap-4 sm:gap-6 mt-6 sm:mt-8" 
+            <motion.div
+              className="flex flex-col gap-4 sm:gap-6 mt-6 sm:mt-8"
               dir="rtl"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, staggerChildren: 0.05 }}
             >
-              <Link 
-                to="/" 
-                className="flex flex-col items-start mb-2 sm:mb-4" 
+              <Link
+                href="/"
+                className="flex flex-col items-start mb-2 sm:mb-4"
                 onClick={() => setIsOpen(false)}
                 aria-label="AMDIR - דף הבית"
               >
                 <span className="text-2xl font-serif font-bold gold-text tracking-wider">AMDIR</span>
                 <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">סוכנות דיגיטלית</span>
               </Link>
-              
+
               <nav role="navigation" aria-label="תפריט נייד">
                 {navLinks.map((link, index) => (
                   <motion.button
                     key={link.href}
                     onClick={(e) => scrollToSection(link.href, e)}
                     className={`block w-full py-3 text-lg text-right transition-colors ${
-                      activeSection === link.id 
-                        ? 'text-primary font-medium' 
+                      activeSection === link.id
+                        ? 'text-primary font-medium'
                         : 'text-muted-foreground hover:text-primary'
                     }`}
                     initial={{ opacity: 0, x: 20 }}
@@ -219,8 +226,8 @@ const Navbar = () => {
                   </motion.button>
                 ))}
               </nav>
-              
-              <motion.div 
+
+              <motion.div
                 className="pt-4 sm:pt-6 border-t border-primary/20"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -228,7 +235,7 @@ const Navbar = () => {
               >
                 <Button
                   onClick={() => {
-                    navigate('/dashboard');
+                    router.push('/dashboard');
                     setIsOpen(false);
                   }}
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm py-6"
