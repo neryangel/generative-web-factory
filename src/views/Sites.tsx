@@ -1,13 +1,16 @@
+'use client';
+
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useTenant } from '@/hooks/useTenant';
 import { supabase } from '@/integrations/supabase/client';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { 
-  Globe, 
-  Plus, 
+import {
+  Globe,
+  Plus,
   Search,
   MoreVertical,
   Eye,
@@ -21,7 +24,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -61,14 +63,14 @@ export default function Sites() {
     fetchSites();
   }, [currentTenant]);
 
-  const filteredSites = sites.filter(site => 
+  const filteredSites = sites.filter(site =>
     site.name.toLowerCase().includes(search.toLowerCase()) ||
     site.slug.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleDelete = async (siteId: string) => {
     if (!confirm('האם אתה בטוח שברצונך למחוק את האתר?')) return;
-    
+
     try {
       const { error } = await supabase
         .from('sites')
@@ -76,7 +78,7 @@ export default function Sites() {
         .eq('id', siteId);
 
       if (error) throw error;
-      
+
       setSites(sites.filter(s => s.id !== siteId));
       toast.success('האתר נמחק בהצלחה');
     } catch (error) {
@@ -96,7 +98,7 @@ export default function Sites() {
               נהל את כל האתרים שלך במקום אחד
             </p>
           </div>
-          <Link to="/dashboard/sites/new">
+          <Link href="/dashboard/sites/new">
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
               אתר חדש
@@ -135,12 +137,12 @@ export default function Sites() {
               {search ? 'לא נמצאו תוצאות' : 'אין אתרים עדיין'}
             </h3>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              {search 
+              {search
                 ? 'נסה לחפש עם מילות מפתח אחרות'
                 : 'צור את האתר הראשון שלך עכשיו ותתחיל לבנות נוכחות דיגיטלית'}
             </p>
             {!search && (
-              <Link to="/dashboard/sites/new">
+              <Link href="/dashboard/sites/new">
                 <Button className="gap-2">
                   <Plus className="h-4 w-4" />
                   צור אתר ראשון
@@ -157,10 +159,10 @@ export default function Sites() {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <Globe className="h-12 w-12 text-primary/30" />
                   </div>
-                  
+
                   {/* Hover Actions */}
                   <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <Link to={`/dashboard/sites/${site.id}`}>
+                    <Link href={`/dashboard/sites/${site.id}`}>
                       <Button size="sm" variant="secondary" className="gap-1">
                         <Pencil className="h-3 w-3" />
                         עריכה
@@ -181,7 +183,7 @@ export default function Sites() {
                         {site.slug}.amdir.app
                       </p>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <span className={`text-xs px-2 py-1 rounded-full border whitespace-nowrap ${
                         site.status === 'published' ? 'status-published' :
@@ -199,7 +201,7 @@ export default function Sites() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>
-                            <Link to={`/dashboard/sites/${site.id}`} className="gap-2">
+                            <Link href={`/dashboard/sites/${site.id}`} className="gap-2">
                               <Pencil className="h-4 w-4" />
                               ערוך
                             </Link>
@@ -210,7 +212,7 @@ export default function Sites() {
                               פתח באתר
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             className="gap-2 text-destructive"
                             onClick={() => handleDelete(site.id)}
                           >

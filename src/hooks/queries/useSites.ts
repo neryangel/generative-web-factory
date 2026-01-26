@@ -1,9 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { sitesApi } from '@/api/sites.api';
 import { useTenant } from '@/hooks/useTenant';
-import type { Site, SiteInsert, SiteUpdate } from '@/types';
-
-export const SITES_QUERY_KEY = ['sites'];
+import { queryKeys } from '@/lib/query-keys';
+import type { SiteInsert, SiteUpdate } from '@/types';
 
 /**
  * Hook to fetch all sites for current tenant
@@ -12,7 +11,7 @@ export function useSites() {
   const { currentTenant } = useTenant();
 
   return useQuery({
-    queryKey: [...SITES_QUERY_KEY, currentTenant?.id],
+    queryKey: queryKeys.sites.list(currentTenant?.id ?? ''),
     queryFn: () => sitesApi.getAll(currentTenant!.id),
     enabled: !!currentTenant,
   });
@@ -25,7 +24,7 @@ export function useSite(siteId: string | undefined) {
   const { currentTenant } = useTenant();
 
   return useQuery({
-    queryKey: [...SITES_QUERY_KEY, siteId],
+    queryKey: queryKeys.sites.detail(siteId ?? ''),
     queryFn: () => sitesApi.getById(siteId!, currentTenant!.id),
     enabled: !!currentTenant && !!siteId,
   });
@@ -36,7 +35,7 @@ export function useSite(siteId: string | undefined) {
  */
 export function useSiteBySlug(slug: string | undefined) {
   return useQuery({
-    queryKey: [...SITES_QUERY_KEY, 'slug', slug],
+    queryKey: queryKeys.sites.bySlug(slug ?? ''),
     queryFn: () => sitesApi.getBySlug(slug!),
     enabled: !!slug,
   });
@@ -51,7 +50,7 @@ export function useCreateSite() {
   return useMutation({
     mutationFn: (site: SiteInsert) => sitesApi.create(site),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: SITES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
     },
   });
 }
@@ -66,8 +65,8 @@ export function useUpdateSite() {
     mutationFn: ({ siteId, updates }: { siteId: string; updates: SiteUpdate }) =>
       sitesApi.update(siteId, updates),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: SITES_QUERY_KEY });
-      queryClient.setQueryData([...SITES_QUERY_KEY, data.id], data);
+      queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
+      queryClient.setQueryData(queryKeys.sites.detail(data.id), data);
     },
   });
 }
@@ -81,7 +80,7 @@ export function useDeleteSite() {
   return useMutation({
     mutationFn: (siteId: string) => sitesApi.delete(siteId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: SITES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
     },
   });
 }
@@ -96,8 +95,8 @@ export function useUpdateSiteSettings() {
     mutationFn: ({ siteId, settings }: { siteId: string; settings: Record<string, unknown> }) =>
       sitesApi.updateSettings(siteId, settings),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: SITES_QUERY_KEY });
-      queryClient.setQueryData([...SITES_QUERY_KEY, data.id], data);
+      queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
+      queryClient.setQueryData(queryKeys.sites.detail(data.id), data);
     },
   });
 }

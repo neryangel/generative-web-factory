@@ -1,5 +1,7 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'next/navigation';
 import { SectionRenderer } from '@/components/editor/SectionRenderer';
 import { Loader2 } from 'lucide-react';
 
@@ -37,7 +39,9 @@ interface SiteData {
 }
 
 export default function PublicSite() {
-  const { slug, pageSlug } = useParams<{ slug: string; pageSlug?: string }>();
+  const params = useParams<{ slug: string; pageSlug?: string }>();
+  const slug = params.slug;
+  const pageSlug = params.pageSlug;
   const [siteData, setSiteData] = useState<SiteData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

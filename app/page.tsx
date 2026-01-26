@@ -1,15 +1,12 @@
 'use client';
 
-import { Suspense, lazy, useState, useEffect } from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from '@/hooks/useAuth';
+import { Suspense, lazy, useState } from 'react';
 import Navbar from '@/components/landing/Navbar';
 import HeroSection from '@/components/landing/HeroSection';
 import Footer from '@/components/landing/Footer';
 import { SmoothScrollProvider } from '@/components/effects/SmoothScroll';
 import { MagneticCursor } from '@/components/effects/MagneticCursor';
 import { Preloader } from '@/components/effects/Preloader';
-import { Loader2 } from 'lucide-react';
 
 // Lazy load below-the-fold sections for better Core Web Vitals
 const ClientLogosMarquee = lazy(() => import('@/components/landing/ClientLogosMarquee'));
@@ -38,37 +35,11 @@ const SectionSkeleton = () => (
   </div>
 );
 
-// Client-only wrapper to avoid hydration issues with BrowserRouter
-function ClientWrapper({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  return (
-    <BrowserRouter>
-      <AuthProvider>
-        {children}
-      </AuthProvider>
-    </BrowserRouter>
-  );
-}
-
 export default function Home() {
   const [isPreloading, setIsPreloading] = useState(true);
 
   return (
-    <ClientWrapper>
-      <SmoothScrollProvider>
+    <SmoothScrollProvider>
       {/* Premium Preloader */}
       <Preloader
         onComplete={() => setIsPreloading(false)}
@@ -133,7 +104,6 @@ export default function Home() {
 
         <Footer />
       </div>
-      </SmoothScrollProvider>
-    </ClientWrapper>
+    </SmoothScrollProvider>
   );
 }

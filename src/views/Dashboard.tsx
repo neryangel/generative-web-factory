@@ -1,20 +1,21 @@
+'use client';
+
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useTenant } from '@/hooks/useTenant';
 import { supabase } from '@/integrations/supabase/client';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { CreateTenantDialog } from '@/components/tenant/CreateTenantDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Building2, 
-  Globe, 
-  Plus, 
+import {
+  Building2,
+  Globe,
+  Plus,
   ArrowLeft,
   Eye,
   FileText,
-  TrendingUp
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Site = Tables<'sites'>;
@@ -77,21 +78,21 @@ export default function Dashboard() {
   }
 
   const stats = [
-    { 
-      label: 'סה"כ אתרים', 
-      value: sites.length, 
+    {
+      label: 'סה"כ אתרים',
+      value: sites.length,
       icon: Globe,
       color: 'text-primary'
     },
-    { 
-      label: 'אתרים פעילים', 
-      value: sites.filter(s => s.status === 'published').length, 
+    {
+      label: 'אתרים פעילים',
+      value: sites.filter(s => s.status === 'published').length,
       icon: Eye,
       color: 'text-success'
     },
-    { 
-      label: 'טיוטות', 
-      value: sites.filter(s => s.status === 'draft').length, 
+    {
+      label: 'טיוטות',
+      value: sites.filter(s => s.status === 'draft').length,
       icon: FileText,
       color: 'text-warning'
     },
@@ -104,13 +105,13 @@ export default function Dashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold">
-              שלום, {currentTenant?.name} 👋
+              שלום, {currentTenant?.name}
             </h1>
             <p className="text-muted-foreground mt-1">
               הנה מה שקורה בארגון שלך
             </p>
           </div>
-          <Link to="/dashboard/sites/new">
+          <Link href="/dashboard/sites/new">
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
               אתר חדש
@@ -142,7 +143,7 @@ export default function Dashboard() {
               <CardTitle>אתרים אחרונים</CardTitle>
               <CardDescription>האתרים שעודכנו לאחרונה</CardDescription>
             </div>
-            <Link to="/dashboard/sites">
+            <Link href="/dashboard/sites">
               <Button variant="ghost" size="sm" className="gap-1">
                 הצג הכל
                 <ArrowLeft className="h-4 w-4" />
@@ -163,7 +164,7 @@ export default function Dashboard() {
                 <p className="text-sm text-muted-foreground mb-4">
                   צור את האתר הראשון שלך עכשיו
                 </p>
-                <Link to="/dashboard/sites/new">
+                <Link href="/dashboard/sites/new">
                   <Button variant="outline" className="gap-2">
                     <Plus className="h-4 w-4" />
                     צור אתר
@@ -173,9 +174,9 @@ export default function Dashboard() {
             ) : (
               <div className="space-y-3">
                 {sites.map((site) => (
-                  <Link 
-                    key={site.id} 
-                    to={`/dashboard/sites/${site.id}`}
+                  <Link
+                    key={site.id}
+                    href={`/dashboard/sites/${site.id}`}
                     className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex items-center gap-3">

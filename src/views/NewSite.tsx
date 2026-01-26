@@ -1,5 +1,7 @@
+'use client';
+
 import { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useTenant } from '@/hooks/useTenant';
 import { supabase } from '@/integrations/supabase/client';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -48,7 +50,7 @@ interface AIBlueprint {
 }
 
 export default function NewSite() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { currentTenant, loading: tenantLoading } = useTenant();
   const [mode, setMode] = useState<CreateMode | null>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -256,7 +258,7 @@ export default function NewSite() {
       }
 
       toast.success('האתר נוצר בהצלחה!');
-      navigate(`/dashboard/sites/${site.id}`);
+      router.push(`/dashboard/sites/${site.id}`);
     } catch (error: any) {
       console.error('Error creating site:', error);
       if (error.message?.includes('duplicate')) {
@@ -349,7 +351,7 @@ export default function NewSite() {
       }
 
       toast.success('האתר נוצר בהצלחה!');
-      navigate(`/dashboard/sites/${site.id}`);
+      router.push(`/dashboard/sites/${site.id}`);
     } catch (error: any) {
       console.error('Error creating site:', error);
       if (error.message?.includes('duplicate')) {
@@ -390,7 +392,7 @@ export default function NewSite() {
               resetAIMode();
               setSelectedTemplate(null);
             } else {
-              navigate('/dashboard/sites');
+              router.push('/dashboard/sites');
             }
           }}
           className="gap-2"
