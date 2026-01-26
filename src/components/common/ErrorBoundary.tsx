@@ -71,3 +71,46 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
+
+/**
+ * Wrapper for dashboard-level error boundary
+ */
+export function DashboardErrorBoundary({ children }: { children: ReactNode }) {
+  return (
+    <ErrorBoundary
+      onError={(error, errorInfo) => {
+        // In production, you'd send this to an error tracking service
+        console.error('Dashboard error:', error, errorInfo);
+      }}
+    >
+      {children}
+    </ErrorBoundary>
+  );
+}
+
+/**
+ * Wrapper for editor-level error boundary with custom messaging
+ */
+export function EditorErrorBoundary({ children }: { children: ReactNode }) {
+  return (
+    <ErrorBoundary
+      fallback={
+        <div className="flex h-full flex-col items-center justify-center p-8 text-center" dir="rtl">
+          <div className="rounded-full bg-amber-500/10 p-4 mb-4">
+            <AlertCircle className="h-8 w-8 text-amber-500" />
+          </div>
+          <h3 className="text-lg font-medium mb-2">שגיאה בעורך</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            אירעה שגיאה בטעינת העורך. נסה לרענן את הדף.
+          </p>
+          <Button size="sm" onClick={() => window.location.reload()}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            רענן דף
+          </Button>
+        </div>
+      }
+    >
+      {children}
+    </ErrorBoundary>
+  );
+}

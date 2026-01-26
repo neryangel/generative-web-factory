@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { useState, useEffect, createContext, useContext, ReactNode, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import type { Tables } from '@/integrations/supabase/types';
@@ -27,7 +27,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   const [currentTenant, setCurrentTenant] = useState<TenantWithRole | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchTenants = async () => {
+  const fetchTenants = useCallback(async () => {
     if (!user) {
       setTenants([]);
       setCurrentTenant(null);
@@ -36,38 +36,33 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      // Get tenant memberships
-      const { data: memberships, error: memberError } = await supabase
+      // Single query with join - fixes N+1 pattern
+      const { data, error } = await supabase
         .from('tenant_members')
-        .select('tenant_id, role')
+        .select(`
+          role,
+          tenant:tenants(*)
+        `)
         .eq('user_id', user.id);
 
-      if (memberError) throw memberError;
+      if (error) throw error;
 
-      if (!memberships || memberships.length === 0) {
+      if (!data || data.length === 0) {
         setTenants([]);
         setCurrentTenant(null);
         setLoading(false);
         return;
       }
 
-      // Get tenant details
-      const tenantIds = memberships.map(m => m.tenant_id);
-      const { data: tenantData, error: tenantError } = await supabase
-        .from('tenants')
-        .select('*')
-        .in('id', tenantIds);
-
-      if (tenantError) throw tenantError;
-
-      // Combine tenant data with roles
-      const tenantsWithRoles: TenantWithRole[] = (tenantData || []).map(tenant => {
-        const membership = memberships.find(m => m.tenant_id === tenant.id);
-        return {
-          ...tenant,
-          role: membership?.role || 'viewer',
-        };
-      });
+      // Transform to TenantWithRole format
+      const tenantsWithRoles: TenantWithRole[] = data
+        .filter((item): item is typeof item & { tenant: Tenant } =>
+          item.tenant !== null
+        )
+        .map((item) => ({
+          ...item.tenant,
+          role: item.role,
+        }));
 
       setTenants(tenantsWithRoles);
 
@@ -80,11 +75,11 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchTenants();
-  }, [user]);
+  }, [fetchTenants]);
 
   useEffect(() => {
     if (currentTenant) {
@@ -104,7 +99,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
       // Refetch to get the updated list with roles
       await fetchTenants();
-      
+
       return { data, error: null };
     } catch (error) {
       return { data: null, error: error as Error };

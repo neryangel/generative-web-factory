@@ -143,10 +143,10 @@ export function truncate(text: string, maxLength: number): string {
 }
 
 /**
- * Generate a random ID
+ * Generate a cryptographically secure random ID
  */
 export function generateId(): string {
-  return Math.random().toString(36).substring(2, 11);
+  return crypto.randomUUID();
 }
 
 /**

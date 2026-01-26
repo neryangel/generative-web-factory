@@ -1,9 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { getAuthenticatedCorsHeaders } from "../_shared/cors.ts";
 
 interface VerifyDomainRequest {
   domainId: string;
@@ -24,13 +20,13 @@ async function verifyDns(domain: string): Promise<{ verified: boolean; records: 
         headers: { Accept: "application/dns-json" },
       }
     );
-    
+
     const data = await response.json();
     const records: DnsRecord[] = [];
-    
+
     // Expected IP for Lovable hosting
     const expectedIp = "185.158.133.1";
-    
+
     if (data.Answer) {
       for (const answer of data.Answer) {
         if (answer.type === 1) { // A record
@@ -42,11 +38,11 @@ async function verifyDns(domain: string): Promise<{ verified: boolean; records: 
         }
       }
     }
-    
+
     const hasCorrectARecord = records.some(
       (r) => r.type === "A" && r.value === expectedIp
     );
-    
+
     // Check TXT record for verification
     const txtResponse = await fetch(
       `https://cloudflare-dns.com/dns-query?name=_lovable.${domain}&type=TXT`,
@@ -54,10 +50,9 @@ async function verifyDns(domain: string): Promise<{ verified: boolean; records: 
         headers: { Accept: "application/dns-json" },
       }
     );
-    
+
     const txtData = await txtResponse.json();
-    let txtVerified = false;
-    
+
     if (txtData.Answer) {
       for (const answer of txtData.Answer) {
         if (answer.type === 16) { // TXT record
@@ -69,7 +64,7 @@ async function verifyDns(domain: string): Promise<{ verified: boolean; records: 
         }
       }
     }
-    
+
     return {
       verified: hasCorrectARecord,
       records,
@@ -81,9 +76,12 @@ async function verifyDns(domain: string): Promise<{ verified: boolean; records: 
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS
+  const origin = req.headers.get("Origin");
+  const corsHeaders = getAuthenticatedCorsHeaders(origin);
+
+  // Handle CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   try {
@@ -104,7 +102,7 @@ Deno.serve(async (req) => {
 
     const token = authHeader.replace("Bearer ", "");
     const { data: claimsData, error: claimsError } = await supabase.auth.getUser(token);
-    
+
     if (claimsError || !claimsData?.user) {
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),

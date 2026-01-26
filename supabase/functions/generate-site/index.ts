@@ -1,13 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { getAuthenticatedCorsHeaders } from "../_shared/cors.ts";
 
 const SECTION_TYPES = [
   "hero",
-  "features", 
+  "features",
   "gallery",
   "testimonials",
   "cta",
@@ -85,9 +81,12 @@ Guidelines:
 - Be creative but professional`;
 
 serve(async (req) => {
+  const origin = req.headers.get("Origin");
+  const corsHeaders = getAuthenticatedCorsHeaders(origin);
+
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   try {
@@ -121,9 +120,9 @@ serve(async (req) => {
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
-          { 
-            role: "user", 
-            content: `Generate a complete website blueprint for this business:\n\n${brief}\n\nRespond with valid JSON only.` 
+          {
+            role: "user",
+            content: `Generate a complete website blueprint for this business:\n\n${brief}\n\nRespond with valid JSON only.`
           },
         ],
         temperature: 0.7,
@@ -178,7 +177,7 @@ serve(async (req) => {
       if (cleanContent.endsWith("```")) {
         cleanContent = cleanContent.slice(0, -3);
       }
-      
+
       blueprint = JSON.parse(cleanContent.trim());
     } catch (parseError) {
       console.error("Failed to parse AI response as JSON:", content);
@@ -200,7 +199,7 @@ serve(async (req) => {
     // Validate section types
     for (const page of blueprint.pages) {
       if (page.sections) {
-        page.sections = page.sections.filter((section: any) => 
+        page.sections = page.sections.filter((section: { type: string }) =>
           SECTION_TYPES.includes(section.type)
         );
       }
@@ -214,6 +213,8 @@ serve(async (req) => {
     );
 
   } catch (error) {
+    const origin = req.headers.get("Origin");
+    const corsHeaders = getAuthenticatedCorsHeaders(origin);
     console.error("generate-site error:", error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : "שגיאה לא צפויה" }),

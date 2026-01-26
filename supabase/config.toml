@@ -1,13 +1,15 @@
 project_id = "achjbhxncobmcbnjyyat"
 
+# Authenticated functions - require valid JWT at gateway level
 [functions.generate-site]
-verify_jwt = false
-
-[functions.get-published-site]
-verify_jwt = false
+verify_jwt = true
 
 [functions.verify-domain]
-verify_jwt = false
+verify_jwt = true
 
 [functions.manage-vercel-domain]
+verify_jwt = true
+
+# Public function - serves published sites to any visitor
+[functions.get-published-site]
 verify_jwt = false
