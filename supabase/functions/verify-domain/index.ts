@@ -1,9 +1,23 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// Allowed origins for CORS - restrict to known app domains
+const ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "https://generative-web-factory.vercel.app",
+  "https://amdir.app",
+  "https://www.amdir.app",
+];
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get("Origin") || "";
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Credentials": "true",
+  };
+}
 
 interface VerifyDomainRequest {
   domainId: string;
@@ -56,8 +70,7 @@ async function verifyDns(domain: string): Promise<{ verified: boolean; records: 
     );
     
     const txtData = await txtResponse.json();
-    let txtVerified = false;
-    
+
     if (txtData.Answer) {
       for (const answer of txtData.Answer) {
         if (answer.type === 16) { // TXT record
@@ -81,6 +94,8 @@ async function verifyDns(domain: string): Promise<{ verified: boolean; records: 
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   // Handle CORS
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });

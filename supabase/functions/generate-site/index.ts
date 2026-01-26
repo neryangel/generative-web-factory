@@ -1,9 +1,23 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// Allowed origins for CORS - restrict to known app domains
+const ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "https://generative-web-factory.vercel.app",
+  "https://amdir.app",
+  "https://www.amdir.app",
+];
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get("Origin") || "";
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Credentials": "true",
+  };
+}
 
 const SECTION_TYPES = [
   "hero",
@@ -85,13 +99,15 @@ Guidelines:
 - Be creative but professional`;
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { brief, language = "he" } = await req.json();
+    const { brief } = await req.json();
 
     if (!brief || typeof brief !== "string" || brief.trim().length < 10) {
       return new Response(
@@ -121,9 +137,9 @@ serve(async (req) => {
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
-          { 
-            role: "user", 
-            content: `Generate a complete website blueprint for this business:\n\n${brief}\n\nRespond with valid JSON only.` 
+          {
+            role: "user",
+            content: `Generate a complete website blueprint for this business:\n\n${brief}\n\nRespond with valid JSON only.`
           },
         ],
         temperature: 0.7,
@@ -178,9 +194,9 @@ serve(async (req) => {
       if (cleanContent.endsWith("```")) {
         cleanContent = cleanContent.slice(0, -3);
       }
-      
+
       blueprint = JSON.parse(cleanContent.trim());
-    } catch (parseError) {
+    } catch (_parseError) {
       console.error("Failed to parse AI response as JSON:", content);
       return new Response(
         JSON.stringify({ error: "שגיאה בפענוח תשובת ה-AI" }),
@@ -200,7 +216,7 @@ serve(async (req) => {
     // Validate section types
     for (const page of blueprint.pages) {
       if (page.sections) {
-        page.sections = page.sections.filter((section: any) => 
+        page.sections = page.sections.filter((section: { type: string }) =>
           SECTION_TYPES.includes(section.type)
         );
       }
