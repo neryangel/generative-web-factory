@@ -57,6 +57,16 @@ const statusLabels: Record<string, { label: string; variant: 'default' | 'second
 const VERCEL_CNAME_VALUE = 'cname.vercel-dns.com';
 const VERCEL_A_RECORD_VALUE = '76.76.21.21';
 
+// Vercel API helper
+async function vercelDomainApi(action: 'add' | 'verify' | 'remove', domain: string) {
+  const response = await fetch(`/api/domains/${action}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ domain }),
+  });
+  return response.json();
+}
+
 export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
   const { currentTenant } = useTenant();
   const [domains, setDomains] = useState<Domain[]>([]);
@@ -124,12 +134,9 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
 
       // Add domain to Vercel
       try {
-        const vercelResponse = await supabase.functions.invoke('manage-vercel-domain', {
-          body: { action: 'add', domainId: data.id },
-        });
-
-        if (vercelResponse.error) {
-          console.warn('Vercel domain add warning:', vercelResponse.error);
+        const vercelResult = await vercelDomainApi('add', newDomain.trim().toLowerCase());
+        if (vercelResult.error) {
+          console.warn('Vercel domain add warning:', vercelResult.error);
         }
       } catch (vercelError) {
         console.warn('Could not add domain to Vercel:', vercelError);
@@ -150,44 +157,38 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
   const handleVerifyDomain = async (domainId: string) => {
     setVerifying(domainId);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-
-      if (!token) {
-        toast.error('יש להתחבר מחדש');
+      // Get domain name from list
+      const domainRecord = domains.find(d => d.id === domainId);
+      if (!domainRecord) {
+        toast.error('דומיין לא נמצא');
         return;
       }
 
-      // Try Vercel verification first
-      const vercelResponse = await supabase.functions.invoke('manage-vercel-domain', {
-        body: { action: 'verify', domainId },
-      });
+      // Try Vercel verification
+      const result = await vercelDomainApi('verify', domainRecord.domain);
 
-      if (vercelResponse.error) {
-        // Fallback to legacy verification
-        const response = await supabase.functions.invoke('verify-domain', {
-          body: { domainId },
-        });
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
 
-        if (response.error) throw response.error;
+      // Update status in database
+      const newStatus = result.verified && result.configured ? 'active' : 'verifying';
+      await supabase
+        .from('domains')
+        .update({
+          status: newStatus,
+          verified_at: newStatus === 'active' ? new Date().toISOString() : null,
+          ssl_status: newStatus === 'active' ? 'active' : 'pending',
+        })
+        .eq('id', domainId);
 
-        const result = response.data;
-
-        if (result.verified) {
-          toast.success('הדומיין אומת בהצלחה!');
-        } else {
-          toast.info('ה-DNS עדיין לא מוגדר כראוי. נסה שוב בעוד מספר דקות.');
-        }
+      if (result.verified && result.configured) {
+        toast.success('הדומיין אומת והוגדר בהצלחה!');
+      } else if (result.verified) {
+        toast.info('הדומיין אומת, ממתין להגדרת DNS...');
       } else {
-        const result = vercelResponse.data;
-
-        if (result.verified && result.configured) {
-          toast.success('הדומיין אומת והוגדר בהצלחה!');
-        } else if (result.verified) {
-          toast.info('הדומיין אומת, ממתין להגדרת DNS...');
-        } else {
-          toast.info('ה-DNS עדיין לא מוגדר כראוי. נסה שוב בעוד מספר דקות.');
-        }
+        toast.info('ה-DNS עדיין לא מוגדר כראוי. נסה שוב בעוד מספר דקות.');
       }
 
       await fetchDomains();
@@ -203,13 +204,16 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
     if (!confirm('האם למחוק את הדומיין?')) return;
 
     try {
+      // Get domain name from list
+      const domainRecord = domains.find(d => d.id === domainId);
+
       // Remove from Vercel first
-      try {
-        await supabase.functions.invoke('manage-vercel-domain', {
-          body: { action: 'remove', domainId },
-        });
-      } catch (vercelError) {
-        console.warn('Could not remove domain from Vercel:', vercelError);
+      if (domainRecord) {
+        try {
+          await vercelDomainApi('remove', domainRecord.domain);
+        } catch (vercelError) {
+          console.warn('Could not remove domain from Vercel:', vercelError);
+        }
       }
 
       // Remove from database
