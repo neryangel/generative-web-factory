@@ -47,11 +47,25 @@ interface DomainManagerProps {
 }
 
 const statusLabels: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-  pending: { label: 'ממתין לאימות', variant: 'secondary' },
-  verifying: { label: 'מאמת...', variant: 'outline' },
+  pending: { label: 'ממתין להגדרה', variant: 'secondary' },
+  verifying: { label: 'מאמת DNS...', variant: 'outline' },
   active: { label: 'פעיל', variant: 'default' },
   failed: { label: 'נכשל', variant: 'destructive' },
 };
+
+// Vercel DNS configuration
+const VERCEL_CNAME_VALUE = 'cname.vercel-dns.com';
+const VERCEL_A_RECORD_VALUE = '76.76.21.21';
+
+// Vercel API helper
+async function vercelDomainApi(action: 'add' | 'verify' | 'remove', domain: string) {
+  const response = await fetch(`/api/domains/${action}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ domain }),
+  });
+  return response.json();
+}
 
 export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
   const { currentTenant } = useTenant();
@@ -118,7 +132,17 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
         return;
       }
 
-      toast.success('הדומיין נוסף בהצלחה');
+      // Add domain to Vercel
+      try {
+        const vercelResult = await vercelDomainApi('add', newDomain.trim().toLowerCase());
+        if (vercelResult.error) {
+          console.warn('Vercel domain add warning:', vercelResult.error);
+        }
+      } catch (vercelError) {
+        console.warn('Could not add domain to Vercel:', vercelError);
+      }
+
+      toast.success('הדומיין נוסף בהצלחה! הגדר את ה-DNS כדי להפעיל אותו.');
       setAddDialogOpen(false);
       setNewDomain('');
       await fetchDomains();
@@ -133,24 +157,36 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
   const handleVerifyDomain = async (domainId: string) => {
     setVerifying(domainId);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-
-      if (!token) {
-        toast.error('יש להתחבר מחדש');
+      // Get domain name from list
+      const domainRecord = domains.find(d => d.id === domainId);
+      if (!domainRecord) {
+        toast.error('דומיין לא נמצא');
         return;
       }
 
-      const response = await supabase.functions.invoke('verify-domain', {
-        body: { domainId },
-      });
+      // Try Vercel verification
+      const result = await vercelDomainApi('verify', domainRecord.domain);
 
-      if (response.error) throw response.error;
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
 
-      const result = response.data;
-      
-      if (result.verified) {
-        toast.success('הדומיין אומת בהצלחה!');
+      // Update status in database
+      const newStatus = result.verified && result.configured ? 'active' : 'verifying';
+      await supabase
+        .from('domains')
+        .update({
+          status: newStatus,
+          verified_at: newStatus === 'active' ? new Date().toISOString() : null,
+          ssl_status: newStatus === 'active' ? 'active' : 'pending',
+        })
+        .eq('id', domainId);
+
+      if (result.verified && result.configured) {
+        toast.success('הדומיין אומת והוגדר בהצלחה!');
+      } else if (result.verified) {
+        toast.info('הדומיין אומת, ממתין להגדרת DNS...');
       } else {
         toast.info('ה-DNS עדיין לא מוגדר כראוי. נסה שוב בעוד מספר דקות.');
       }
@@ -168,6 +204,19 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
     if (!confirm('האם למחוק את הדומיין?')) return;
 
     try {
+      // Get domain name from list
+      const domainRecord = domains.find(d => d.id === domainId);
+
+      // Remove from Vercel first
+      if (domainRecord) {
+        try {
+          await vercelDomainApi('remove', domainRecord.domain);
+        } catch (vercelError) {
+          console.warn('Could not remove domain from Vercel:', vercelError);
+        }
+      }
+
+      // Remove from database
       const { error } = await supabase
         .from('domains')
         .delete()
@@ -342,34 +391,42 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
                         <p className="mb-3">
                           הוסף את הרשומות הבאות בהגדרות ה-DNS של הדומיין שלך:
                         </p>
-                        <div className="space-y-2 font-mono text-xs bg-muted p-3 rounded-lg">
-                          <div className="flex items-center justify-between">
-                            <span>
-                              <strong>Type:</strong> A | <strong>Name:</strong> @ | <strong>Value:</strong> 185.158.133.1
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => copyToClipboard('185.158.133.1')}
-                            >
-                              <Copy className="h-3 w-3" />
-                            </Button>
+                        <div className="space-y-3 font-mono text-xs bg-muted p-3 rounded-lg">
+                          {/* For apex domain (root) */}
+                          <div>
+                            <p className="text-muted-foreground mb-1 font-sans">לדומיין הראשי ({domain.domain}):</p>
+                            <div className="flex items-center justify-between">
+                              <span>
+                                <strong>Type:</strong> A | <strong>Name:</strong> @ | <strong>Value:</strong> {VERCEL_A_RECORD_VALUE}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => copyToClipboard(VERCEL_A_RECORD_VALUE)}
+                              >
+                                <Copy className="h-3 w-3" />
+                              </Button>
+                            </div>
                           </div>
-                          <div className="flex items-center justify-between">
-                            <span>
-                              <strong>Type:</strong> A | <strong>Name:</strong> www | <strong>Value:</strong> 185.158.133.1
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => copyToClipboard('185.158.133.1')}
-                            >
-                              <Copy className="h-3 w-3" />
-                            </Button>
+                          {/* For www subdomain */}
+                          <div>
+                            <p className="text-muted-foreground mb-1 font-sans">לתת-דומיין www:</p>
+                            <div className="flex items-center justify-between">
+                              <span>
+                                <strong>Type:</strong> CNAME | <strong>Name:</strong> www | <strong>Value:</strong> {VERCEL_CNAME_VALUE}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => copyToClipboard(VERCEL_CNAME_VALUE)}
+                              >
+                                <Copy className="h-3 w-3" />
+                              </Button>
+                            </div>
                           </div>
                         </div>
                         <p className="mt-3 text-xs text-muted-foreground">
-                          שינויי DNS עשויים לקחת עד 48 שעות להתפשט
+                          SSL יופעל אוטומטית לאחר אימות ה-DNS. שינויים עשויים לקחת עד 48 שעות.
                         </p>
                       </AlertDescription>
                     </Alert>
