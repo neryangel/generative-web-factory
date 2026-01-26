@@ -2,29 +2,36 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-// Support both Vite (import.meta.env) and Next.js (process.env)
-const getEnvVar = (viteKey: string, nextKey: string): string => {
+// Get Supabase URL - try Next.js env first, then Vite
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
   // @ts-ignore - import.meta.env exists in Vite
-  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[viteKey]) {
-    // @ts-ignore
-    return import.meta.env[viteKey];
-  }
-  if (typeof process !== 'undefined' && process.env && process.env[nextKey]) {
-    return process.env[nextKey] as string;
-  }
-  return '';
-};
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) ||
+  '';
 
-const SUPABASE_URL = getEnvVar('VITE_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL');
-const SUPABASE_PUBLISHABLE_KEY = getEnvVar('VITE_SUPABASE_PUBLISHABLE_KEY', 'NEXT_PUBLIC_SUPABASE_ANON_KEY');
+// Get Supabase Anon Key - try Next.js env first, then Vite
+const SUPABASE_PUBLISHABLE_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  // @ts-ignore - import.meta.env exists in Vite
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY) ||
+  '';
+
+// Validate that we have the required config
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  console.error('Missing Supabase configuration. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.');
+}
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    storage: typeof window !== 'undefined' ? localStorage : undefined,
-    persistSession: true,
-    autoRefreshToken: true,
+export const supabase = createClient<Database>(
+  SUPABASE_URL || 'https://placeholder.supabase.co',
+  SUPABASE_PUBLISHABLE_KEY || 'placeholder-key',
+  {
+    auth: {
+      storage: typeof window !== 'undefined' ? localStorage : undefined,
+      persistSession: true,
+      autoRefreshToken: true,
+    }
   }
-});
+);
