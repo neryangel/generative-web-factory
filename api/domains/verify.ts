@@ -23,11 +23,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const token = process.env.VERCEL_TOKEN;
-    const projectId = process.env.VERCEL_PROJECT_ID;
-    const teamId = process.env.VERCEL_TEAM_ID;
+    const projectId = process.env.VERCEL_PROJECT_ID; // Auto-provided by Vercel
+    const teamId = process.env.VERCEL_TEAM_ID; // Optional
 
-    if (!token || !projectId) {
-      return res.status(500).json({ error: 'Missing Vercel configuration' });
+    if (!token) {
+      return res.status(500).json({ error: 'Missing VERCEL_TOKEN environment variable' });
+    }
+
+    if (!projectId) {
+      return res.status(500).json({ error: 'VERCEL_PROJECT_ID not available' });
     }
 
     // First, try to verify the domain
