@@ -3,7 +3,7 @@
  * Standalone component with independent styling using a11y tokens
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { cn } from '../lib/utils';
 
 export interface ToggleButtonProps {
@@ -24,6 +24,7 @@ export interface ToggleButtonProps {
 /**
  * Toggle button with icon and label
  * Uses independent colors for full site isolation
+ * Hover is handled via CSS [data-a11y-toggle] selector
  */
 export const ToggleButton: React.FC<ToggleButtonProps> = ({
   icon: Icon,
@@ -33,8 +34,6 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
   isRtl = false,
   className,
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   // Calculate transform based on text direction
   const getToggleTransform = () => {
     if (isRtl) {
@@ -43,23 +42,16 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
     return active ? 'translateX(14px)' : 'translateX(2px)';
   };
 
-  const getBackgroundColor = () => {
-    if (active) return 'hsl(var(--a11y-primary) / 0.1)';
-    if (isHovered) return 'hsl(var(--a11y-muted))';
-    return 'hsl(var(--a11y-background))';
-  };
-
   return (
     <button
       onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      data-a11y-toggle=""
       className={cn(
         'w-full flex items-center gap-3 p-3 rounded-lg border transition-colors',
         className
       )}
       style={{
-        backgroundColor: getBackgroundColor(),
+        backgroundColor: active ? 'hsl(var(--a11y-primary) / 0.1)' : 'hsl(var(--a11y-background))',
         borderColor: active ? 'hsl(var(--a11y-primary))' : 'hsl(var(--a11y-border))',
         color: active ? 'hsl(var(--a11y-primary))' : 'hsl(var(--a11y-foreground))',
       }}
