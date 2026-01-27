@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTenant } from '@/hooks/useTenant';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { isReservedSlug } from '@/lib/validation-patterns';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Template = Tables<'templates'>;
@@ -67,6 +68,14 @@ export default function NewSite() {
   const [siteName, setSiteName] = useState('');
   const [siteSlug, setSiteSlug] = useState('');
   const [brief, setBrief] = useState('');
+  const aiAbortRef = useRef<AbortController | null>(null);
+
+  // Cleanup AI fetch on unmount
+  useEffect(() => {
+    return () => {
+      aiAbortRef.current?.abort();
+    };
+  }, []);
 
   // IMPORTANT: All hooks must be called before any conditional returns
   // This is a React rule - hooks cannot be called conditionally
@@ -157,6 +166,11 @@ export default function NewSite() {
     setAiError(null);
     setGeneratedBlueprint(null);
 
+    // Cancel any previous in-flight request
+    aiAbortRef.current?.abort();
+    const abortController = new AbortController();
+    aiAbortRef.current = abortController;
+
     try {
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -174,6 +188,7 @@ export default function NewSite() {
             Authorization: `Bearer ${supabaseKey}`,
           },
           body: JSON.stringify({ brief: brief.trim() }),
+          signal: abortController.signal,
         }
       );
 
@@ -188,7 +203,7 @@ export default function NewSite() {
       }
 
       setGeneratedBlueprint(data.blueprint);
-      
+
       // Auto-fill site name from blueprint
       if (data.blueprint.siteName) {
         setSiteName(data.blueprint.siteName);
@@ -196,10 +211,13 @@ export default function NewSite() {
       }
 
       toast.success('מבנה האתר נוצר בהצלחה!');
-    } catch (error: any) {
+    } catch (error) {
+      // Ignore abort errors (user navigated away or re-triggered)
+      if (error instanceof DOMException && error.name === 'AbortError') return;
       console.error('AI generation error:', error);
-      setAiError(error.message || 'שגיאה ביצירת האתר');
-      toast.error(error.message || 'שגיאה ביצירת האתר');
+      const message = error instanceof Error ? error.message : 'שגיאה ביצירת האתר';
+      setAiError(message);
+      toast.error(message);
     } finally {
       setAiGenerating(false);
     }
@@ -207,6 +225,11 @@ export default function NewSite() {
 
   const handleCreateFromAI = async () => {
     if (!currentTenant || !generatedBlueprint || !siteName.trim() || !siteSlug.trim()) return;
+
+    if (isReservedSlug(siteSlug)) {
+      toast.error('שם הכתובת שמור למערכת. נא לבחור שם אחר.');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -282,6 +305,11 @@ export default function NewSite() {
 
   const handleCreateFromTemplate = async () => {
     if (!currentTenant || !selectedTemplate || !siteName.trim() || !siteSlug.trim()) return;
+
+    if (isReservedSlug(siteSlug)) {
+      toast.error('שם הכתובת שמור למערכת. נא לבחור שם אחר.');
+      return;
+    }
 
     setLoading(true);
     try {
