@@ -1,0 +1,95 @@
+/**
+ * Accessibility Widget - Independent Color System
+ * צבעים עצמאיים לווידג'ט הנגישות - לא תלויים בהגדרות האתר
+ * @version 2.0.0
+ */
+
+/* ============================================
+   CSS Variables עצמאיים לווידג'ט
+   ============================================ */
+
+[data-accessibility-widget],
+[data-accessibility-widget] *,
+[data-accessibility-portal],
+[data-accessibility-portal] * {
+  /* Primary - כחול נגישות (ניטרלי ומקצועי) */
+  --a11y-primary: 217 91% 60%;
+  --a11y-primary-foreground: 0 0% 100%;
+  
+  /* Background - רקע לבן */
+  --a11y-background: 0 0% 100%;
+  --a11y-foreground: 0 0% 9%;
+  
+  /* Card - זהה ל-background */
+  --a11y-card: 0 0% 100%;
+  --a11y-card-foreground: 0 0% 9%;
+  
+  /* Border - אפור בהיר */
+  --a11y-border: 0 0% 85%;
+  
+  /* Muted - רקע ניטרלי */
+  --a11y-muted: 0 0% 96%;
+  --a11y-muted-foreground: 0 0% 45%;
+  
+  /* Input */
+  --a11y-input: 0 0% 90%;
+  
+  /* Ring - פוקוס */
+  --a11y-ring: 217 91% 60%;
+  
+  /* Accent - זהה ל-primary */
+  --a11y-accent: 217 91% 60%;
+  --a11y-accent-foreground: 0 0% 100%;
+}
+
+/* ============================================
+   Dark Mode Support (מבוסס על prefers-color-scheme)
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  [data-accessibility-widget],
+  [data-accessibility-widget] *,
+  [data-accessibility-portal],
+  [data-accessibility-portal] * {
+    /* Background - כהה */
+    --a11y-background: 0 0% 12%;
+    --a11y-foreground: 0 0% 98%;
+    
+    /* Card */
+    --a11y-card: 0 0% 15%;
+    --a11y-card-foreground: 0 0% 98%;
+    
+    /* Border */
+    --a11y-border: 0 0% 25%;
+    
+    /* Muted */
+    --a11y-muted: 0 0% 20%;
+    --a11y-muted-foreground: 0 0% 65%;
+    
+    /* Input */
+    --a11y-input: 0 0% 20%;
+  }
+}
+
+/* ============================================
+   Class לשימוש בצבעי האתר (אופציונלי)
+   ============================================ */
+
+[data-accessibility-widget].use-site-colors,
+[data-accessibility-widget].use-site-colors *,
+[data-accessibility-portal].use-site-colors,
+[data-accessibility-portal].use-site-colors * {
+  --a11y-primary: var(--primary, 217 91% 60%);
+  --a11y-primary-foreground: var(--primary-foreground, 0 0% 100%);
+  --a11y-background: var(--background, 0 0% 100%);
+  --a11y-foreground: var(--foreground, 0 0% 9%);
+  --a11y-card: var(--card, 0 0% 100%);
+  --a11y-card-foreground: var(--card-foreground, 0 0% 9%);
+  --a11y-border: var(--border, 0 0% 85%);
+  --a11y-muted: var(--muted, 0 0% 96%);
+  --a11y-muted-foreground: var(--muted-foreground, 0 0% 45%);
+  --a11y-input: var(--input, 0 0% 90%);
+  --a11y-ring: var(--ring, 217 91% 60%);
+  --a11y-accent: var(--accent, 217 91% 60%);
+  --a11y-accent-foreground: var(--accent-foreground, 0 0% 100%);
+}

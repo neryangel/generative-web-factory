@@ -1,0 +1,362 @@
+/* ============================================
+   סגנונות נגישות - Accessibility Styles
+   בהתאם לתקן ת"י 5568 (WCAG 2.1 AA)
+   
+   קובץ עצמאי - לא תלוי בהגדרות CSS של האתר
+   ============================================ */
+
+/* ייבוא צבעים עצמאיים */
+@import './colors.css';
+
+/* ============================================
+   כפתור נגישות - תמיד מעל הכל (WCAG 2.4.11)
+   ============================================ */
+
+[data-accessibility-widget="trigger"] {
+  z-index: 9999 !important;
+  isolation: isolate;
+  position: fixed !important;
+}
+
+[data-accessibility-widget="trigger"]:focus-visible {
+  outline: 4px solid hsl(var(--a11y-primary)) !important;
+  outline-offset: 4px !important;
+  box-shadow: 0 0 0 8px hsl(var(--a11y-background)) !important;
+}
+
+[data-accessibility-widget="dialog"] {
+  z-index: 10000 !important;
+  isolation: isolate;
+}
+
+/* ניגודיות גבוהה - משפיע רק על האתר, לא על הווידג'ט */
+.high-contrast {
+  --background: 0 0% 0% !important;
+  --foreground: 0 0% 100% !important;
+  --muted: 0 0% 15% !important;
+  --muted-foreground: 0 0% 90% !important;
+  --primary: 60 100% 50% !important;
+  --primary-foreground: 0 0% 0% !important;
+  --border: 0 0% 100% !important;
+}
+
+.high-contrast * {
+  border-color: hsl(0 0% 100% / 0.5) !important;
+}
+
+.high-contrast img {
+  filter: contrast(1.2);
+}
+
+/* הדגשת קישורים */
+.highlight-links a:not(.no-highlight) {
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 4px !important;
+  background-color: hsl(var(--a11y-primary) / 0.1) !important;
+  padding: 0.1em 0.2em !important;
+  border-radius: 2px !important;
+}
+
+.highlight-links a:not(.no-highlight):hover,
+.highlight-links a:not(.no-highlight):focus {
+  background-color: hsl(var(--a11y-primary) / 0.2) !important;
+  outline: 2px solid hsl(var(--a11y-primary)) !important;
+  outline-offset: 2px !important;
+}
+
+/* ============================================
+   עצירת אנימציות - כיסוי מלא
+   עובד על CSS animations, transitions, ו-Framer Motion
+   ============================================ */
+
+.pause-animations *,
+.pause-animations *::before,
+.pause-animations *::after {
+  /* עצירת CSS animations */
+  animation: none !important;
+  animation-duration: 0.001ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  animation-play-state: paused !important;
+  
+  /* עצירת transitions */
+  transition: none !important;
+  transition-duration: 0.001ms !important;
+  transition-delay: 0ms !important;
+  
+  /* עצירת scroll behavior */
+  scroll-behavior: auto !important;
+}
+
+/* עצירת Framer Motion - מכוון לאלמנטים עם style transforms */
+.pause-animations [style*="transform"],
+.pause-animations [style*="opacity"],
+.pause-animations [style*="translate"],
+.pause-animations [style*="scale"],
+.pause-animations [style*="rotate"] {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* עצירת אנימציות marquee/ticker */
+.pause-animations [class*="marquee"],
+.pause-animations [class*="ticker"],
+.pause-animations [class*="scroll"],
+.pause-animations [class*="rotate"],
+.pause-animations [class*="spin"] {
+  animation: none !important;
+  animation-play-state: paused !important;
+}
+
+/* תמיכה ב-prefers-reduced-motion (הגדרת מערכת) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition: none !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* סמן גדול */
+.large-cursor,
+.large-cursor * {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24'%3E%3Cpath fill='black' stroke='white' stroke-width='1' d='M5.5 3.21V20.8l4.86-4.86 3.21 7.29 2.58-1.14-3.21-7.29h6.06L5.5 3.21z'/%3E%3C/svg%3E") 0 0, auto !important;
+}
+
+.large-cursor a,
+.large-cursor button,
+.large-cursor [role="button"],
+.large-cursor input[type="submit"],
+.large-cursor input[type="button"],
+.large-cursor .cursor-pointer {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24'%3E%3Cpath fill='black' stroke='white' stroke-width='1' d='M7 5.5L17 12l-10 6.5V5.5z'/%3E%3C/svg%3E") 8 12, pointer !important;
+}
+
+/* גווני אפור - מוחל רק על תוכן האתר, לא על כפתור הנגישות */
+.grayscale-mode #root {
+  filter: grayscale(100%);
+}
+
+/* וודא שכפתור הנגישות לא מושפע מהפילטר */
+[data-accessibility-widget="trigger"],
+[data-accessibility-widget="dialog"] {
+  filter: none !important;
+}
+
+.grayscale-mode img,
+.grayscale-mode video {
+  filter: grayscale(100%);
+}
+
+/* ============================================
+   ריווח טקסט (WCAG 1.4.12 Text Spacing)
+   ============================================ */
+
+.text-spacing {
+  line-height: 2 !important;
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.16em !important;
+}
+
+.text-spacing p,
+.text-spacing li,
+.text-spacing span,
+.text-spacing div,
+.text-spacing h1,
+.text-spacing h2,
+.text-spacing h3,
+.text-spacing h4,
+.text-spacing h5,
+.text-spacing h6,
+.text-spacing a,
+.text-spacing label,
+.text-spacing button {
+  line-height: 2 !important;
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.16em !important;
+}
+
+/* ============================================
+   גופן דיסלקסיה (Dyslexia Friendly Font)
+   ============================================ */
+
+/* שימוש בגופן OpenDyslexic או Arial כ-fallback */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+.dyslexia-font,
+.dyslexia-font * {
+  font-family: 'OpenDyslexic', Arial, sans-serif !important;
+}
+
+/* ============================================
+   שיפורי פוקוס - עצמאיים
+   ============================================ */
+
+/* פוקוס גלוי לאלמנטים בתוך הווידג'ט בלבד */
+[data-accessibility-widget] a:focus-visible,
+[data-accessibility-widget] button:focus-visible,
+[data-accessibility-widget] input:focus-visible,
+[data-accessibility-widget] [tabindex]:focus-visible {
+  outline: 3px solid hsl(var(--a11y-primary)) !important;
+  outline-offset: 2px !important;
+}
+
+/* ============================================
+   Skip Links - עצמאיים
+   ============================================ */
+
+.a11y-skip-link {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: hsl(var(--a11y-primary));
+  color: hsl(var(--a11y-primary-foreground));
+  padding: 0.75rem 1.5rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+  z-index: 9999;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+
+.a11y-skip-link:focus {
+  top: 0;
+  outline: 3px solid hsl(var(--a11y-background));
+  outline-offset: 2px;
+}
+
+/* ============================================
+   מרווחי טקסט נגישים (ת"י 5568)
+   ============================================ */
+
+/* line-height מינימלי 1.5 */
+p,
+li,
+dd,
+dt {
+  line-height: 1.6;
+}
+
+/* מרווח פסקאות */
+p + p {
+  margin-top: 1em;
+}
+
+/* מרווח בין אותיות */
+body {
+  letter-spacing: 0.01em;
+}
+
+/* ============================================
+   גודל מטרת מגע (44x44px)
+   ============================================ */
+
+@media (pointer: coarse) {
+  button,
+  a,
+  input[type="checkbox"],
+  input[type="radio"],
+  [role="button"],
+  [role="link"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* ============================================
+   תמיכה בקוראי מסך
+   ============================================ */
+
+/* הסתרה ויזואלית בלבד (נגיש לקוראי מסך) */
+.a11y-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ============================================
+   טפסים נגישים
+   ============================================ */
+
+/* שדות שגיאה */
+input[aria-invalid="true"],
+textarea[aria-invalid="true"],
+select[aria-invalid="true"] {
+  border-color: hsl(0 84% 60%) !important;
+  box-shadow: 0 0 0 1px hsl(0 84% 60%) !important;
+}
+
+/* הודעות שגיאה */
+[role="alert"] {
+  font-weight: 500;
+}
+
+/* Labels */
+label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+/* Required indicator */
+label[data-required="true"]::after {
+  content: " *";
+  color: hsl(0 84% 60%);
+}
+
+/* ============================================
+   Live Regions
+   ============================================ */
+
+[aria-live="polite"],
+[aria-live="assertive"],
+[role="status"],
+[role="alert"] {
+  /* Ensure screen readers pick up changes */
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+
+@media print {
+  .high-contrast,
+  .highlight-links,
+  .pause-animations,
+  .large-cursor,
+  .grayscale-mode {
+    all: unset;
+  }
+  
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+}
