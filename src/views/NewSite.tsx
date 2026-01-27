@@ -68,35 +68,8 @@ export default function NewSite() {
   const [siteSlug, setSiteSlug] = useState('');
   const [brief, setBrief] = useState('');
 
-  // Show loading while tenant is being fetched
-  if (tenantLoading) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  // Show error if no tenant exists
-  if (!currentTenant) {
-    return (
-      <DashboardLayout>
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-          <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-          <h2 className="text-2xl font-bold mb-2">לא נמצא ארגון</h2>
-          <p className="text-muted-foreground mb-6 max-w-md">
-            כדי ליצור אתר, יש צורך בארגון פעיל. נסה לרענן את הדף או צור קשר עם התמיכה.
-          </p>
-          <Button onClick={() => window.location.reload()}>
-            רענן את הדף
-          </Button>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
+  // IMPORTANT: All hooks must be called before any conditional returns
+  // This is a React rule - hooks cannot be called conditionally
   useEffect(() => {
     async function fetchTemplates() {
       try {
@@ -131,6 +104,35 @@ export default function NewSite() {
     return templates.filter(t => t.category === selectedCategory);
   }, [templates, selectedCategory]);
 
+  // Show loading while tenant is being fetched
+  if (tenantLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Show error if no tenant exists
+  if (!currentTenant) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+          <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+          <h2 className="text-2xl font-bold mb-2">לא נמצא ארגון</h2>
+          <p className="text-muted-foreground mb-6 max-w-md">
+            כדי ליצור אתר, יש צורך בארגון פעיל. נסה לרענן את הדף או צור קשר עם התמיכה.
+          </p>
+          <Button onClick={() => window.location.reload()}>
+            רענן את הדף
+          </Button>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   const generateSlug = (name: string) => {
     return name
       .toLowerCase()
@@ -156,13 +158,20 @@ export default function NewSite() {
     setGeneratedBlueprint(null);
 
     try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+      if (!supabaseUrl || !supabaseKey) {
+        throw new Error('Supabase configuration is missing');
+      }
+
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-site`,
+        `${supabaseUrl}/functions/v1/generate-site`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${supabaseKey}`,
           },
           body: JSON.stringify({ brief: brief.trim() }),
         }

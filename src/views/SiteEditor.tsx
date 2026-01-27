@@ -149,7 +149,7 @@ export default function SiteEditor() {
     }
 
     fetchData();
-  }, [siteId, currentTenant, navigate]);
+  }, [siteId, currentTenant, router]);
 
   // Fetch sections when page changes
   useEffect(() => {
@@ -364,7 +364,7 @@ export default function SiteEditor() {
       {/* Editor Header */}
       <header className="h-14 bg-card border-b flex items-center justify-between px-4 shrink-0">
         <div className="flex items-center gap-4">
-          <Link to="/dashboard/sites">
+          <Link href="/dashboard/sites">
             <Button variant="ghost" size="icon">
               <ArrowRight className="h-4 w-4" />
             </Button>
