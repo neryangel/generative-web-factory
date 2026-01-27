@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { DOMAIN_REGEX } from '@/lib/validation-patterns';
 
 /**
  * App domains configuration - loaded from environment variable
@@ -10,11 +11,6 @@ const APP_DOMAINS = (process.env.APP_DOMAINS || DEFAULT_APP_DOMAINS)
   .split(',')
   .map(d => d.trim())
   .filter(Boolean);
-
-// RFC 1123 compliant domain validation regex
-// Allows alphanumeric characters, hyphens, and dots
-// Max 253 characters total, max 63 characters per label
-const VALID_DOMAIN_REGEX = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/;
 
 /**
  * Validates and sanitizes a domain name to prevent injection attacks
@@ -32,7 +28,7 @@ function validateDomain(domain: string): string | null {
   }
 
   // Validate against RFC 1123 pattern
-  if (!VALID_DOMAIN_REGEX.test(domain)) {
+  if (!DOMAIN_REGEX.test(domain)) {
     return null;
   }
 

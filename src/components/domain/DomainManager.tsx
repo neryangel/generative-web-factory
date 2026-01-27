@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useTenant } from '@/hooks/useTenant';
+import { isValidDomain } from '@/lib/validation-patterns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -104,8 +105,7 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
     if (!newDomain.trim() || !currentTenant) return;
 
     // Validate domain format
-    const domainRegex = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
-    if (!domainRegex.test(newDomain.trim())) {
+    if (!isValidDomain(newDomain.trim())) {
       toast.error('פורמט דומיין לא תקין');
       return;
     }

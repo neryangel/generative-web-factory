@@ -1,58 +1,36 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { SectionRenderer } from '@/components/editor/SectionRenderer';
-
-interface PublishedSection {
-  id: string;
-  type: string;
-  variant: string;
-  content: Record<string, unknown>;
-  settings: Record<string, unknown>;
-  sort_order: number;
-}
-
-interface PublishedPage {
-  id: string;
-  slug: string;
-  title: string;
-  is_homepage: boolean;
-  seo: Record<string, unknown>;
-  sections: PublishedSection[];
-}
-
-interface SiteData {
-  site: {
-    name: string;
-    settings: Record<string, unknown>;
-  };
-  snapshot: {
-    pages: PublishedPage[];
-    settings?: Record<string, unknown>;
-  };
-  version: number;
-  publishedAt: string;
-}
+import type { PublishedSiteData, PublishedPage } from '@/types/published-site';
 
 interface SiteRendererProps {
-  siteData: SiteData;
+  siteData: PublishedSiteData;
   currentPage: PublishedPage;
 }
 
 export function SiteRenderer({ siteData, currentPage }: SiteRendererProps) {
   // Update favicon if site has custom one
   useEffect(() => {
-    if (siteData.site?.settings?.faviconUrl) {
-      const link = document.querySelector("link[rel='icon']") as HTMLLinkElement;
-      if (link) {
-        link.href = siteData.site.settings.faviconUrl as string;
+    try {
+      if (siteData.site?.settings?.faviconUrl) {
+        const link = document.querySelector("link[rel='icon']") as HTMLLinkElement | null;
+        if (link) {
+          link.href = siteData.site.settings.faviconUrl as string;
+        }
       }
+    } catch {
+      // DOM manipulation may fail in edge cases
     }
   }, [siteData]);
 
-  // Sort sections by sort_order
-  const sortedSections = [...(currentPage.sections || [])].sort(
-    (a, b) => (a.sort_order || 0) - (b.sort_order || 0)
+  // Memoize sorted sections to avoid re-sorting on every render
+  const sortedSections = useMemo(
+    () =>
+      [...(currentPage.sections || [])].sort(
+        (a, b) => (a.sort_order || 0) - (b.sort_order || 0)
+      ),
+    [currentPage.sections]
   );
 
   return (
