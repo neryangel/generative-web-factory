@@ -1,22 +1,24 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { sitesApi } from '@/api/sites.api';
 import { useTenant } from '@/hooks/useTenant';
-import { queryKeys } from '@/lib/query-keys';
+import { queryKeys, DISABLED_QUERY_KEY } from '@/lib/query-keys';
 import type { SiteInsert, SiteUpdate } from '@/types';
 
 /**
- * Hook to fetch all sites for current tenant
+ * Hook to fetch all sites for a tenant
+ * @param tenantId - Optional tenant ID override. If not provided, uses current tenant from context.
  */
-export function useSites() {
+export function useSites(tenantId?: string | null) {
   const { currentTenant } = useTenant();
+  const effectiveTenantId = tenantId ?? currentTenant?.id;
 
   return useQuery({
-    queryKey: queryKeys.sites.list(currentTenant?.id),
+    queryKey: queryKeys.sites.list(effectiveTenantId) ?? DISABLED_QUERY_KEY,
     queryFn: () => {
-      if (!currentTenant) throw new Error('No tenant selected');
-      return sitesApi.getAll(currentTenant.id);
+      if (!effectiveTenantId) throw new Error('No tenant selected');
+      return sitesApi.getAll(effectiveTenantId);
     },
-    enabled: !!currentTenant,
+    enabled: !!effectiveTenantId,
   });
 }
 
@@ -27,7 +29,7 @@ export function useSite(siteId: string | undefined) {
   const { currentTenant } = useTenant();
 
   return useQuery({
-    queryKey: queryKeys.sites.detail(siteId),
+    queryKey: queryKeys.sites.detail(siteId) ?? DISABLED_QUERY_KEY,
     queryFn: () => {
       if (!currentTenant) throw new Error('No tenant selected');
       if (!siteId) throw new Error('No site ID provided');
@@ -42,7 +44,7 @@ export function useSite(siteId: string | undefined) {
  */
 export function useSiteBySlug(slug: string | undefined) {
   return useQuery({
-    queryKey: queryKeys.sites.bySlug(slug),
+    queryKey: queryKeys.sites.bySlug(slug) ?? DISABLED_QUERY_KEY,
     queryFn: () => {
       if (!slug) throw new Error('No slug provided');
       return sitesApi.getBySlug(slug);
@@ -79,7 +81,10 @@ export function useUpdateSite() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
-      queryClient.setQueryData(queryKeys.sites.detail(data.id), data);
+      const detailKey = queryKeys.sites.detail(data.id);
+      if (detailKey) {
+        queryClient.setQueryData(detailKey, data);
+      }
     },
   });
 }
@@ -116,7 +121,10 @@ export function useUpdateSiteSettings() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
-      queryClient.setQueryData(queryKeys.sites.detail(data.id), data);
+      const detailKey = queryKeys.sites.detail(data.id);
+      if (detailKey) {
+        queryClient.setQueryData(detailKey, data);
+      }
     },
   });
 }

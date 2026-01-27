@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// List of known app domains (not custom domains)
-const APP_DOMAINS = [
-  'localhost',
-  'vercel.app',
-  'generative-web-factory.vercel.app',
-  'amdir.app',
-  'www.amdir.app',
-];
+/**
+ * App domains configuration - loaded from environment variable
+ * Format: comma-separated list of domains (e.g., "localhost,vercel.app,amdir.app")
+ * Defaults provided for development; override in production via APP_DOMAINS env var
+ */
+const DEFAULT_APP_DOMAINS = 'localhost,vercel.app,amdir.app,www.amdir.app';
+const APP_DOMAINS = (process.env.APP_DOMAINS || DEFAULT_APP_DOMAINS)
+  .split(',')
+  .map(d => d.trim())
+  .filter(Boolean);
 
 // RFC 1123 compliant domain validation regex
 // Allows alphanumeric characters, hyphens, and dots

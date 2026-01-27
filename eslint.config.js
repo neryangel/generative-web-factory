@@ -5,13 +5,17 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", ".next", "node_modules"] },
+  { ignores: ["dist", ".next", "node_modules", "**/*.test.ts", "**/*.test.tsx"] },
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        project: ["./tsconfig.app.json"],
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     plugins: {
       "react-hooks": reactHooks,
@@ -38,6 +42,18 @@ export default tseslint.config(
         prefer: "type-imports",
         disallowTypeAnnotations: false,
         fixStyle: "separate-type-imports",
+      }],
+      // Prevent unhandled promise rejections (silent failures)
+      "@typescript-eslint/no-floating-promises": ["error", {
+        ignoreVoid: true,
+        ignoreIIFE: true,
+      }],
+      // Ensure promises are awaited or handled
+      "@typescript-eslint/no-misused-promises": ["error", {
+        checksVoidReturn: {
+          arguments: false,
+          attributes: false,
+        },
       }],
     },
   },

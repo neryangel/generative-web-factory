@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { tenantsApi, TenantWithRole } from '@/api/tenants.api';
 import { useAuth } from '@/hooks/useAuth';
-import { queryKeys } from '@/lib/query-keys';
+import { queryKeys, DISABLED_QUERY_KEY } from '@/lib/query-keys';
 
 /**
  * Hook to fetch all tenants for the current user
@@ -10,7 +10,7 @@ export function useTenants() {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: queryKeys.tenants.list(user?.id),
+    queryKey: queryKeys.tenants.list(user?.id) ?? DISABLED_QUERY_KEY,
     queryFn: () => {
       if (!user) throw new Error('No user authenticated');
       return tenantsApi.getAllForUser(user.id);
@@ -24,7 +24,7 @@ export function useTenants() {
  */
 export function useTenantById(tenantId: string | undefined) {
   return useQuery({
-    queryKey: queryKeys.tenants.detail(tenantId),
+    queryKey: queryKeys.tenants.detail(tenantId) ?? DISABLED_QUERY_KEY,
     queryFn: () => {
       if (!tenantId) throw new Error('No tenant ID provided');
       return tenantsApi.getById(tenantId);
@@ -58,7 +58,10 @@ export function useUpdateTenant() {
       tenantsApi.update(tenantId, updates),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all });
-      queryClient.setQueryData(queryKeys.tenants.detail(data.id), data);
+      const detailKey = queryKeys.tenants.detail(data.id);
+      if (detailKey) {
+        queryClient.setQueryData(detailKey, data);
+      }
     },
   });
 }
