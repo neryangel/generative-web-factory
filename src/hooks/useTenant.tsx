@@ -35,8 +35,13 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   // Initialize current tenant from localStorage or first available
   useEffect(() => {
     if (tenants.length > 0 && !currentTenant) {
-      const savedTenantId = localStorage.getItem('currentTenantId');
-      const savedTenant = tenants.find(t => t.id === savedTenantId);
+      let savedTenantId: string | null = null;
+      try {
+        savedTenantId = localStorage.getItem('currentTenantId');
+      } catch {
+        // localStorage may be unavailable in private browsing
+      }
+      const savedTenant = savedTenantId ? tenants.find(t => t.id === savedTenantId) : null;
       setCurrentTenantState(savedTenant || tenants[0] || null);
     }
   }, [tenants, currentTenant]);
@@ -51,10 +56,14 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   // Persist current tenant selection
   const setCurrentTenant = useCallback((tenant: TenantWithRole | null) => {
     setCurrentTenantState(tenant);
-    if (tenant) {
-      localStorage.setItem('currentTenantId', tenant.id);
-    } else {
-      localStorage.removeItem('currentTenantId');
+    try {
+      if (tenant) {
+        localStorage.setItem('currentTenantId', tenant.id);
+      } else {
+        localStorage.removeItem('currentTenantId');
+      }
+    } catch {
+      // localStorage may be unavailable in private browsing
     }
   }, []);
 

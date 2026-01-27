@@ -99,8 +99,10 @@ export function useAutoSave(options: AutoSaveOptions = {}) {
                 retryCount: op.retryCount + 1,
               });
             } else {
-              // Max retries exceeded
-              onError?.(error as Error);
+              // Max retries exceeded - notify user
+              const saveError = error instanceof Error ? error : new Error('Save failed');
+              onError?.(saveError);
+              toast.error('שמירה אוטומטית נכשלה. נסה לשמור שוב.');
             }
           }
         }

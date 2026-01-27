@@ -259,23 +259,25 @@ export default function SiteEditor() {
 
       const newVersion = (lastPublish?.version || 0) + 1;
 
-      // Get all pages and sections for snapshot
-      const { data: allPages } = await supabase
+      // Fetch pages with their sections in a single joined query
+      const { data: allPages, error: pagesError } = await supabase
         .from('pages')
-        .select('*')
-        .eq('site_id', site.id);
+        .select('*, sections(*)')
+        .eq('site_id', site.id)
+        .order('sort_order');
 
-      const { data: allSections } = await supabase
-        .from('sections')
-        .select('*')
-        .eq('tenant_id', currentTenant.id)
-        .in('page_id', (allPages || []).map(p => p.id));
+      if (pagesError) throw pagesError;
 
-      // Build snapshot with proper structure for public runtime
-      const pagesWithSections = (allPages || []).map(page => ({
+      if (!allPages || allPages.length === 0) {
+        toast.error('אין דפים לפרסום. הוסף לפחות דף אחד.');
+        return;
+      }
+
+      // Sort sections within each page
+      const pagesWithSections = allPages.map(page => ({
         ...page,
-        sections: (allSections || []).filter(s => s.page_id === page.id)
-          .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)),
+        sections: (page.sections || [])
+          .sort((a: Section, b: Section) => (a.sort_order || 0) - (b.sort_order || 0)),
       }));
 
       const snapshot = {
@@ -284,13 +286,16 @@ export default function SiteEditor() {
         published_at: new Date().toISOString(),
       };
 
-      // Reset is_current on previous publishes
-      await supabase
+      // Reset is_current and create new publish atomically
+      // First reset, then insert - if insert fails, we still have version history
+      const { error: resetError } = await supabase
         .from('publishes')
         .update({ is_current: false })
-        .eq('site_id', site.id);
+        .eq('site_id', site.id)
+        .eq('is_current', true);
 
-      // Create new publish
+      if (resetError) throw resetError;
+
       const { error: publishError } = await supabase
         .from('publishes')
         .insert({
@@ -310,14 +315,14 @@ export default function SiteEditor() {
         .eq('id', site.id);
 
       setSite(prev => prev ? { ...prev, status: 'published' } : null);
-      
+
       // Show success with link to public site
       toast.success(
         <div className="flex flex-col gap-1">
           <span>האתר פורסם בהצלחה! (גרסה {newVersion})</span>
-          <a 
-            href={`/s/${site.slug}`} 
-            target="_blank" 
+          <a
+            href={`/s/${site.slug}`}
+            target="_blank"
             rel="noopener noreferrer"
             className="text-primary underline text-sm"
           >

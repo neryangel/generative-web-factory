@@ -50,8 +50,8 @@ async function verifyDns(domain: string): Promise<{ verified: boolean; records: 
     const data = await response.json();
     const records: DnsRecord[] = [];
     
-    // Expected IP for Lovable hosting
-    const expectedIp = "185.158.133.1";
+    // Expected IP for hosting - configurable via environment
+    const expectedIp = Deno.env.get("HOSTING_IP") || "185.158.133.1";
     
     if (data.Answer) {
       for (const answer of data.Answer) {

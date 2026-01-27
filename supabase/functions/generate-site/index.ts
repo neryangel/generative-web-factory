@@ -140,25 +140,40 @@ serve(async (req) => {
 
     console.log("Generating site for brief:", sanitizedBrief.substring(0, 100));
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          {
-            role: "user",
-            content: `Generate a complete website blueprint for this business:\n\n${sanitizedBrief}\n\nRespond with valid JSON only.`
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 4000,
-      }),
-    });
+    // Add timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    let response: Response;
+    try {
+      response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            { role: "system", content: systemPrompt },
+            {
+              role: "user",
+              content: `Generate a complete website blueprint for this business:\n\n${sanitizedBrief}\n\nRespond with valid JSON only.`
+            },
+          ],
+          temperature: 0.7,
+          max_tokens: 4000,
+        }),
+        signal: controller.signal,
+      });
+    } catch (fetchError: unknown) {
+      if (fetchError instanceof DOMException && fetchError.name === "AbortError") {
+        return errorResponse("שירות ה-AI לא הגיב בזמן, נסה שוב", 504, corsHeaders);
+      }
+      throw fetchError;
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
