@@ -62,12 +62,14 @@ export const sitesApi = {
 
   /**
    * Update a site
+   * @param tenantId - Required for defense-in-depth validation alongside RLS
    */
-  async update(siteId: string, updates: SiteUpdate): Promise<Site> {
+  async update(siteId: string, tenantId: string, updates: SiteUpdate): Promise<Site> {
     const { data, error } = await supabase
       .from('sites')
       .update(updates)
       .eq('id', siteId)
+      .eq('tenant_id', tenantId)
       .select()
       .single();
 
@@ -77,24 +79,28 @@ export const sitesApi = {
 
   /**
    * Delete a site
+   * @param tenantId - Required for defense-in-depth validation alongside RLS
    */
-  async delete(siteId: string): Promise<void> {
+  async delete(siteId: string, tenantId: string): Promise<void> {
     const { error } = await supabase
       .from('sites')
       .delete()
-      .eq('id', siteId);
+      .eq('id', siteId)
+      .eq('tenant_id', tenantId);
 
     if (error) throw parseSupabaseError(error);
   },
 
   /**
    * Update site settings
+   * @param tenantId - Required for defense-in-depth validation alongside RLS
    */
-  async updateSettings(siteId: string, settings: Record<string, unknown>): Promise<Site> {
+  async updateSettings(siteId: string, tenantId: string, settings: Record<string, unknown>): Promise<Site> {
     const { data, error } = await supabase
       .from('sites')
       .update({ settings: settings as unknown as import('@/integrations/supabase/types').Json })
       .eq('id', siteId)
+      .eq('tenant_id', tenantId)
       .select()
       .single();
 

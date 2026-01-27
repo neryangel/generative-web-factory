@@ -60,10 +60,11 @@ export function useCreateSite() {
  */
 export function useUpdateSite() {
   const queryClient = useQueryClient();
+  const { currentTenant } = useTenant();
 
   return useMutation({
     mutationFn: ({ siteId, updates }: { siteId: string; updates: SiteUpdate }) =>
-      sitesApi.update(siteId, updates),
+      sitesApi.update(siteId, currentTenant!.id, updates),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
       queryClient.setQueryData(queryKeys.sites.detail(data.id), data);
@@ -76,9 +77,10 @@ export function useUpdateSite() {
  */
 export function useDeleteSite() {
   const queryClient = useQueryClient();
+  const { currentTenant } = useTenant();
 
   return useMutation({
-    mutationFn: (siteId: string) => sitesApi.delete(siteId),
+    mutationFn: (siteId: string) => sitesApi.delete(siteId, currentTenant!.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
     },
@@ -90,10 +92,11 @@ export function useDeleteSite() {
  */
 export function useUpdateSiteSettings() {
   const queryClient = useQueryClient();
+  const { currentTenant } = useTenant();
 
   return useMutation({
     mutationFn: ({ siteId, settings }: { siteId: string; settings: Record<string, unknown> }) =>
-      sitesApi.updateSettings(siteId, settings),
+      sitesApi.updateSettings(siteId, currentTenant!.id, settings),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
       queryClient.setQueryData(queryKeys.sites.detail(data.id), data);

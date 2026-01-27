@@ -78,6 +78,20 @@ vi.mock('@/integrations/supabase/client', () => ({
             eq: (...eqArgs: unknown[]) => {
               mockEq(...eqArgs);
               return {
+                eq: (...eq2Args: unknown[]) => {
+                  mockEq(...eq2Args);
+                  return {
+                    select: () => ({
+                      single: () => {
+                        mockSingle();
+                        return Promise.resolve({
+                          data: { id: eqArgs[1], ...data },
+                          error: null,
+                        });
+                      },
+                    }),
+                  };
+                },
                 select: () => ({
                   single: () => {
                     mockSingle();
@@ -96,7 +110,12 @@ vi.mock('@/integrations/supabase/client', () => ({
           return {
             eq: (...eqArgs: unknown[]) => {
               mockEq(...eqArgs);
-              return Promise.resolve({ error: null });
+              return {
+                eq: (...eq2Args: unknown[]) => {
+                  mockEq(...eq2Args);
+                  return Promise.resolve({ error: null });
+                },
+              };
             },
           };
         },
@@ -171,42 +190,48 @@ describe('sitesApi', () => {
   });
 
   describe('update', () => {
-    it('should update a site', async () => {
+    it('should update a site with tenant validation', async () => {
       const siteId = 'site-1';
+      const tenantId = 'tenant-1';
       const updates = { name: 'Updated Site' };
 
-      const result = await sitesApi.update(siteId, updates);
+      const result = await sitesApi.update(siteId, tenantId, updates);
 
       expect(mockFrom).toHaveBeenCalledWith('sites');
       expect(mockUpdate).toHaveBeenCalledWith(updates);
       expect(mockEq).toHaveBeenCalledWith('id', siteId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
       expect(mockSingle).toHaveBeenCalled();
       expect(result).toHaveProperty('id', siteId);
     });
   });
 
   describe('delete', () => {
-    it('should delete a site', async () => {
+    it('should delete a site with tenant validation', async () => {
       const siteId = 'site-1';
+      const tenantId = 'tenant-1';
 
-      await sitesApi.delete(siteId);
+      await sitesApi.delete(siteId, tenantId);
 
       expect(mockFrom).toHaveBeenCalledWith('sites');
       expect(mockDelete).toHaveBeenCalled();
       expect(mockEq).toHaveBeenCalledWith('id', siteId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
     });
   });
 
   describe('updateSettings', () => {
-    it('should update site settings', async () => {
+    it('should update site settings with tenant validation', async () => {
       const siteId = 'site-1';
+      const tenantId = 'tenant-1';
       const settings = { theme: 'dark' };
 
-      const result = await sitesApi.updateSettings(siteId, settings);
+      const result = await sitesApi.updateSettings(siteId, tenantId, settings);
 
       expect(mockFrom).toHaveBeenCalledWith('sites');
       expect(mockUpdate).toHaveBeenCalledWith({ settings });
       expect(mockEq).toHaveBeenCalledWith('id', siteId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
       expect(result).toHaveProperty('id', siteId);
     });
   });
