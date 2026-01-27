@@ -8,10 +8,26 @@
     },
     "skipLibCheck": true,
     "allowJs": true,
+
+    /* Strict Type-Checking - Enterprise Grade */
     "strict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+
+    /* Additional Checks */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+
+    /* Module Resolution */
     "forceConsistentCasingInFileNames": true,
     "exactOptionalPropertyTypes": false
   }

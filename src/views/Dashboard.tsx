@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTenant } from '@/hooks/useTenant';
-import { supabase } from '@/integrations/supabase/client';
+import { useSites } from '@/hooks/queries/useSites';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { CreateTenantDialog } from '@/components/tenant/CreateTenantDialog';
 import { Button } from '@/components/ui/button';
@@ -16,42 +15,15 @@ import {
   Eye,
   FileText,
 } from 'lucide-react';
-import type { Tables } from '@/integrations/supabase/types';
-
-type Site = Tables<'sites'>;
 
 export default function Dashboard() {
   const { currentTenant, tenants, loading: tenantLoading } = useTenant();
-  const [sites, setSites] = useState<Site[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchSites() {
-      if (!currentTenant) {
-        setSites([]);
-        setLoading(false);
-        return;
-      }
+  // Use React Query hook with proper API layer (includes Zod validation)
+  const { data: allSites = [], isLoading: loading } = useSites(currentTenant?.id);
 
-      try {
-        const { data, error } = await supabase
-          .from('sites')
-          .select('*')
-          .eq('tenant_id', currentTenant.id)
-          .order('updated_at', { ascending: false })
-          .limit(5);
-
-        if (error) throw error;
-        setSites(data || []);
-      } catch (error) {
-        console.error('Error fetching sites:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchSites();
-  }, [currentTenant]);
+  // Get only the 5 most recent sites for dashboard display
+  const sites = allSites.slice(0, 5);
 
   // No tenant - show onboarding
   if (!tenantLoading && tenants.length === 0) {
@@ -77,22 +49,23 @@ export default function Dashboard() {
     );
   }
 
+  // Stats use allSites for accurate counts
   const stats = [
     {
       label: 'סה"כ אתרים',
-      value: sites.length,
+      value: allSites.length,
       icon: Globe,
       color: 'text-primary'
     },
     {
       label: 'אתרים פעילים',
-      value: sites.filter(s => s.status === 'published').length,
+      value: allSites.filter(s => s.status === 'published').length,
       icon: Eye,
       color: 'text-success'
     },
     {
       label: 'טיוטות',
-      value: sites.filter(s => s.status === 'draft').length,
+      value: allSites.filter(s => s.status === 'draft').length,
       icon: FileText,
       color: 'text-warning'
     },

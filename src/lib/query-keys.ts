@@ -7,12 +7,21 @@
  * - scope: The query type (list, detail, slug, etc.)
  * - identifiers: Specific IDs or parameters
  *
- * Note: Functions return empty arrays for null/undefined IDs to prevent
- * cache collisions when identifiers are not yet available. Queries should
- * use `enabled: !!id` to prevent fetching with invalid keys.
+ * IMPORTANT: Functions return null for missing identifiers to prevent cache collisions.
+ * Queries MUST use `enabled: !!id` and handle null queryKey appropriately.
+ *
+ * @example
+ * const { data } = useQuery({
+ *   queryKey: queryKeys.sites.detail(siteId) ?? ['_disabled'],
+ *   queryFn: () => sitesApi.getById(siteId!, tenantId!),
+ *   enabled: !!siteId && !!tenantId,
+ * });
  */
 
 type MaybeString = string | null | undefined;
+
+// Sentinel key used when query should be disabled
+export const DISABLED_QUERY_KEY = ['_disabled'] as const;
 
 export const queryKeys = {
   // Sites
@@ -20,12 +29,12 @@ export const queryKeys = {
     all: ['sites'] as const,
     lists: () => [...queryKeys.sites.all, 'list'] as const,
     list: (tenantId: MaybeString) =>
-      tenantId ? ([...queryKeys.sites.lists(), tenantId] as const) : ([] as const),
+      tenantId ? ([...queryKeys.sites.lists(), tenantId] as const) : null,
     details: () => [...queryKeys.sites.all, 'detail'] as const,
     detail: (siteId: MaybeString) =>
-      siteId ? ([...queryKeys.sites.details(), siteId] as const) : ([] as const),
+      siteId ? ([...queryKeys.sites.details(), siteId] as const) : null,
     bySlug: (slug: MaybeString) =>
-      slug ? ([...queryKeys.sites.all, 'slug', slug] as const) : ([] as const),
+      slug ? ([...queryKeys.sites.all, 'slug', slug] as const) : null,
   },
 
   // Pages
@@ -33,14 +42,14 @@ export const queryKeys = {
     all: ['pages'] as const,
     lists: () => [...queryKeys.pages.all, 'list'] as const,
     list: (siteId: MaybeString) =>
-      siteId ? ([...queryKeys.pages.lists(), siteId] as const) : ([] as const),
+      siteId ? ([...queryKeys.pages.lists(), siteId] as const) : null,
     details: () => [...queryKeys.pages.all, 'detail'] as const,
     detail: (pageId: MaybeString) =>
-      pageId ? ([...queryKeys.pages.details(), pageId] as const) : ([] as const),
+      pageId ? ([...queryKeys.pages.details(), pageId] as const) : null,
     bySlug: (siteId: MaybeString, slug: MaybeString) =>
       siteId && slug
         ? ([...queryKeys.pages.all, 'slug', siteId, slug] as const)
-        : ([] as const),
+        : null,
   },
 
   // Sections
@@ -48,10 +57,10 @@ export const queryKeys = {
     all: ['sections'] as const,
     lists: () => [...queryKeys.sections.all, 'list'] as const,
     list: (pageId: MaybeString) =>
-      pageId ? ([...queryKeys.sections.lists(), pageId] as const) : ([] as const),
+      pageId ? ([...queryKeys.sections.lists(), pageId] as const) : null,
     details: () => [...queryKeys.sections.all, 'detail'] as const,
     detail: (sectionId: MaybeString) =>
-      sectionId ? ([...queryKeys.sections.details(), sectionId] as const) : ([] as const),
+      sectionId ? ([...queryKeys.sections.details(), sectionId] as const) : null,
   },
 
   // Templates
@@ -64,9 +73,9 @@ export const queryKeys = {
         : queryKeys.templates.lists(),
     details: () => [...queryKeys.templates.all, 'detail'] as const,
     detail: (templateId: MaybeString) =>
-      templateId ? ([...queryKeys.templates.details(), templateId] as const) : ([] as const),
+      templateId ? ([...queryKeys.templates.details(), templateId] as const) : null,
     bySlug: (slug: MaybeString) =>
-      slug ? ([...queryKeys.templates.all, 'slug', slug] as const) : ([] as const),
+      slug ? ([...queryKeys.templates.all, 'slug', slug] as const) : null,
   },
 
   // Tenants
@@ -74,10 +83,10 @@ export const queryKeys = {
     all: ['tenants'] as const,
     lists: () => [...queryKeys.tenants.all, 'list'] as const,
     list: (userId: MaybeString) =>
-      userId ? ([...queryKeys.tenants.lists(), userId] as const) : ([] as const),
+      userId ? ([...queryKeys.tenants.lists(), userId] as const) : null,
     details: () => [...queryKeys.tenants.all, 'detail'] as const,
     detail: (tenantId: MaybeString) =>
-      tenantId ? ([...queryKeys.tenants.details(), tenantId] as const) : ([] as const),
+      tenantId ? ([...queryKeys.tenants.details(), tenantId] as const) : null,
   },
 
   // Domains
@@ -85,12 +94,12 @@ export const queryKeys = {
     all: ['domains'] as const,
     lists: () => [...queryKeys.domains.all, 'list'] as const,
     list: (siteId: MaybeString) =>
-      siteId ? ([...queryKeys.domains.lists(), siteId] as const) : ([] as const),
+      siteId ? ([...queryKeys.domains.lists(), siteId] as const) : null,
     details: () => [...queryKeys.domains.all, 'detail'] as const,
     detail: (domainId: MaybeString) =>
-      domainId ? ([...queryKeys.domains.details(), domainId] as const) : ([] as const),
+      domainId ? ([...queryKeys.domains.details(), domainId] as const) : null,
     byDomain: (domain: MaybeString) =>
-      domain ? ([...queryKeys.domains.all, 'domain', domain] as const) : ([] as const),
+      domain ? ([...queryKeys.domains.all, 'domain', domain] as const) : null,
   },
 
   // Assets
@@ -102,10 +111,10 @@ export const queryKeys = {
         ? siteId
           ? ([...queryKeys.assets.lists(), tenantId, siteId] as const)
           : ([...queryKeys.assets.lists(), tenantId] as const)
-        : ([] as const),
+        : null,
     details: () => [...queryKeys.assets.all, 'detail'] as const,
     detail: (assetId: MaybeString) =>
-      assetId ? ([...queryKeys.assets.details(), assetId] as const) : ([] as const),
+      assetId ? ([...queryKeys.assets.details(), assetId] as const) : null,
   },
 
   // Publishes
@@ -113,9 +122,9 @@ export const queryKeys = {
     all: ['publishes'] as const,
     lists: () => [...queryKeys.publishes.all, 'list'] as const,
     list: (siteId: MaybeString) =>
-      siteId ? ([...queryKeys.publishes.lists(), siteId] as const) : ([] as const),
+      siteId ? ([...queryKeys.publishes.lists(), siteId] as const) : null,
     current: (siteId: MaybeString) =>
-      siteId ? ([...queryKeys.publishes.all, 'current', siteId] as const) : ([] as const),
+      siteId ? ([...queryKeys.publishes.all, 'current', siteId] as const) : null,
   },
 } as const;
 
