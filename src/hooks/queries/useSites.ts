@@ -11,8 +11,11 @@ export function useSites() {
   const { currentTenant } = useTenant();
 
   return useQuery({
-    queryKey: queryKeys.sites.list(currentTenant?.id ?? ''),
-    queryFn: () => sitesApi.getAll(currentTenant!.id),
+    queryKey: queryKeys.sites.list(currentTenant?.id),
+    queryFn: () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return sitesApi.getAll(currentTenant.id);
+    },
     enabled: !!currentTenant,
   });
 }
@@ -24,8 +27,12 @@ export function useSite(siteId: string | undefined) {
   const { currentTenant } = useTenant();
 
   return useQuery({
-    queryKey: queryKeys.sites.detail(siteId ?? ''),
-    queryFn: () => sitesApi.getById(siteId!, currentTenant!.id),
+    queryKey: queryKeys.sites.detail(siteId),
+    queryFn: () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      if (!siteId) throw new Error('No site ID provided');
+      return sitesApi.getById(siteId, currentTenant.id);
+    },
     enabled: !!currentTenant && !!siteId,
   });
 }
@@ -35,8 +42,11 @@ export function useSite(siteId: string | undefined) {
  */
 export function useSiteBySlug(slug: string | undefined) {
   return useQuery({
-    queryKey: queryKeys.sites.bySlug(slug ?? ''),
-    queryFn: () => sitesApi.getBySlug(slug!),
+    queryKey: queryKeys.sites.bySlug(slug),
+    queryFn: () => {
+      if (!slug) throw new Error('No slug provided');
+      return sitesApi.getBySlug(slug);
+    },
     enabled: !!slug,
   });
 }
@@ -63,8 +73,10 @@ export function useUpdateSite() {
   const { currentTenant } = useTenant();
 
   return useMutation({
-    mutationFn: ({ siteId, updates }: { siteId: string; updates: SiteUpdate }) =>
-      sitesApi.update(siteId, currentTenant!.id, updates),
+    mutationFn: ({ siteId, updates }: { siteId: string; updates: SiteUpdate }) => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return sitesApi.update(siteId, currentTenant.id, updates);
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
       queryClient.setQueryData(queryKeys.sites.detail(data.id), data);
@@ -80,7 +92,10 @@ export function useDeleteSite() {
   const { currentTenant } = useTenant();
 
   return useMutation({
-    mutationFn: (siteId: string) => sitesApi.delete(siteId, currentTenant!.id),
+    mutationFn: (siteId: string) => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return sitesApi.delete(siteId, currentTenant.id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
     },
@@ -95,8 +110,10 @@ export function useUpdateSiteSettings() {
   const { currentTenant } = useTenant();
 
   return useMutation({
-    mutationFn: ({ siteId, settings }: { siteId: string; settings: Record<string, unknown> }) =>
-      sitesApi.updateSettings(siteId, currentTenant!.id, settings),
+    mutationFn: ({ siteId, settings }: { siteId: string; settings: Record<string, unknown> }) => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return sitesApi.updateSettings(siteId, currentTenant.id, settings);
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
       queryClient.setQueryData(queryKeys.sites.detail(data.id), data);

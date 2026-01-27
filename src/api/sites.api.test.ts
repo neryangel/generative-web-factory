@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { sitesApi } from './sites.api';
 
+// Valid UUIDs for testing
+const MOCK_TENANT_ID = '11111111-1111-1111-1111-111111111111';
+const MOCK_SITE_ID = '22222222-2222-2222-2222-222222222222';
+const MOCK_NEW_SITE_ID = '33333333-3333-3333-3333-333333333333';
+
 // Mock supabase client
 const mockFrom = vi.fn();
 const mockSelect = vi.fn();
@@ -65,7 +70,7 @@ vi.mock('@/integrations/supabase/client', () => ({
               single: () => {
                 mockSingle();
                 return Promise.resolve({
-                  data: { id: 'new-site-id', ...data },
+                  data: { id: MOCK_NEW_SITE_ID, ...data },
                   error: null,
                 });
               },
@@ -131,31 +136,28 @@ describe('sitesApi', () => {
 
   describe('getAll', () => {
     it('should fetch all sites for a tenant', async () => {
-      const tenantId = 'tenant-1';
-      await sitesApi.getAll(tenantId);
+      await sitesApi.getAll(MOCK_TENANT_ID);
 
       expect(mockFrom).toHaveBeenCalledWith('sites');
       expect(mockSelect).toHaveBeenCalledWith('*');
-      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', MOCK_TENANT_ID);
       expect(mockOrder).toHaveBeenCalledWith('updated_at', { ascending: false });
     });
 
     it('should return empty array when no sites exist', async () => {
-      const result = await sitesApi.getAll('tenant-1');
+      const result = await sitesApi.getAll(MOCK_TENANT_ID);
       expect(result).toEqual([]);
     });
   });
 
   describe('getById', () => {
     it('should fetch a site by ID', async () => {
-      const siteId = 'site-1';
-      const tenantId = 'tenant-1';
-      await sitesApi.getById(siteId, tenantId);
+      await sitesApi.getById(MOCK_SITE_ID, MOCK_TENANT_ID);
 
       expect(mockFrom).toHaveBeenCalledWith('sites');
       expect(mockSelect).toHaveBeenCalledWith('*');
-      expect(mockEq).toHaveBeenCalledWith('id', siteId);
-      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
+      expect(mockEq).toHaveBeenCalledWith('id', MOCK_SITE_ID);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', MOCK_TENANT_ID);
       expect(mockMaybeSingle).toHaveBeenCalled();
     });
   });
@@ -177,7 +179,7 @@ describe('sitesApi', () => {
       const siteData = {
         name: 'New Site',
         slug: 'new-site',
-        tenant_id: 'tenant-1',
+        tenant_id: MOCK_TENANT_ID,
       };
 
       const result = await sitesApi.create(siteData);
@@ -191,48 +193,41 @@ describe('sitesApi', () => {
 
   describe('update', () => {
     it('should update a site with tenant validation', async () => {
-      const siteId = 'site-1';
-      const tenantId = 'tenant-1';
       const updates = { name: 'Updated Site' };
 
-      const result = await sitesApi.update(siteId, tenantId, updates);
+      const result = await sitesApi.update(MOCK_SITE_ID, MOCK_TENANT_ID, updates);
 
       expect(mockFrom).toHaveBeenCalledWith('sites');
       expect(mockUpdate).toHaveBeenCalledWith(updates);
-      expect(mockEq).toHaveBeenCalledWith('id', siteId);
-      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
+      expect(mockEq).toHaveBeenCalledWith('id', MOCK_SITE_ID);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', MOCK_TENANT_ID);
       expect(mockSingle).toHaveBeenCalled();
-      expect(result).toHaveProperty('id', siteId);
+      expect(result).toHaveProperty('id', MOCK_SITE_ID);
     });
   });
 
   describe('delete', () => {
     it('should delete a site with tenant validation', async () => {
-      const siteId = 'site-1';
-      const tenantId = 'tenant-1';
-
-      await sitesApi.delete(siteId, tenantId);
+      await sitesApi.delete(MOCK_SITE_ID, MOCK_TENANT_ID);
 
       expect(mockFrom).toHaveBeenCalledWith('sites');
       expect(mockDelete).toHaveBeenCalled();
-      expect(mockEq).toHaveBeenCalledWith('id', siteId);
-      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
+      expect(mockEq).toHaveBeenCalledWith('id', MOCK_SITE_ID);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', MOCK_TENANT_ID);
     });
   });
 
   describe('updateSettings', () => {
     it('should update site settings with tenant validation', async () => {
-      const siteId = 'site-1';
-      const tenantId = 'tenant-1';
       const settings = { theme: 'dark' };
 
-      const result = await sitesApi.updateSettings(siteId, tenantId, settings);
+      const result = await sitesApi.updateSettings(MOCK_SITE_ID, MOCK_TENANT_ID, settings);
 
       expect(mockFrom).toHaveBeenCalledWith('sites');
       expect(mockUpdate).toHaveBeenCalledWith({ settings });
-      expect(mockEq).toHaveBeenCalledWith('id', siteId);
-      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
-      expect(result).toHaveProperty('id', siteId);
+      expect(mockEq).toHaveBeenCalledWith('id', MOCK_SITE_ID);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', MOCK_TENANT_ID);
+      expect(result).toHaveProperty('id', MOCK_SITE_ID);
     });
   });
 
@@ -250,11 +245,24 @@ describe('sitesApi', () => {
 
     it('should exclude a site ID when checking availability', async () => {
       const slug = 'test-slug';
-      const excludeSiteId = 'site-1';
 
-      await sitesApi.isSlugAvailable(slug, excludeSiteId);
+      await sitesApi.isSlugAvailable(slug, MOCK_SITE_ID);
 
-      expect(mockNeq).toHaveBeenCalledWith('id', excludeSiteId);
+      expect(mockNeq).toHaveBeenCalledWith('id', MOCK_SITE_ID);
+    });
+  });
+
+  describe('validation', () => {
+    it('should reject invalid tenant ID format', async () => {
+      await expect(sitesApi.getAll('invalid-id')).rejects.toThrow();
+    });
+
+    it('should reject invalid site ID format', async () => {
+      await expect(sitesApi.getById('invalid-id', MOCK_TENANT_ID)).rejects.toThrow();
+    });
+
+    it('should reject invalid slug format', async () => {
+      await expect(sitesApi.getBySlug('Invalid Slug!')).rejects.toThrow();
     });
   });
 });
