@@ -46,8 +46,6 @@ export function CreateTenantDialog({ children, onSuccess }: CreateTenantDialogPr
 
     setLoading(true);
     try {
-      console.log('Creating tenant:', { name: name.trim(), slug: slug.trim() });
-      
       const { data, error } = await createTenant(name.trim(), slug.trim());
       
       if (error) {
@@ -62,8 +60,6 @@ export function CreateTenantDialog({ children, onSuccess }: CreateTenantDialogPr
         return;
       }
 
-      console.log('Tenant created successfully:', data);
-      
       // Small delay to ensure the trigger has completed
       await new Promise(resolve => setTimeout(resolve, 500));
 

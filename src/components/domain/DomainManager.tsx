@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useTenant } from '@/hooks/useTenant';
 import { isValidDomain } from '@/lib/validation-patterns';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -136,10 +137,10 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
       try {
         const vercelResult = await vercelDomainApi('add', newDomain.trim().toLowerCase());
         if (vercelResult.error) {
-          console.warn('Vercel domain add warning:', vercelResult.error);
+          logger.warn('Vercel domain add warning:', vercelResult.error);
         }
       } catch (vercelError) {
-        console.warn('Could not add domain to Vercel:', vercelError);
+        logger.warn('Could not add domain to Vercel:', vercelError);
       }
 
       toast.success('הדומיין נוסף בהצלחה! הגדר את ה-DNS כדי להפעיל אותו.');
@@ -212,7 +213,7 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
         try {
           await vercelDomainApi('remove', domainRecord.domain);
         } catch (vercelError) {
-          console.warn('Could not remove domain from Vercel:', vercelError);
+          logger.warn('Could not remove domain from Vercel:', vercelError);
         }
       }
 
