@@ -29,6 +29,19 @@ vi.mock('@/integrations/supabase/client', () => ({
                 eq: (...eq2Args: unknown[]) => {
                   mockEq(...eq2Args);
                   return {
+                    eq: (...eq3Args: unknown[]) => {
+                      mockEq(...eq3Args);
+                      return {
+                        maybeSingle: () => {
+                          mockMaybeSingle();
+                          return Promise.resolve({ data: null, error: null });
+                        },
+                      };
+                    },
+                    order: (...orderArgs: unknown[]) => {
+                      mockOrder(...orderArgs);
+                      return Promise.resolve({ data: [], error: null });
+                    },
                     maybeSingle: () => {
                       mockMaybeSingle();
                       return Promise.resolve({ data: null, error: null });
@@ -74,6 +87,20 @@ vi.mock('@/integrations/supabase/client', () => ({
                 updateCalls.push({ id: eqArgs[1] as string, sort_order: data.sort_order });
               }
               return {
+                eq: (...eq2Args: unknown[]) => {
+                  mockEq(...eq2Args);
+                  return {
+                    select: () => ({
+                      single: () => {
+                        mockSingle();
+                        return Promise.resolve({
+                          data: { id: eqArgs[1], site_id: 'site-1', ...data },
+                          error: null,
+                        });
+                      },
+                    }),
+                  };
+                },
                 select: () => ({
                   single: () => {
                     mockSingle();
@@ -92,7 +119,12 @@ vi.mock('@/integrations/supabase/client', () => ({
           return {
             eq: (...eqArgs: unknown[]) => {
               mockEq(...eqArgs);
-              return Promise.resolve({ error: null });
+              return {
+                eq: (...eq2Args: unknown[]) => {
+                  mockEq(...eq2Args);
+                  return Promise.resolve({ error: null });
+                },
+              };
             },
           };
         },
@@ -108,42 +140,48 @@ describe('pagesApi', () => {
   });
 
   describe('getBySiteId', () => {
-    it('should fetch all pages for a site', async () => {
+    it('should fetch all pages for a site with tenant validation', async () => {
       const siteId = 'site-1';
-      await pagesApi.getBySiteId(siteId);
+      const tenantId = 'tenant-1';
+      await pagesApi.getBySiteId(siteId, tenantId);
 
       expect(mockFrom).toHaveBeenCalledWith('pages');
       expect(mockSelect).toHaveBeenCalledWith('*');
       expect(mockEq).toHaveBeenCalledWith('site_id', siteId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
       expect(mockOrder).toHaveBeenCalledWith('sort_order');
     });
 
     it('should return empty array when no pages exist', async () => {
-      const result = await pagesApi.getBySiteId('site-1');
+      const result = await pagesApi.getBySiteId('site-1', 'tenant-1');
       expect(result).toEqual([]);
     });
   });
 
   describe('getById', () => {
-    it('should fetch a page by ID', async () => {
+    it('should fetch a page by ID with tenant validation', async () => {
       const pageId = 'page-1';
-      await pagesApi.getById(pageId);
+      const tenantId = 'tenant-1';
+      await pagesApi.getById(pageId, tenantId);
 
       expect(mockFrom).toHaveBeenCalledWith('pages');
       expect(mockSelect).toHaveBeenCalledWith('*');
       expect(mockEq).toHaveBeenCalledWith('id', pageId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
       expect(mockMaybeSingle).toHaveBeenCalled();
     });
   });
 
   describe('getHomepage', () => {
-    it('should fetch homepage for a site', async () => {
+    it('should fetch homepage for a site with tenant validation', async () => {
       const siteId = 'site-1';
-      await pagesApi.getHomepage(siteId);
+      const tenantId = 'tenant-1';
+      await pagesApi.getHomepage(siteId, tenantId);
 
       expect(mockFrom).toHaveBeenCalledWith('pages');
       expect(mockSelect).toHaveBeenCalledWith('*');
       expect(mockEq).toHaveBeenCalledWith('site_id', siteId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
       expect(mockEq).toHaveBeenCalledWith('is_homepage', true);
       expect(mockMaybeSingle).toHaveBeenCalled();
     });
@@ -169,29 +207,33 @@ describe('pagesApi', () => {
   });
 
   describe('update', () => {
-    it('should update a page', async () => {
+    it('should update a page with tenant validation', async () => {
       const pageId = 'page-1';
+      const tenantId = 'tenant-1';
       const updates = { title: 'Updated Page' };
 
-      const result = await pagesApi.update(pageId, updates);
+      const result = await pagesApi.update(pageId, tenantId, updates);
 
       expect(mockFrom).toHaveBeenCalledWith('pages');
       expect(mockUpdate).toHaveBeenCalledWith(updates);
       expect(mockEq).toHaveBeenCalledWith('id', pageId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
       expect(mockSingle).toHaveBeenCalled();
       expect(result).toHaveProperty('id', pageId);
     });
   });
 
   describe('delete', () => {
-    it('should delete a page', async () => {
+    it('should delete a page with tenant validation', async () => {
       const pageId = 'page-1';
+      const tenantId = 'tenant-1';
 
-      await pagesApi.delete(pageId);
+      await pagesApi.delete(pageId, tenantId);
 
       expect(mockFrom).toHaveBeenCalledWith('pages');
       expect(mockDelete).toHaveBeenCalled();
       expect(mockEq).toHaveBeenCalledWith('id', pageId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
     });
   });
 
