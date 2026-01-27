@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Upload, X, Loader2, ImageIcon, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useTenant } from '@/hooks/useTenant';
@@ -38,6 +38,16 @@ export function ImageUploader({
   });
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
+  }, []);
 
   const aspectRatioClasses = {
     square: 'aspect-square',
@@ -136,7 +146,7 @@ export function ImageUploader({
         : `${currentTenant.id}/general/${fileName}`;
 
       // Simulate progress for better UX
-      const progressInterval = setInterval(() => {
+      progressIntervalRef.current = setInterval(() => {
         setUploadState(prev => ({
           ...prev,
           progress: Math.min(prev.progress + 10, 90),
@@ -150,7 +160,10 @@ export function ImageUploader({
           upsert: false,
         });
 
-      clearInterval(progressInterval);
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
 
       if (error) {
         throw error;
@@ -185,18 +198,19 @@ export function ImageUploader({
         description: 'התמונה הועלתה בהצלחה',
       });
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Upload error:', error);
+      const message = error instanceof Error ? error.message : 'שגיאה בהעלאת הקובץ';
       setUploadState(prev => ({
         ...prev,
         status: 'error',
         progress: 0,
-        error: error.message || 'שגיאה בהעלאת הקובץ',
+        error: message,
       }));
 
       toast({
         title: 'שגיאה בהעלאה',
-        description: error.message || 'לא ניתן להעלות את הקובץ',
+        description: message,
         variant: 'destructive',
       });
     }
