@@ -1,25 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-/**
- * Get required environment variable
- * Throws early if missing to prevent cryptic runtime errors
- */
-function getRequiredEnvVar(key: string): string {
-  const value = process.env[key];
+// Next.js requires direct access to NEXT_PUBLIC_* env vars for proper inlining at build time
+// Dynamic access via process.env[key] doesn't work because Next.js replaces these at compile time
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-  if (!value) {
-    throw new Error(
-      `Missing required environment variable: ${key}\n` +
-      `Please set ${key} in your .env.local file.`
-    );
-  }
-
-  return value;
+// Log warning in development if env vars are missing (don't throw to avoid breaking the app)
+if (typeof window !== 'undefined' && (!SUPABASE_URL || !SUPABASE_ANON_KEY)) {
+  console.warn(
+    'Supabase environment variables are not configured.\n' +
+    'Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file.'
+  );
 }
-
-const SUPABASE_URL = getRequiredEnvVar('NEXT_PUBLIC_SUPABASE_URL');
-const SUPABASE_ANON_KEY = getRequiredEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 
 /**
  * Supabase client instance

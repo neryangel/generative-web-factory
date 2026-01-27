@@ -5,18 +5,22 @@ export function MagneticCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [cursorVariant, setCursorVariant] = useState<'default' | 'hover' | 'text'>('default');
-  
+  // Start with null to avoid hydration mismatch - will be set in useEffect
+  const [isTouchDevice, setIsTouchDevice] = useState<boolean | null>(null);
+
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  
+
   const springConfig = { damping: 25, stiffness: 400 };
   const cursorX = useSpring(mouseX, springConfig);
   const cursorY = useSpring(mouseY, springConfig);
 
   useEffect(() => {
-    // Hide on mobile/touch devices
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    if (isTouchDevice) return;
+    // Detect touch device only on client side to avoid hydration mismatch
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    setIsTouchDevice(isTouch);
+
+    if (isTouch) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
@@ -30,7 +34,7 @@ export function MagneticCursor() {
     // Detect hover states
     const handleElementHover = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      
+
       if (target.closest('button, a, [role="button"]')) {
         setCursorVariant('hover');
       } else if (target.closest('h1, h2, h3, p, span')) {
@@ -53,8 +57,9 @@ export function MagneticCursor() {
     };
   }, [mouseX, mouseY]);
 
-  // Don't render on touch devices
-  if (typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
+  // Don't render until we know if it's a touch device (avoids hydration mismatch)
+  // Also don't render on touch devices
+  if (isTouchDevice === null || isTouchDevice) {
     return null;
   }
 

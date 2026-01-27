@@ -7,7 +7,7 @@ import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion
 import { useRef } from 'react';
 import { WordReveal } from '@/components/effects/SplitText';
 import { useMouseParallax } from '@/hooks/useParallax';
-import portfolioHotel from '@/assets/portfolio-hotel.jpg';
+import portfolioHotelImg from '@/assets/portfolio-hotel.jpg';
 
 const HeroSection = () => {
   const router = useRouter();
@@ -268,7 +268,7 @@ const HeroSection = () => {
                 {/* Image with Parallax Scale */}
                 <div className="aspect-[4/3] relative overflow-hidden">
                   <motion.img
-                    src={portfolioHotel}
+                    src={typeof portfolioHotelImg === 'string' ? portfolioHotelImg : portfolioHotelImg.src}
                     alt="פרויקט מוביל - מלון יוקרה"
                     className="w-full h-full object-cover"
                     style={{ scale: prefersReducedMotion ? 1 : imageScale }}
