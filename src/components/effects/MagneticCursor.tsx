@@ -1,17 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 export function MagneticCursor() {
-  const cursorRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
-  const [cursorVariant, setCursorVariant] = useState<'default' | 'hover' | 'text'>('default');
+  const [cursorVariant, setCursorVariant] = useState<'default' | 'hover'>('default');
   // Start with null to avoid hydration mismatch - will be set in useEffect
   const [isTouchDevice, setIsTouchDevice] = useState<boolean | null>(null);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  const springConfig = { damping: 25, stiffness: 400 };
+  // Stiffer spring so the ring stays closer to the real cursor
+  const springConfig = { damping: 30, stiffness: 500 };
   const cursorX = useSpring(mouseX, springConfig);
   const cursorY = useSpring(mouseY, springConfig);
 
@@ -31,14 +31,12 @@ export function MagneticCursor() {
     const handleMouseLeave = () => setIsVisible(false);
     const handleMouseEnter = () => setIsVisible(true);
 
-    // Detect hover states
+    // Detect hover states for interactive elements only
     const handleElementHover = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
 
-      if (target.closest('button, a, [role="button"]')) {
+      if (target.closest('button, a, [role="button"], input, textarea, select, .cursor-pointer')) {
         setCursorVariant('hover');
-      } else if (target.closest('h1, h2, h3, p, span')) {
-        setCursorVariant('text');
       } else {
         setCursorVariant('default');
       }
@@ -63,71 +61,27 @@ export function MagneticCursor() {
     return null;
   }
 
-  const variants = {
-    default: {
-      width: 12,
-      height: 12,
-      backgroundColor: 'transparent',
-      border: '2px solid hsl(var(--primary))',
-      scale: 1,
-    },
-    hover: {
-      width: 48,
-      height: 48,
-      backgroundColor: 'hsla(var(--primary), 0.1)',
-      border: '2px solid hsl(var(--primary))',
-      scale: 1,
-    },
-    text: {
-      width: 4,
-      height: 24,
-      backgroundColor: 'hsl(var(--primary))',
-      border: 'none',
-      scale: 1,
-    },
-  };
-
   return (
-    <>
-      {/* Main cursor dot */}
-      <motion.div
-        ref={cursorRef}
-        className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full mix-blend-difference"
-        style={{
-          x: cursorX,
-          y: cursorY,
-          translateX: '-50%',
-          translateY: '-50%',
-        }}
-        animate={cursorVariant}
-        variants={variants}
-        transition={{ type: 'spring', damping: 25, stiffness: 400 }}
-        initial={false}
-      />
-      
-      {/* Outer ring (follows with delay) */}
-      <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full border border-primary/30"
-        style={{
-          x: cursorX,
-          y: cursorY,
-          translateX: '-50%',
-          translateY: '-50%',
-          width: 40,
-          height: 40,
-          opacity: isVisible && cursorVariant !== 'text' ? 0.5 : 0,
-        }}
-        transition={{ type: 'spring', damping: 30, stiffness: 200 }}
-      />
-
-      {/* Hide default cursor */}
-      <style>{`
-        @media (hover: hover) and (pointer: fine) {
-          * {
-            cursor: none !important;
-          }
-        }
-      `}</style>
-    </>
+    /* Subtle accent ring that follows cursor — native cursor stays visible */
+    <motion.div
+      className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full"
+      style={{
+        x: cursorX,
+        y: cursorY,
+        translateX: '-50%',
+        translateY: '-50%',
+        borderStyle: 'solid',
+        borderColor: 'hsl(var(--primary))',
+        backgroundColor: cursorVariant === 'hover' ? 'hsla(var(--primary), 0.06)' : 'transparent',
+      }}
+      animate={{
+        width: cursorVariant === 'hover' ? 44 : 28,
+        height: cursorVariant === 'hover' ? 44 : 28,
+        opacity: isVisible ? (cursorVariant === 'hover' ? 0.55 : 0.3) : 0,
+        borderWidth: cursorVariant === 'hover' ? 2 : 1.5,
+      }}
+      transition={{ type: 'spring', damping: 25, stiffness: 400 }}
+      initial={false}
+    />
   );
 }
