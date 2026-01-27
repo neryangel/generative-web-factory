@@ -2,6 +2,7 @@
 
 import { use } from 'react';
 import SiteEditor from '@/views/SiteEditor';
+import { PageErrorBoundary } from '@/components/common/PageErrorBoundary';
 
 // Create a context-like wrapper to pass siteId to the existing component
 export default function SiteEditorPage({
@@ -13,7 +14,11 @@ export default function SiteEditorPage({
 
   // The existing SiteEditor uses useParams from react-router-dom
   // We need to provide the params through a different mechanism
-  return <SiteEditorWrapper siteId={siteId} />;
+  return (
+    <PageErrorBoundary pageName="עורך האתר">
+      <SiteEditorWrapper siteId={siteId} />
+    </PageErrorBoundary>
+  );
 }
 
 function SiteEditorWrapper({ siteId }: { siteId: string }) {
