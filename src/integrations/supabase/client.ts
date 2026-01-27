@@ -8,10 +8,12 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 // Log warning in development if env vars are missing (don't throw to avoid breaking the app)
 if (typeof window !== 'undefined' && (!SUPABASE_URL || !SUPABASE_ANON_KEY)) {
-  console.warn(
-    'Supabase environment variables are not configured.\n' +
-    'Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file.'
-  );
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(
+      'Supabase environment variables are not configured.\n' +
+      'Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file.'
+    );
+  }
 }
 
 /**

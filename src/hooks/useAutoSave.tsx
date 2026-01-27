@@ -1,6 +1,7 @@
 import { useCallback, useRef, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface AutoSaveOptions {
   debounceMs?: number;
@@ -76,7 +77,7 @@ export function useAutoSave(options: AutoSaveOptions = {}) {
 
           // Skip stale operations (newer version already queued)
           if (!isLatestVersion(key, op.version)) {
-            console.log(`[AutoSave] Skipping stale operation for ${key} (v${op.version})`);
+            logger.log(`[AutoSave] Skipping stale operation for ${key} (v${op.version})`);
             continue;
           }
 
