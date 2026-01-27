@@ -6,37 +6,9 @@ import { SectionRenderer } from '@/components/editor/SectionRenderer';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
-/**
- * Get Supabase URL with support for both Vite and Next.js environments
- */
-function getSupabaseUrl(): string {
-  // Check Vite environment first
-  // @ts-expect-error - import.meta.env exists in Vite
-  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) {
-    // @ts-expect-error
-    return import.meta.env.VITE_SUPABASE_URL;
-  }
-  // Check Next.js environment
-  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) {
-    return process.env.NEXT_PUBLIC_SUPABASE_URL;
-  }
-  throw new Error('Missing Supabase URL environment variable');
-}
-
-/**
- * Get Supabase anon key with support for both Vite and Next.js environments
- */
-function getSupabaseAnonKey(): string {
-  // @ts-expect-error - import.meta.env exists in Vite
-  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY) {
-    // @ts-expect-error
-    return import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-  }
-  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  }
-  throw new Error('Missing Supabase anon key environment variable');
-}
+// Supabase configuration from Next.js environment variables
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 interface PublishedSection {
   id: string;
@@ -89,11 +61,11 @@ export default function PublicSite() {
 
       try {
         const response = await fetch(
-          `${getSupabaseUrl()}/functions/v1/get-published-site?slug=${encodeURIComponent(slug)}`,
+          `${SUPABASE_URL}/functions/v1/get-published-site?slug=${encodeURIComponent(slug)}`,
           {
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${getSupabaseAnonKey()}`,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
             },
           }
         );

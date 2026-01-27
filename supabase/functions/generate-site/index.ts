@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { validateBrief, errorResponse, successResponse } from "../_shared/validation.ts";
 
 /**
  * Allowed origins for CORS
@@ -116,12 +117,17 @@ serve(async (req) => {
   try {
     const { brief, language = "he" } = await req.json();
 
-    if (!brief || typeof brief !== "string" || brief.trim().length < 10) {
-      return new Response(
-        JSON.stringify({ error: "נא לספק תיאור עסק מפורט יותר (לפחות 10 תווים)" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    // Validate and sanitize the brief
+    const briefValidation = validateBrief(brief);
+    if (!briefValidation.valid) {
+      return errorResponse(
+        briefValidation.error || "נא לספק תיאור עסק מפורט יותר (לפחות 10 תווים)",
+        400,
+        corsHeaders
       );
     }
+
+    const sanitizedBrief = briefValidation.brief!;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -132,7 +138,7 @@ serve(async (req) => {
       );
     }
 
-    console.log("Generating site for brief:", brief.substring(0, 100));
+    console.log("Generating site for brief:", sanitizedBrief.substring(0, 100));
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -144,9 +150,9 @@ serve(async (req) => {
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
-          { 
-            role: "user", 
-            content: `Generate a complete website blueprint for this business:\n\n${brief}\n\nRespond with valid JSON only.` 
+          {
+            role: "user",
+            content: `Generate a complete website blueprint for this business:\n\n${sanitizedBrief}\n\nRespond with valid JSON only.`
           },
         ],
         temperature: 0.7,

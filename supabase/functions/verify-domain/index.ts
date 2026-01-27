@@ -139,9 +139,19 @@ Deno.serve(async (req) => {
 
     const { domainId } = await req.json() as VerifyDomainRequest;
 
+    // Validate domainId is present and is a valid UUID
     if (!domainId) {
       return new Response(
         JSON.stringify({ error: "Missing domainId" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate UUID format to prevent injection
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(domainId)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid domainId format" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -157,6 +167,15 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ error: "Domain not found" }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate domain format before making DNS requests
+    const domainRegex = /^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63})*$/;
+    if (!domainRegex.test(domain.domain) || !domain.domain.includes('.')) {
+      return new Response(
+        JSON.stringify({ error: "Invalid domain format in database" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
