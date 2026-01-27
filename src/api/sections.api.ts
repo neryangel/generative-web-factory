@@ -1,33 +1,38 @@
 import { supabase } from '@/integrations/supabase/client';
+import { parseSupabaseError, ApiError } from '@/lib/api-error';
 import type { Section, SectionInsert, SectionUpdate, SectionContent } from '@/types';
 import type { Json } from '@/integrations/supabase/types';
 
 export const sectionsApi = {
   /**
    * Get all sections for a page
+   * @param tenantId - Required for defense-in-depth validation alongside RLS
    */
-  async getByPageId(pageId: string): Promise<Section[]> {
+  async getByPageId(pageId: string, tenantId: string): Promise<Section[]> {
     const { data, error } = await supabase
       .from('sections')
       .select('*')
       .eq('page_id', pageId)
+      .eq('tenant_id', tenantId)
       .order('sort_order');
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data || [];
   },
 
   /**
    * Get a section by ID
+   * @param tenantId - Required for defense-in-depth validation alongside RLS
    */
-  async getById(sectionId: string): Promise<Section | null> {
+  async getById(sectionId: string, tenantId: string): Promise<Section | null> {
     const { data, error } = await supabase
       .from('sections')
       .select('*')
       .eq('id', sectionId)
+      .eq('tenant_id', tenantId)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -41,54 +46,61 @@ export const sectionsApi = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
   /**
    * Update a section
+   * @param tenantId - Required for defense-in-depth validation alongside RLS
    */
-  async update(sectionId: string, updates: SectionUpdate): Promise<Section> {
+  async update(sectionId: string, tenantId: string, updates: SectionUpdate): Promise<Section> {
     const { data, error } = await supabase
       .from('sections')
       .update(updates)
       .eq('id', sectionId)
+      .eq('tenant_id', tenantId)
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
   /**
    * Update section content
+   * @param tenantId - Required for defense-in-depth validation alongside RLS
    */
-  async updateContent(sectionId: string, content: SectionContent): Promise<Section> {
+  async updateContent(sectionId: string, tenantId: string, content: SectionContent): Promise<Section> {
     const { data, error } = await supabase
       .from('sections')
       .update({ content: content as Json })
       .eq('id', sectionId)
+      .eq('tenant_id', tenantId)
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
   /**
    * Delete a section
+   * @param tenantId - Required for defense-in-depth validation alongside RLS
    */
-  async delete(sectionId: string): Promise<void> {
+  async delete(sectionId: string, tenantId: string): Promise<void> {
     const { error } = await supabase
       .from('sections')
       .delete()
-      .eq('id', sectionId);
+      .eq('id', sectionId)
+      .eq('tenant_id', tenantId);
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
   },
 
   /**
    * Update section order
+   * Note: RLS policies validate tenant access for each section
    */
   async updateOrder(sections: Array<{ id: string; sort_order: number }>): Promise<void> {
     const updates = sections.map(({ id, sort_order }) =>
@@ -98,17 +110,24 @@ export const sectionsApi = {
         .eq('id', id)
     );
 
-    await Promise.all(updates);
+    const results = await Promise.all(updates);
+    const firstError = results.find(r => r.error);
+    if (firstError?.error) throw parseSupabaseError(firstError.error);
   },
 
   /**
    * Duplicate a section
+   * @param tenantId - Required for defense-in-depth validation alongside RLS
    */
   async duplicate(sectionId: string, tenantId: string): Promise<Section> {
     // Get original section
-    const original = await sectionsApi.getById(sectionId);
+    const original = await sectionsApi.getById(sectionId, tenantId);
     if (!original) {
-      throw new Error('Section not found');
+      throw new ApiError({
+        code: 'NOT_FOUND',
+        message: 'Section not found',
+        retryable: false,
+      });
     }
 
     // Create duplicate with incremented sort_order
@@ -126,7 +145,7 @@ export const sectionsApi = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 };

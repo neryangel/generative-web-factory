@@ -40,6 +40,22 @@ vi.mock('@/integrations/supabase/client', () => ({
             eq: (...eqArgs: unknown[]) => {
               mockEq(...eqArgs);
               return {
+                eq: (...eq2Args: unknown[]) => {
+                  mockEq(...eq2Args);
+                  return {
+                    order: (...orderArgs: unknown[]) => {
+                      mockOrder(...orderArgs);
+                      return Promise.resolve({ data: [], error: null });
+                    },
+                    maybeSingle: () => {
+                      mockMaybeSingle();
+                      if (returnSectionForDuplicate) {
+                        return Promise.resolve({ data: mockSectionForDuplicate, error: null });
+                      }
+                      return Promise.resolve({ data: null, error: null });
+                    },
+                  };
+                },
                 order: (...orderArgs: unknown[]) => {
                   mockOrder(...orderArgs);
                   return Promise.resolve({ data: [], error: null });
@@ -78,10 +94,24 @@ vi.mock('@/integrations/supabase/client', () => ({
           return {
             eq: (...eqArgs: unknown[]) => {
               mockEq(...eqArgs);
-              if (data.sort_order !== undefined) {
+              if (data && data.sort_order !== undefined) {
                 updateCalls.push({ id: eqArgs[1] as string, sort_order: data.sort_order });
               }
               return {
+                eq: (...eq2Args: unknown[]) => {
+                  mockEq(...eq2Args);
+                  return {
+                    select: () => ({
+                      single: () => {
+                        mockSingle();
+                        return Promise.resolve({
+                          data: { id: eqArgs[1], page_id: 'page-1', ...data },
+                          error: null,
+                        });
+                      },
+                    }),
+                  };
+                },
                 select: () => ({
                   single: () => {
                     mockSingle();
@@ -100,7 +130,12 @@ vi.mock('@/integrations/supabase/client', () => ({
           return {
             eq: (...eqArgs: unknown[]) => {
               mockEq(...eqArgs);
-              return Promise.resolve({ error: null });
+              return {
+                eq: (...eq2Args: unknown[]) => {
+                  mockEq(...eq2Args);
+                  return Promise.resolve({ error: null });
+                },
+              };
             },
           };
         },
@@ -117,30 +152,34 @@ describe('sectionsApi', () => {
   });
 
   describe('getByPageId', () => {
-    it('should fetch all sections for a page', async () => {
+    it('should fetch all sections for a page with tenant validation', async () => {
       const pageId = 'page-1';
-      await sectionsApi.getByPageId(pageId);
+      const tenantId = 'tenant-1';
+      await sectionsApi.getByPageId(pageId, tenantId);
 
       expect(mockFrom).toHaveBeenCalledWith('sections');
       expect(mockSelect).toHaveBeenCalledWith('*');
       expect(mockEq).toHaveBeenCalledWith('page_id', pageId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
       expect(mockOrder).toHaveBeenCalledWith('sort_order');
     });
 
     it('should return empty array when no sections exist', async () => {
-      const result = await sectionsApi.getByPageId('page-1');
+      const result = await sectionsApi.getByPageId('page-1', 'tenant-1');
       expect(result).toEqual([]);
     });
   });
 
   describe('getById', () => {
-    it('should fetch a section by ID', async () => {
+    it('should fetch a section by ID with tenant validation', async () => {
       const sectionId = 'section-1';
-      await sectionsApi.getById(sectionId);
+      const tenantId = 'tenant-1';
+      await sectionsApi.getById(sectionId, tenantId);
 
       expect(mockFrom).toHaveBeenCalledWith('sections');
       expect(mockSelect).toHaveBeenCalledWith('*');
       expect(mockEq).toHaveBeenCalledWith('id', sectionId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
       expect(mockMaybeSingle).toHaveBeenCalled();
     });
   });
@@ -165,43 +204,49 @@ describe('sectionsApi', () => {
   });
 
   describe('update', () => {
-    it('should update a section', async () => {
+    it('should update a section with tenant validation', async () => {
       const sectionId = 'section-1';
+      const tenantId = 'tenant-1';
       const updates = { variant: 'centered' };
 
-      const result = await sectionsApi.update(sectionId, updates);
+      const result = await sectionsApi.update(sectionId, tenantId, updates);
 
       expect(mockFrom).toHaveBeenCalledWith('sections');
       expect(mockUpdate).toHaveBeenCalledWith(updates);
       expect(mockEq).toHaveBeenCalledWith('id', sectionId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
       expect(mockSingle).toHaveBeenCalled();
       expect(result).toHaveProperty('id', sectionId);
     });
   });
 
   describe('updateContent', () => {
-    it('should update section content', async () => {
+    it('should update section content with tenant validation', async () => {
       const sectionId = 'section-1';
+      const tenantId = 'tenant-1';
       const content = { title: 'Updated Title', description: 'New description' };
 
-      const result = await sectionsApi.updateContent(sectionId, content);
+      const result = await sectionsApi.updateContent(sectionId, tenantId, content);
 
       expect(mockFrom).toHaveBeenCalledWith('sections');
       expect(mockUpdate).toHaveBeenCalledWith({ content });
       expect(mockEq).toHaveBeenCalledWith('id', sectionId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
       expect(result).toHaveProperty('content');
     });
   });
 
   describe('delete', () => {
-    it('should delete a section', async () => {
+    it('should delete a section with tenant validation', async () => {
       const sectionId = 'section-1';
+      const tenantId = 'tenant-1';
 
-      await sectionsApi.delete(sectionId);
+      await sectionsApi.delete(sectionId, tenantId);
 
       expect(mockFrom).toHaveBeenCalledWith('sections');
       expect(mockDelete).toHaveBeenCalled();
       expect(mockEq).toHaveBeenCalledWith('id', sectionId);
+      expect(mockEq).toHaveBeenCalledWith('tenant_id', tenantId);
     });
   });
 

@@ -138,7 +138,8 @@ describe('useSites hooks', () => {
       });
 
       const { sitesApi } = await import('@/api/sites.api');
-      expect(sitesApi.update).toHaveBeenCalledWith('site-1', { name: 'Updated Site' });
+      // API is called with siteId, tenantId (from useTenant), and updates
+      expect(sitesApi.update).toHaveBeenCalledWith('site-1', 'tenant-1', { name: 'Updated Site' });
     });
   });
 
@@ -149,7 +150,8 @@ describe('useSites hooks', () => {
       await result.current.mutateAsync('site-1');
 
       const { sitesApi } = await import('@/api/sites.api');
-      expect(sitesApi.delete).toHaveBeenCalledWith('site-1');
+      // API is called with siteId and tenantId (from useTenant)
+      expect(sitesApi.delete).toHaveBeenCalledWith('site-1', 'tenant-1');
     });
   });
 
@@ -163,7 +165,8 @@ describe('useSites hooks', () => {
       });
 
       const { sitesApi } = await import('@/api/sites.api');
-      expect(sitesApi.updateSettings).toHaveBeenCalledWith('site-1', { theme: 'dark' });
+      // API is called with siteId, tenantId (from useTenant), and settings
+      expect(sitesApi.updateSettings).toHaveBeenCalledWith('site-1', 'tenant-1', { theme: 'dark' });
     });
   });
 

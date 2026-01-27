@@ -1,9 +1,19 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+/**
+ * CORS headers for public site endpoint
+ *
+ * IMPORTANT: This endpoint intentionally allows all origins (*) because:
+ * 1. It serves published sites on custom domains (user's own domains)
+ * 2. These domains are unpredictable and user-configured
+ * 3. The endpoint is read-only and serves only public/published content
+ * 4. No authentication is required - uses service role internally
+ */
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
 };
 
 serve(async (req) => {
