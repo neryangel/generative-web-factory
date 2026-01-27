@@ -210,6 +210,29 @@
 }
 
 /* ============================================
+   Dialog scroll fade — hints that content continues below
+   ============================================ */
+
+[data-a11y-scroll] {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black calc(100% - 24px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    black calc(100% - 24px),
+    transparent 100%
+  );
+}
+
+/* Remove fade when user has scrolled to the bottom */
+[data-a11y-scroll][data-scrolled-end] {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* ============================================
    Hover states for widget buttons (replaces inline JS)
    ============================================ */
 
