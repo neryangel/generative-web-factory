@@ -5,14 +5,36 @@ import type { Site } from '@/types';
 import type { Json } from '@/integrations/supabase/types';
 
 /**
+ * Pagination options
+ */
+export interface PaginationOptions {
+  page?: number;
+  pageSize?: number;
+}
+
+/**
+ * Paginated response
+ */
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+const DEFAULT_PAGE_SIZE = 20;
+const MAX_PAGE_SIZE = 100;
+
+/**
  * Sites API layer with runtime validation
  * All mutations are validated with Zod schemas before being sent to the database
  */
 export const sitesApi = {
   /**
-   * Get all sites for a tenant
+   * Get all sites for a tenant (with optional pagination)
    */
-  async getAll(tenantId: string): Promise<Site[]> {
+  async getAll(tenantId: string, options?: PaginationOptions): Promise<Site[]> {
     // Validate input
     const validTenantId = uuidSchema.parse(tenantId);
 
@@ -24,6 +46,47 @@ export const sitesApi = {
 
     if (error) throw parseSupabaseError(error);
     return data || [];
+  },
+
+  /**
+   * Get paginated sites for a tenant
+   * Use this for large lists to improve performance
+   */
+  async getPaginated(tenantId: string, options: PaginationOptions = {}): Promise<PaginatedResponse<Site>> {
+    // Validate input
+    const validTenantId = uuidSchema.parse(tenantId);
+
+    // Sanitize pagination options
+    const page = Math.max(1, options.page || 1);
+    const pageSize = Math.min(MAX_PAGE_SIZE, Math.max(1, options.pageSize || DEFAULT_PAGE_SIZE));
+    const offset = (page - 1) * pageSize;
+
+    // Get total count
+    const { count, error: countError } = await supabase
+      .from('sites')
+      .select('*', { count: 'exact', head: true })
+      .eq('tenant_id', validTenantId);
+
+    if (countError) throw parseSupabaseError(countError);
+
+    // Get paginated data
+    const { data, error } = await supabase
+      .from('sites')
+      .select('*')
+      .eq('tenant_id', validTenantId)
+      .order('updated_at', { ascending: false })
+      .range(offset, offset + pageSize - 1);
+
+    if (error) throw parseSupabaseError(error);
+
+    const total = count || 0;
+    return {
+      data: data || [],
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   },
 
   /**

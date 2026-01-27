@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { isValidUuid, isValidDomain, errorResponse } from "../_shared/validation.ts";
 
 /**
  * Allowed origins for CORS
@@ -216,11 +217,19 @@ Deno.serve(async (req) => {
 
     const { action, domainId, domain: domainName } = await req.json() as ManageDomainRequest;
 
+    // Validate action
+    const validActions = ["add", "remove", "verify", "status"];
+    if (!action || !validActions.includes(action)) {
+      return errorResponse("Invalid action", 400, corsHeaders);
+    }
+
+    // Validate domainId
     if (!domainId) {
-      return new Response(
-        JSON.stringify({ error: "Missing domainId" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse("Missing domainId", 400, corsHeaders);
+    }
+
+    if (!isValidUuid(domainId)) {
+      return errorResponse("Invalid domainId format", 400, corsHeaders);
     }
 
     // Get domain from database
@@ -231,13 +240,16 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (domainError || !domainRecord) {
-      return new Response(
-        JSON.stringify({ error: "Domain not found" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse("Domain not found", 404, corsHeaders);
     }
 
     const domain = domainRecord.domain;
+
+    // Validate domain format before making external API calls
+    if (!isValidDomain(domain)) {
+      return errorResponse("Invalid domain format in database", 400, corsHeaders);
+    }
+
     let result: Record<string, unknown> = {};
 
     switch (action) {
