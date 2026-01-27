@@ -94,10 +94,39 @@ export function useDraggablePosition(
   }, [position]);
 
   /**
+   * Clamp position so the button stays fully inside the viewport.
+   * Works independently of snapToEdges — always enforced.
+   */
+  const clampToViewport = useCallback((pos: Position): Position => {
+    if (!dragRef.current) return pos;
+
+    const buttonRect = dragRef.current.getBoundingClientRect();
+    const buttonWidth = buttonRect.width;
+    const buttonHeight = buttonRect.height;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    const defaultX = defaultSide === 'right'
+      ? windowWidth - buttonWidth - EDGE_MARGIN
+      : EDGE_MARGIN;
+    const defaultY = windowHeight - bottomOffset - buttonHeight;
+
+    const minX = EDGE_MARGIN - defaultX;
+    const maxX = windowWidth - buttonWidth - EDGE_MARGIN - defaultX;
+    const minY = EDGE_MARGIN - defaultY;
+    const maxY = windowHeight - buttonHeight - EDGE_MARGIN - defaultY;
+
+    return {
+      x: Math.max(minX, Math.min(maxX, pos.x)),
+      y: Math.max(minY, Math.min(maxY, pos.y)),
+    };
+  }, [defaultSide, bottomOffset]);
+
+  /**
    * Snap לקצה הקרוב ביותר
    */
   const snapToNearestEdge = useCallback((pos: Position): Position => {
-    if (!snapToEdges || !dragRef.current) return pos;
+    if (!snapToEdges || !dragRef.current) return clampToViewport(pos);
 
     const buttonRect = dragRef.current.getBoundingClientRect();
     const buttonWidth = buttonRect.width;
@@ -106,11 +135,11 @@ export function useDraggablePosition(
     const windowHeight = window.innerHeight;
 
     // חישוב מיקום אבסולוטי נוכחי
-    const defaultX = defaultSide === 'right' 
-      ? windowWidth - buttonWidth - EDGE_MARGIN 
+    const defaultX = defaultSide === 'right'
+      ? windowWidth - buttonWidth - EDGE_MARGIN
       : EDGE_MARGIN;
     const defaultY = windowHeight - bottomOffset - buttonHeight;
-    
+
     const absoluteX = defaultX + pos.x;
     const absoluteY = defaultY + pos.y;
 
@@ -135,17 +164,8 @@ export function useDraggablePosition(
       snappedY = windowHeight - buttonHeight - EDGE_MARGIN - defaultY;
     }
 
-    // וידוא שהכפתור לא יוצא מהמסך
-    const minX = EDGE_MARGIN - defaultX;
-    const maxX = windowWidth - buttonWidth - EDGE_MARGIN - defaultX;
-    const minY = EDGE_MARGIN - defaultY;
-    const maxY = windowHeight - buttonHeight - EDGE_MARGIN - defaultY;
-
-    snappedX = Math.max(minX, Math.min(maxX, snappedX));
-    snappedY = Math.max(minY, Math.min(maxY, snappedY));
-
-    return { x: snappedX, y: snappedY };
-  }, [snapToEdges, defaultSide, bottomOffset]);
+    return clampToViewport({ x: snappedX, y: snappedY });
+  }, [snapToEdges, defaultSide, bottomOffset, clampToViewport]);
 
   /**
    * התחלת גרירה
@@ -173,11 +193,12 @@ export function useDraggablePosition(
     const deltaX = clientX - dragStartPos.current.x;
     const deltaY = clientY - dragStartPos.current.y;
 
-    setPosition({
+    const raw = {
       x: elementStartPos.current.x + deltaX,
       y: elementStartPos.current.y + deltaY,
-    });
-  }, [isDragging]);
+    };
+    setPosition(clampToViewport(raw));
+  }, [isDragging, clampToViewport]);
 
   /**
    * סיום גרירה
