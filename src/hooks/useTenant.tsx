@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import type { Tables } from '@/integrations/supabase/types';
@@ -27,7 +27,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   const [currentTenant, setCurrentTenant] = useState<TenantWithRole | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchTenants = async () => {
+  const fetchTenants = useCallback(async () => {
     if (!user) {
       setTenants([]);
       setCurrentTenant(null);
@@ -80,11 +80,11 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchTenants();
-  }, [user]);
+  }, [fetchTenants]);
 
   useEffect(() => {
     if (currentTenant) {
