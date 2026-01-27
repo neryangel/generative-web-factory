@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { SiteRenderer } from '@/components/site/SiteRenderer';
 import { notFound } from 'next/navigation';
+import { fetchPublishedSiteByDomain } from '@/lib/fetch-published-site';
+import type { PublishedPage } from '@/types/published-site';
 
 interface PageProps {
   params: Promise<{ domain: string; slug: string[] }>;
@@ -11,65 +13,41 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { domain, slug } = await params;
   const pageSlug = slug?.[0] || 'home';
 
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-published-site?domain=${encodeURIComponent(domain)}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        next: { revalidate: 60 },
-      }
-    );
+  const data = await fetchPublishedSiteByDomain(domain);
 
-    if (!response.ok) {
-      return { title: 'אתר לא נמצא' };
-    }
-
-    const data = await response.json();
-    const page = data.snapshot?.pages?.find(
-      (p: any) => p.slug === pageSlug || (pageSlug === 'home' && p.is_homepage)
-    );
-
-    return {
-      title: page?.seo?.title || page?.title || data.site?.name || 'אתר',
-      description: page?.seo?.description || data.site?.settings?.description || '',
-      openGraph: {
-        title: page?.seo?.title || page?.title,
-        description: page?.seo?.description || data.site?.settings?.description,
-        images: page?.seo?.ogImage || data.site?.settings?.ogImage ? [page?.seo?.ogImage || data.site.settings.ogImage] : [],
-        type: 'website',
-      },
-    };
-  } catch (error) {
-    return { title: 'שגיאה' };
+  if (!data) {
+    return { title: 'אתר לא נמצא' };
   }
+
+  const page = data.snapshot?.pages?.find(
+    (p: PublishedPage) => p.slug === pageSlug || (pageSlug === 'home' && p.is_homepage)
+  );
+
+  return {
+    title: page?.seo?.title as string || page?.title || data.site?.name || 'אתר',
+    description: page?.seo?.description as string || data.site?.settings?.description as string || '',
+    openGraph: {
+      title: page?.seo?.title as string || page?.title,
+      description: page?.seo?.description as string || data.site?.settings?.description as string,
+      images: page?.seo?.ogImage || data.site?.settings?.ogImage ? [page?.seo?.ogImage as string || data.site.settings.ogImage as string] : [],
+      type: 'website',
+    },
+  };
 }
 
 export default async function CustomDomainSubPage({ params }: PageProps) {
   const { domain, slug } = await params;
   const pageSlug = slug?.[0] || 'home';
 
-  // Fetch site data server-side
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-published-site?domain=${encodeURIComponent(domain)}`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      next: { revalidate: 60 },
-    }
-  );
+  const siteData = await fetchPublishedSiteByDomain(domain);
 
-  if (!response.ok) {
+  if (!siteData) {
     notFound();
   }
 
-  const siteData = await response.json();
-
   // Find the requested page
   const currentPage = siteData.snapshot?.pages?.find(
-    (p: any) => p.slug === pageSlug || (pageSlug === 'home' && p.is_homepage)
+    (p: PublishedPage) => p.slug === pageSlug || (pageSlug === 'home' && p.is_homepage)
   );
 
   if (!currentPage) {

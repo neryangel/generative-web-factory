@@ -1,69 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { SiteRenderer } from '@/components/site/SiteRenderer';
-
-interface PublishedSection {
-  id: string;
-  type: string;
-  variant: string;
-  content: Record<string, unknown>;
-  settings: Record<string, unknown>;
-  sort_order: number;
-}
-
-interface PublishedPage {
-  id: string;
-  slug: string;
-  title: string;
-  is_homepage: boolean;
-  seo: Record<string, unknown>;
-  sections: PublishedSection[];
-}
-
-interface SiteData {
-  site: {
-    name: string;
-    settings: Record<string, unknown>;
-  };
-  snapshot: {
-    pages: PublishedPage[];
-    settings?: Record<string, unknown>;
-  };
-  version: number;
-  publishedAt: string;
-}
-
-async function getSiteData(slug: string): Promise<SiteData | null> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    console.error('Missing Supabase configuration');
-    return null;
-  }
-
-  try {
-    const response = await fetch(
-      `${supabaseUrl}/functions/v1/get-published-site?slug=${encodeURIComponent(slug)}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${supabaseKey}`,
-        },
-        next: { revalidate: 60 }, // Revalidate every 60 seconds
-      }
-    );
-
-    if (!response.ok) {
-      return null;
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching site:', error);
-    return null;
-  }
-}
+import { fetchPublishedSiteBySlug } from '@/lib/fetch-published-site';
 
 export async function generateMetadata({
   params,
@@ -71,7 +9,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const siteData = await getSiteData(slug);
+  const siteData = await fetchPublishedSiteBySlug(slug);
 
   if (!siteData) {
     return {
@@ -99,7 +37,7 @@ export default async function PublicSitePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const siteData = await getSiteData(slug);
+  const siteData = await fetchPublishedSiteBySlug(slug);
 
   if (!siteData) {
     notFound();

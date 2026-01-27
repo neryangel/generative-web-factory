@@ -1,10 +1,9 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect } from 'react';
 import SiteEditor from '@/views/SiteEditor';
 import { PageErrorBoundary } from '@/components/common/PageErrorBoundary';
 
-// Create a context-like wrapper to pass siteId to the existing component
 export default function SiteEditorPage({
   params,
 }: {
@@ -12,8 +11,6 @@ export default function SiteEditorPage({
 }) {
   const { siteId } = use(params);
 
-  // The existing SiteEditor uses useParams from react-router-dom
-  // We need to provide the params through a different mechanism
   return (
     <PageErrorBoundary pageName="עורך האתר">
       <SiteEditorWrapper siteId={siteId} />
@@ -22,15 +19,14 @@ export default function SiteEditorPage({
 }
 
 function SiteEditorWrapper({ siteId }: { siteId: string }) {
-  // Override the URL to include the siteId for react-router-dom compatibility
-  // This works because SiteEditor uses useParams which reads from the URL
-  if (typeof window !== 'undefined') {
-    // Update browser history to make useParams work
+  // Ensure the URL matches the siteId for useParams compatibility
+  // Done in useEffect to avoid hydration mismatch
+  useEffect(() => {
     const currentPath = window.location.pathname;
     if (!currentPath.includes(siteId)) {
       window.history.replaceState(null, '', `/dashboard/sites/${siteId}`);
     }
-  }
+  }, [siteId]);
 
   return <SiteEditor />;
 }
