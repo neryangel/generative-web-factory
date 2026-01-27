@@ -5,7 +5,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  { ignores: ["dist", ".next", "node_modules"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
@@ -24,6 +24,20 @@ export default tseslint.config(
         argsIgnorePattern: "^_",
         varsIgnorePattern: "^_",
         ignoreRestSiblings: true,
+      }],
+      // Import ordering for consistent codebase
+      "sort-imports": ["error", {
+        ignoreCase: true,
+        ignoreDeclarationSort: true, // Let developers group imports logically
+        ignoreMemberSort: false,
+        memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
+        allowSeparatedGroups: true,
+      }],
+      // Consistent type imports for better tree-shaking
+      "@typescript-eslint/consistent-type-imports": ["error", {
+        prefer: "type-imports",
+        disallowTypeAnnotations: false,
+        fixStyle: "separate-type-imports",
       }],
     },
   },

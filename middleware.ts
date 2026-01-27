@@ -9,6 +9,40 @@ const APP_DOMAINS = [
   'www.amdir.app',
 ];
 
+// RFC 1123 compliant domain validation regex
+// Allows alphanumeric characters, hyphens, and dots
+// Max 253 characters total, max 63 characters per label
+const VALID_DOMAIN_REGEX = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/;
+
+/**
+ * Validates and sanitizes a domain name to prevent injection attacks
+ * Returns null if the domain is invalid
+ */
+function validateDomain(domain: string): string | null {
+  // Check length constraints
+  if (!domain || domain.length > 253 || domain.length < 1) {
+    return null;
+  }
+
+  // Check for path traversal attempts
+  if (domain.includes('/') || domain.includes('\\') || domain.includes('..')) {
+    return null;
+  }
+
+  // Validate against RFC 1123 pattern
+  if (!VALID_DOMAIN_REGEX.test(domain)) {
+    return null;
+  }
+
+  // Additional check: each label must be max 63 characters
+  const labels = domain.split('.');
+  if (labels.some(label => label.length > 63)) {
+    return null;
+  }
+
+  return domain.toLowerCase();
+}
+
 export const config = {
   matcher: [
     // Match all paths except static files and API routes
@@ -22,7 +56,15 @@ export function middleware(request: NextRequest) {
   const pathname = url.pathname;
 
   // Extract domain without port
-  const domain = hostname.split(':')[0];
+  const rawDomain = hostname.split(':')[0];
+
+  // Validate and sanitize the domain
+  const domain = validateDomain(rawDomain);
+
+  // If domain is invalid, return 400 Bad Request
+  if (!domain) {
+    return new NextResponse('Invalid domain', { status: 400 });
+  }
 
   // Check if this is a known app domain
   const isAppDomain = APP_DOMAINS.some(
