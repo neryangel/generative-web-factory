@@ -14,6 +14,7 @@ import {
   Minimize2Icon,
   XIcon
 } from '../icons';
+import { Z_INDEX_DIALOG } from '../constants';
 import type { HideDuration } from '../constants';
 import type { AccessibilityTranslations } from '../i18n/translations';
 
@@ -79,8 +80,8 @@ export const HideOptionsDialog: React.FC<HideOptionsDialogProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[10001] flex items-center justify-center relative"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      className="fixed inset-0 flex items-center justify-center relative"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: Z_INDEX_DIALOG + 1 }}
       tabIndex={-1}
       role="dialog"
       aria-modal="true"

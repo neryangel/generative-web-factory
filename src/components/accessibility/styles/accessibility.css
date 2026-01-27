@@ -139,7 +139,8 @@
 }
 
 /* גווני אפור - מוחל רק על תוכן האתר, לא על כפתור הנגישות */
-.grayscale-mode #root {
+.grayscale-mode #root,
+.grayscale-mode #__next {
   filter: grayscale(100%);
 }
 

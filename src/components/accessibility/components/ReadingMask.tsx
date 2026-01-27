@@ -4,7 +4,7 @@
  * תומך גם בעכבר וגם בניווט מקלדת
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { READING_MASK_HEIGHT, READING_MASK_OPACITY, Z_INDEX_READING_MASK } from '../constants';
 
 export interface ReadingMaskProps {
@@ -18,42 +18,55 @@ export interface ReadingMaskProps {
 
 /**
  * רכיב מסכת קריאה
+ * משתמש ב-refs + rAF במקום state כדי למנוע re-render בכל mousemove
  */
 export const ReadingMask: React.FC<ReadingMaskProps> = ({
   height = READING_MASK_HEIGHT,
   opacity = READING_MASK_OPACITY,
 }) => {
-  const [maskY, setMaskY] = useState(0);
+  const topRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const rafId = useRef<number>(0);
+
+  const updateMask = useCallback((y: number) => {
+    cancelAnimationFrame(rafId.current);
+    rafId.current = requestAnimationFrame(() => {
+      const topHeight = Math.max(0, y - height / 2);
+      const bottomTop = y + height / 2;
+      if (topRef.current) {
+        topRef.current.style.height = `${topHeight}px`;
+      }
+      if (bottomRef.current) {
+        bottomRef.current.style.top = `${bottomTop}px`;
+      }
+    });
+  }, [height]);
 
   useEffect(() => {
-    // מעקב אחר מיקום העכבר
     const handleMouseMove = (e: MouseEvent) => {
-      setMaskY(e.clientY);
+      updateMask(e.clientY);
     };
 
-    // מעקב אחר פוקוס מקלדת
     const handleFocusIn = () => {
-      const activeElement = document.activeElement as HTMLElement;
-      if (activeElement && activeElement !== document.body) {
-        const rect = activeElement.getBoundingClientRect();
-        setMaskY(rect.top + rect.height / 2);
+      const active = document.activeElement as HTMLElement;
+      if (active && active !== document.body) {
+        const rect = active.getBoundingClientRect();
+        updateMask(rect.top + rect.height / 2);
       }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('focusin', handleFocusIn);
-    
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('focusin', handleFocusIn);
+      cancelAnimationFrame(rafId.current);
     };
-  }, []);
-
-  const topHeight = Math.max(0, maskY - height / 2);
-  const bottomTop = maskY + height / 2;
+  }, [updateMask]);
 
   return (
-    <div 
+    <div
       role="presentation"
       aria-hidden="true"
       data-testid="reading-mask"
@@ -64,24 +77,26 @@ export const ReadingMask: React.FC<ReadingMaskProps> = ({
         zIndex: Z_INDEX_READING_MASK,
       }}
     >
-      <div 
-        style={{ 
+      <div
+        ref={topRef}
+        style={{
           position: 'absolute',
           left: 0,
           right: 0,
           top: 0,
-          height: topHeight,
-          backgroundColor: `rgba(0, 0, 0, ${opacity})` 
+          height: 0,
+          backgroundColor: `rgba(0, 0, 0, ${opacity})`
         }}
       />
-      <div 
-        style={{ 
+      <div
+        ref={bottomRef}
+        style={{
           position: 'absolute',
           left: 0,
           right: 0,
-          top: bottomTop,
+          top: 0,
           bottom: 0,
-          backgroundColor: `rgba(0, 0, 0, ${opacity})` 
+          backgroundColor: `rgba(0, 0, 0, ${opacity})`
         }}
       />
     </div>
