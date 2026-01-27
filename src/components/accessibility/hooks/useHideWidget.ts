@@ -130,8 +130,13 @@ export function useHideWidget(options: UseHideWidgetOptions = {}): UseHideWidget
         localStorage.setItem(HIDDEN_STORAGE_KEY, 'true');
         localStorage.setItem(HIDDEN_UNTIL_STORAGE_KEY, String(untilDate));
 
-        const descKey = `hiddenToast${option.charAt(0).toUpperCase() + option.slice(1)}` as keyof typeof t;
-        showToast(t.hiddenToastTitle, t[descKey] as string);
+        const toastDescMap: Record<string, keyof AccessibilityTranslations> = {
+          day: 'hiddenToastDay',
+          week: 'hiddenToastWeek',
+          month: 'hiddenToastMonth',
+        };
+        const descKey = toastDescMap[option];
+        showToast(t.hiddenToastTitle, descKey ? t[descKey] : undefined);
       }
     } catch { /* ignore */ }
 

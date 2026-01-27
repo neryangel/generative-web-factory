@@ -42,6 +42,7 @@ function validateAdminSettings(data: unknown): WidgetAdminSettings | null {
  */
 export function useAdminSettingsSync(): UseAdminSettingsSyncReturn {
   const [adminSettings, setAdminSettings] = useState<WidgetAdminSettings>(() => {
+    if (typeof window === 'undefined') return DEFAULT_ADMIN_SETTINGS;
     try {
       const stored = localStorage.getItem(ADMIN_SETTINGS_STORAGE_KEY);
       if (!stored) {
@@ -90,9 +91,10 @@ export function useAdminSettingsSync(): UseAdminSettingsSyncReturn {
 
   // בודק אם להציג על המכשיר הנוכחי
   const shouldShowOnDevice = (): boolean => {
+    if (typeof window === 'undefined') return true;
     const { showOnDesktop, showOnMobile } = adminSettings.trigger;
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    
+
     if (isMobile) {
       return showOnMobile;
     }

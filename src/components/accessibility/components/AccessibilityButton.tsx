@@ -82,6 +82,7 @@ export const AccessibilityButton = React.forwardRef<
     <button
       ref={ref}
       disabled={disabled}
+      data-a11y-btn={variant}
       className={cn(
         'focus-visible:outline-none focus-visible:ring-2',
         className
@@ -93,28 +94,6 @@ export const AccessibilityButton = React.forwardRef<
         // Focus ring color
         ['--tw-ring-color' as string]: 'hsl(var(--a11y-primary))',
         ['--tw-ring-offset-color' as string]: 'hsl(var(--a11y-background))',
-      }}
-      onMouseEnter={(e) => {
-        if (!disabled) {
-          if (variant === 'default') {
-            e.currentTarget.style.backgroundColor = 'hsl(var(--a11y-primary) / 0.9)';
-          } else if (variant === 'outline' || variant === 'ghost') {
-            e.currentTarget.style.backgroundColor = 'hsl(var(--a11y-muted))';
-          }
-        }
-        props.onMouseEnter?.(e);
-      }}
-      onMouseLeave={(e) => {
-        if (!disabled) {
-          if (variant === 'default') {
-            e.currentTarget.style.backgroundColor = 'hsl(var(--a11y-primary))';
-          } else if (variant === 'outline') {
-            e.currentTarget.style.backgroundColor = 'hsl(var(--a11y-background))';
-          } else if (variant === 'ghost') {
-            e.currentTarget.style.backgroundColor = 'transparent';
-          }
-        }
-        props.onMouseLeave?.(e);
       }}
       {...props}
     >

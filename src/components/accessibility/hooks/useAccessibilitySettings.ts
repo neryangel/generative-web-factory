@@ -25,9 +25,6 @@ export const SETTING_LABELS: Record<keyof AccessibilitySettings, { he: string; e
   dyslexiaFont: { he: 'גופן דיסלקסיה', en: 'Dyslexia Font' },
 };
 
-/** @deprecated Use DEFAULT_SETTINGS from '../types' instead */
-export const defaultSettings = DEFAULT_SETTINGS;
-
 /**
  * מאמת הגדרות נגישות מ-localStorage
  * @param data - נתונים לוולידציה
@@ -104,16 +101,17 @@ export interface UseAccessibilitySettingsReturn {
  */
 export function useAccessibilitySettings(): UseAccessibilitySettingsReturn {
   const [settings, setSettings] = useState<AccessibilitySettings>(() => {
+    if (typeof window === 'undefined') return DEFAULT_SETTINGS;
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (!stored) {
-        return defaultSettings;
+        return DEFAULT_SETTINGS;
       }
       const parsed = JSON.parse(stored);
       const validated = validateSettings(parsed);
-      return validated ?? defaultSettings;
+      return validated ?? DEFAULT_SETTINGS;
     } catch {
-      return defaultSettings;
+      return DEFAULT_SETTINGS;
     }
   });
 
@@ -153,7 +151,7 @@ export function useAccessibilitySettings(): UseAccessibilitySettingsReturn {
 
   /** מאפס את כל ההגדרות לברירת מחדל */
   const resetSettings = useCallback((announce?: (message: string) => void, resetMessage?: string) => {
-    setSettings(defaultSettings);
+    setSettings(DEFAULT_SETTINGS);
     if (announce && resetMessage) {
       announce(resetMessage);
     }

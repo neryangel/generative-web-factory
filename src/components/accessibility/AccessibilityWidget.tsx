@@ -37,6 +37,7 @@ import { ReadingMask } from './components/ReadingMask';
 import { HideOptionsDialog } from './components/HideOptionsDialog';
 import { MinimizedButton } from './components/MinimizedButton';
 import { AccessibilityDialog } from './components/AccessibilityDialog';
+import { WidgetErrorBoundary } from './components/WidgetErrorBoundary';
 import { Z_INDEX_TRIGGER } from './constants';
 import type { AccessibilitySettings } from './types';
 
@@ -65,7 +66,7 @@ export interface AccessibilityWidgetProps {
  * רכיב Widget לנגישות
  * מספק תפריט צף עם אפשרויות נגישות מותאמות
  */
-export const AccessibilityWidget: React.FC<AccessibilityWidgetProps> = ({
+const AccessibilityWidgetInner: React.FC<AccessibilityWidgetProps> = ({
   defaultLanguage = 'he',
   position = 'auto',
   customTranslations,
@@ -346,6 +347,16 @@ export const AccessibilityWidget: React.FC<AccessibilityWidgetProps> = ({
   if (portalContainer) {
     return createPortal(widgetContent, portalContainer);
   }
-  
+
   return widgetContent;
 };
+
+/**
+ * רכיב Widget לנגישות — עטוף ב-Error Boundary
+ * אם הווידג'ט קורס, האפליקציה ממשיכה לעבוד
+ */
+export const AccessibilityWidget: React.FC<AccessibilityWidgetProps> = (props) => (
+  <WidgetErrorBoundary>
+    <AccessibilityWidgetInner {...props} />
+  </WidgetErrorBoundary>
+);

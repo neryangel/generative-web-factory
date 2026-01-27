@@ -65,6 +65,7 @@ export function useDraggablePosition(
 
   const dragRef = useRef<HTMLButtonElement>(null);
   const [position, setPosition] = useState<Position>(() => {
+    if (typeof window === 'undefined') return initialPosition;
     try {
       const stored = localStorage.getItem(POSITION_STORAGE_KEY);
       if (stored) {

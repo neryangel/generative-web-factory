@@ -139,7 +139,8 @@
 }
 
 /* גווני אפור - מוחל רק על תוכן האתר, לא על כפתור הנגישות */
-.grayscale-mode #root {
+.grayscale-mode #root,
+.grayscale-mode #__next {
   filter: grayscale(100%);
 }
 
@@ -186,10 +187,10 @@
    גופן דיסלקסיה (Dyslexia Friendly Font)
    ============================================ */
 
-/* שימוש בגופן OpenDyslexic או Arial כ-fallback */
+/* שימוש בגופן OpenDyslexic מקומי עם Arial כ-fallback */
 @font-face {
   font-family: 'OpenDyslexic';
-  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Regular.woff') format('woff');
+  src: url('/fonts/OpenDyslexic-Regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -197,7 +198,7 @@
 
 @font-face {
   font-family: 'OpenDyslexic';
-  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Bold.woff') format('woff');
+  src: url('/fonts/OpenDyslexic-Bold.woff') format('woff');
   font-weight: bold;
   font-style: normal;
   font-display: swap;
@@ -206,6 +207,38 @@
 .dyslexia-font,
 .dyslexia-font * {
   font-family: 'OpenDyslexic', Arial, sans-serif !important;
+}
+
+/* ============================================
+   Hover states for widget buttons (replaces inline JS)
+   ============================================ */
+
+/* AccessibilityButton variants */
+[data-a11y-btn="default"]:not(:disabled):hover {
+  background-color: hsl(var(--a11y-primary) / 0.9) !important;
+}
+
+[data-a11y-btn="outline"]:not(:disabled):hover,
+[data-a11y-btn="ghost"]:not(:disabled):hover {
+  background-color: hsl(var(--a11y-muted)) !important;
+}
+
+/* ToggleButton hover */
+[data-a11y-toggle]:not([aria-pressed="true"]):hover {
+  background-color: hsl(var(--a11y-muted)) !important;
+}
+
+/* Generic widget interactive elements */
+[data-a11y-hover="muted"]:hover {
+  background-color: hsl(var(--a11y-muted)) !important;
+}
+
+[data-a11y-hover="primary"]:hover {
+  background-color: hsl(var(--a11y-primary) / 0.08) !important;
+}
+
+[data-a11y-hover="background"]:hover {
+  background-color: hsl(var(--a11y-background)) !important;
 }
 
 /* ============================================

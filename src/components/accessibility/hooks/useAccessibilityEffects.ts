@@ -52,12 +52,8 @@ export function useAccessibilityEffects({
         attributeFilter: ['style', 'class']
       });
       
-      // בדוק כל 500ms לאנימציות חדשות (גיבוי)
-      const intervalId = setInterval(pauseAllAnimations, 500);
-      
       return () => {
         observer.disconnect();
-        clearInterval(intervalId);
       };
     } else {
       // החזר את כל האנימציות לפעולה

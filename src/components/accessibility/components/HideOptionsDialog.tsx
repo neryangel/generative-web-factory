@@ -14,6 +14,7 @@ import {
   Minimize2Icon,
   XIcon
 } from '../icons';
+import { Z_INDEX_DIALOG } from '../constants';
 import type { HideDuration } from '../constants';
 import type { AccessibilityTranslations } from '../i18n/translations';
 
@@ -79,8 +80,8 @@ export const HideOptionsDialog: React.FC<HideOptionsDialogProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[10001] flex items-center justify-center relative"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      className="fixed inset-0 flex items-center justify-center relative"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: Z_INDEX_DIALOG + 1 }}
       tabIndex={-1}
       role="dialog"
       aria-modal="true"
@@ -119,8 +120,7 @@ export const HideOptionsDialog: React.FC<HideOptionsDialogProps> = ({
             onClick={onClose}
             className="p-2 rounded-full transition-colors"
             style={{ color: 'hsl(var(--a11y-muted-foreground))' }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'hsl(var(--a11y-muted))'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+            data-a11y-hover="muted"
             aria-label={translations.close}
           >
             <XIcon size={20} />
@@ -137,8 +137,7 @@ export const HideOptionsDialog: React.FC<HideOptionsDialogProps> = ({
                 onClose();
               }}
               className="w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-start group"
-              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'hsl(var(--a11y-primary) / 0.08)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              data-a11y-hover="primary"
             >
               <div
                 className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
@@ -171,8 +170,7 @@ export const HideOptionsDialog: React.FC<HideOptionsDialogProps> = ({
               color: 'hsl(var(--a11y-foreground))',
               backgroundColor: 'hsl(var(--a11y-background))',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'hsl(var(--a11y-muted))'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'hsl(var(--a11y-background))'; }}
+            data-a11y-hover="muted"
           >
             {translations.cancel}
           </button>
