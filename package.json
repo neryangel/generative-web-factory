@@ -5,15 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "dev:vite": "vite",
     "build": "next build",
-    "build:vite": "vite build",
-    "build:dev": "vite build --mode development",
     "start": "next start",
     "lint": "eslint .",
-    "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

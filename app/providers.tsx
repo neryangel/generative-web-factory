@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from '@/hooks/useAuth';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { AuthLoadingBoundary } from '@/components/common/AuthLoadingBoundary';
 import { useState } from 'react';
 import { createQueryClient } from '@/lib/query-client';
 
@@ -16,10 +17,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            {children}
-          </TooltipProvider>
+          <AuthLoadingBoundary>
+            <TooltipProvider>
+              <Toaster />
+              {children}
+            </TooltipProvider>
+          </AuthLoadingBoundary>
         </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
