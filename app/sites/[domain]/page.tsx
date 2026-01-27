@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-published-site?domain=${domain}`,
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-published-site?domain=${encodeURIComponent(domain)}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export default async function CustomDomainPage({ params }: PageProps) {
 
   // Fetch site data server-side
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-published-site?domain=${domain}`,
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-published-site?domain=${encodeURIComponent(domain)}`,
     {
       headers: {
         'Content-Type': 'application/json',
