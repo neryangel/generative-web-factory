@@ -1,14 +1,12 @@
-import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect, createContext, useContext, ReactNode, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
+import { useTenants, useCreateTenant } from './queries/useTenants';
+import { queryKeys } from '@/lib/query-keys';
+import type { TenantWithRole } from '@/api/tenants.api';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Tenant = Tables<'tenants'>;
-type TenantMember = Tables<'tenant_members'>;
-
-interface TenantWithRole extends Tenant {
-  role: TenantMember['role'];
-}
 
 interface TenantContextType {
   tenants: TenantWithRole[];
@@ -21,104 +19,70 @@ interface TenantContextType {
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
 
+/**
+ * TenantProvider with React Query integration
+ * Provides tenant state management with automatic caching, refetching, and retry logic
+ */
 export function TenantProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const [tenants, setTenants] = useState<TenantWithRole[]>([]);
-  const [currentTenant, setCurrentTenant] = useState<TenantWithRole | null>(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const [currentTenant, setCurrentTenantState] = useState<TenantWithRole | null>(null);
 
-  const fetchTenants = useCallback(async () => {
-    if (!user) {
-      setTenants([]);
-      setCurrentTenant(null);
-      setLoading(false);
-      return;
-    }
+  // Use React Query for tenant data fetching
+  const { data: tenants = [], isLoading, refetch } = useTenants();
+  const createTenantMutation = useCreateTenant();
 
-    try {
-      // Get tenant memberships
-      const { data: memberships, error: memberError } = await supabase
-        .from('tenant_members')
-        .select('tenant_id, role')
-        .eq('user_id', user.id);
-
-      if (memberError) throw memberError;
-
-      if (!memberships || memberships.length === 0) {
-        setTenants([]);
-        setCurrentTenant(null);
-        setLoading(false);
-        return;
-      }
-
-      // Get tenant details
-      const tenantIds = memberships.map(m => m.tenant_id);
-      const { data: tenantData, error: tenantError } = await supabase
-        .from('tenants')
-        .select('*')
-        .in('id', tenantIds);
-
-      if (tenantError) throw tenantError;
-
-      // Combine tenant data with roles
-      const tenantsWithRoles: TenantWithRole[] = (tenantData || []).map(tenant => {
-        const membership = memberships.find(m => m.tenant_id === tenant.id);
-        return {
-          ...tenant,
-          role: membership?.role || 'viewer',
-        };
-      });
-
-      setTenants(tenantsWithRoles);
-
-      // Set current tenant from localStorage or first available
+  // Initialize current tenant from localStorage or first available
+  useEffect(() => {
+    if (tenants.length > 0 && !currentTenant) {
       const savedTenantId = localStorage.getItem('currentTenantId');
-      const savedTenant = tenantsWithRoles.find(t => t.id === savedTenantId);
-      setCurrentTenant(savedTenant || tenantsWithRoles[0] || null);
-    } catch (error) {
-      console.error('Error fetching tenants:', error);
-    } finally {
-      setLoading(false);
+      const savedTenant = tenants.find(t => t.id === savedTenantId);
+      setCurrentTenantState(savedTenant || tenants[0] || null);
+    }
+  }, [tenants, currentTenant]);
+
+  // Clear tenant when user logs out
+  useEffect(() => {
+    if (!user) {
+      setCurrentTenantState(null);
     }
   }, [user]);
 
-  useEffect(() => {
-    fetchTenants();
-  }, [fetchTenants]);
-
-  useEffect(() => {
-    if (currentTenant) {
-      localStorage.setItem('currentTenantId', currentTenant.id);
+  // Persist current tenant selection
+  const setCurrentTenant = useCallback((tenant: TenantWithRole | null) => {
+    setCurrentTenantState(tenant);
+    if (tenant) {
+      localStorage.setItem('currentTenantId', tenant.id);
+    } else {
+      localStorage.removeItem('currentTenantId');
     }
-  }, [currentTenant]);
+  }, []);
 
-  const createTenant = async (name: string, slug: string) => {
+  // Create tenant wrapper that matches the existing interface
+  const createTenant = useCallback(async (name: string, slug: string) => {
     try {
-      const { data, error } = await supabase
-        .from('tenants')
-        .insert({ name, slug })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Refetch to get the updated list with roles
-      await fetchTenants();
-      
+      const data = await createTenantMutation.mutateAsync({ name, slug });
+      // After creation, refetch to get the updated list with roles
+      await refetch();
       return { data, error: null };
     } catch (error) {
       return { data: null, error: error as Error };
     }
-  };
+  }, [createTenantMutation, refetch]);
+
+  // Refetch tenants wrapper
+  const refetchTenants = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all });
+  }, [queryClient]);
 
   return (
     <TenantContext.Provider value={{
       tenants,
       currentTenant,
       setCurrentTenant,
-      loading,
+      loading: isLoading,
       createTenant,
-      refetchTenants: fetchTenants,
+      refetchTenants,
     }}>
       {children}
     </TenantContext.Provider>

@@ -12,6 +12,16 @@ dist
 dist-ssr
 *.local
 
+# Package manager - standardized on npm
+bun.lockb
+yarn.lock
+pnpm-lock.yaml
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
 # Next.js
 .next
 out

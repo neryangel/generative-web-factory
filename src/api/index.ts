@@ -5,3 +5,4 @@ export * from './sections.api';
 export * from './templates.api';
 export * from './domains.api';
 export * from './publishes.api';
+export * from './tenants.api';
