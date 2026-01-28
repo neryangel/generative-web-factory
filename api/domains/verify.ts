@@ -3,7 +3,13 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 const VERCEL_API_URL = 'https://api.vercel.com';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Restrict CORS to allowed origins only
+  const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'https://amdir.app,https://www.amdir.app').split(',');
+  const origin = req.headers.origin || '';
+
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
