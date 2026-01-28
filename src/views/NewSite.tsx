@@ -356,11 +356,12 @@ export default function NewSite() {
             for (let j = 0; j < pageBlueprint.sections.length; j++) {
               const sectionBlueprint = pageBlueprint.sections[j];
               
-              // Support both old format (string) and new format (object with type and content)
+              // Support both old format (string) and new format (object with type, variant, and content)
               const isNewFormat = typeof sectionBlueprint === 'object' && sectionBlueprint.type;
               const sectionType = isNewFormat ? sectionBlueprint.type : sectionBlueprint;
+              const sectionVariant = isNewFormat ? (sectionBlueprint.variant || 'default') : 'default';
               const blueprintContent = isNewFormat ? sectionBlueprint.content : null;
-              
+
               // If blueprint has content, use it; otherwise get default from registry
               let sectionContent = blueprintContent;
               if (!sectionContent) {
@@ -378,7 +379,7 @@ export default function NewSite() {
                   page_id: page.id,
                   tenant_id: currentTenant.id,
                   type: sectionType,
-                  variant: 'default',
+                  variant: sectionVariant,
                   content: sectionContent,
                   sort_order: j,
                 });
