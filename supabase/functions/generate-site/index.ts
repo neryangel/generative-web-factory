@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateBrief, errorResponse, successResponse } from "../_shared/validation.ts";
 
 /**
@@ -115,6 +116,25 @@ serve(async (req) => {
   }
 
   try {
+    // SECURITY: Require authentication to prevent abuse/DoS
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return errorResponse("נדרשת הזדהות", 401, corsHeaders);
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } }
+    });
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return errorResponse("הזדהות נכשלה", 401, corsHeaders);
+    }
+
     const { brief, language = "he" } = await req.json();
 
     // Validate and sanitize the brief
@@ -176,8 +196,8 @@ serve(async (req) => {
     }
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      // Log status only, not response body (may contain sensitive data)
+      console.error("AI gateway error:", response.status);
 
       if (response.status === 429) {
         return new Response(
@@ -258,9 +278,10 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error("generate-site error:", error);
+    // Log error type only, not full error (may contain sensitive data)
+    console.error("generate-site error:", error instanceof Error ? error.name : "Unknown");
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "שגיאה לא צפויה" }),
+      JSON.stringify({ error: "שגיאה לא צפויה" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

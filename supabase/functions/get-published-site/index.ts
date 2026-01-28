@@ -8,7 +8,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
  * 1. It serves published sites on custom domains (user's own domains)
  * 2. These domains are unpredictable and user-configured
  * 3. The endpoint is read-only and serves only public/published content
- * 4. No authentication is required - uses service role internally
+ *
+ * SECURITY: Uses anon key with RLS policies that allow public access to
+ * published content only. Never use service role key for public endpoints.
  */
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -35,9 +37,11 @@ serve(async (req) => {
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    // SECURITY: Use anon key for public endpoints, not service role key
+    // RLS policies must allow public access to published sites/domains/publishes
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     let siteId: string | null = null;
 

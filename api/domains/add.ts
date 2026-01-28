@@ -3,10 +3,16 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 const VERCEL_API_URL = 'https://api.vercel.com';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS headers - restrict to allowed origins only (CSRF protection)
+  const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'https://amdir.app,https://www.amdir.app').split(',');
+  const origin = req.headers.origin || '';
+
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Vary', 'Origin');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -51,7 +57,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Vercel API error:', data);
+      // Log error code only, not full response (may contain sensitive data)
+      console.error('Vercel API error:', response.status, data.error?.code);
       return res.status(response.status).json({
         error: data.error?.message || 'Failed to add domain',
         code: data.error?.code
@@ -65,7 +72,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       verification: data.verification,
     });
   } catch (error) {
-    console.error('Add domain error:', error);
+    // Log error type only, not full error (may contain sensitive data)
+    console.error('Add domain error:', error instanceof Error ? error.name : 'Unknown');
     return res.status(500).json({ error: 'Internal server error' });
   }
 }

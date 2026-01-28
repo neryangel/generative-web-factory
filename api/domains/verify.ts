@@ -82,7 +82,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       verification: verifyData.verification,
     });
   } catch (error) {
-    console.error('Verify domain error:', error);
+    // Log error type only, not full error (may contain sensitive data)
+    console.error('Verify domain error:', error instanceof Error ? error.name : 'Unknown');
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
