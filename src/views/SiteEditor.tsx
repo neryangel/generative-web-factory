@@ -225,16 +225,21 @@ export default function SiteEditor() {
     const reorderedSections = arrayMove(sections, oldIndex, newIndex);
     setSections(reorderedSections);
 
-    // Persist to database
+    // Persist to database atomically using RPC
     try {
-      const updates = reorderedSections.map((section, index) => 
-        supabase
-          .from('sections')
-          .update({ sort_order: index })
-          .eq('id', section.id)
-      );
+      if (!currentPage) return;
 
-      await Promise.all(updates);
+      const sectionOrders = reorderedSections.map((section, index) => ({
+        id: section.id,
+        sort_order: index,
+      }));
+
+      const { error } = await supabase.rpc('reorder_sections', {
+        p_page_id: currentPage.id,
+        p_section_orders: sectionOrders,
+      });
+
+      if (error) throw error;
       toast.success('סדר הסקשנים עודכן');
     } catch (error) {
       console.error('Error updating sort order:', error);

@@ -568,6 +568,10 @@ export type Database = {
         Args: { p_tenant_id: string; p_user_id: string }
         Returns: boolean
       }
+      reorder_sections: {
+        Args: { p_page_id: string; p_section_orders: { id: string; sort_order: number }[] }
+        Returns: undefined
+      }
     }
     Enums: {
       domain_status: "pending" | "verifying" | "active" | "failed"
