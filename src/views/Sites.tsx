@@ -9,14 +9,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
+  ExternalLink,
+  Eye,
   Globe,
+  MoreVertical,
+  Pencil,
   Plus,
   Search,
-  MoreVertical,
-  Eye,
-  Pencil,
-  Trash2,
-  ExternalLink
+  Trash2
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -60,7 +60,7 @@ export default function Sites() {
       }
     }
 
-    fetchSites();
+    void fetchSites();
   }, [currentTenant]);
 
   const filteredSites = sites.filter(site =>

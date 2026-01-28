@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, usePathname, useParams, useSearchParams } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 import { routes } from '@/lib/navigation';
 

@@ -5,7 +5,6 @@
  * @module accessibility/profiles
  */
 
-import { DEFAULT_SETTINGS } from './types';
 import type { AccessibilitySettings } from './types';
 
 /**

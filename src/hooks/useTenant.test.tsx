@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactNode } from 'react';
 
 // Mock localStorage
@@ -86,11 +87,21 @@ import { TenantProvider, useTenant } from './useTenant';
 import { AuthProvider } from './useAuth';
 
 describe('useTenant', () => {
-  const wrapper = ({ children }: { children: ReactNode }) => (
-    <AuthProvider>
-      <TenantProvider>{children}</TenantProvider>
-    </AuthProvider>
-  );
+  const createWrapper = () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+    return ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <TenantProvider>{children}</TenantProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    );
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -99,7 +110,7 @@ describe('useTenant', () => {
 
   describe('TenantProvider', () => {
     it('should eventually load tenants', async () => {
-      const { result } = renderHook(() => useTenant(), { wrapper });
+      const { result } = renderHook(() => useTenant(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -107,7 +118,7 @@ describe('useTenant', () => {
     });
 
     it('should provide tenant context values', async () => {
-      const { result } = renderHook(() => useTenant(), { wrapper });
+      const { result } = renderHook(() => useTenant(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -123,7 +134,7 @@ describe('useTenant', () => {
 
   describe('setCurrentTenant', () => {
     it('should be a function', async () => {
-      const { result } = renderHook(() => useTenant(), { wrapper });
+      const { result } = renderHook(() => useTenant(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -135,7 +146,7 @@ describe('useTenant', () => {
 
   describe('createTenant', () => {
     it('should be a function', async () => {
-      const { result } = renderHook(() => useTenant(), { wrapper });
+      const { result } = renderHook(() => useTenant(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -147,7 +158,7 @@ describe('useTenant', () => {
 
   describe('refetchTenants', () => {
     it('should be a function', async () => {
-      const { result } = renderHook(() => useTenant(), { wrapper });
+      const { result } = renderHook(() => useTenant(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -159,8 +170,13 @@ describe('useTenant', () => {
 
   describe('useTenant outside TenantProvider', () => {
     it('should throw error when used outside TenantProvider', () => {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
       const authWrapper = ({ children }: { children: ReactNode }) => (
-        <AuthProvider>{children}</AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>{children}</AuthProvider>
+        </QueryClientProvider>
       );
 
       expect(() => {

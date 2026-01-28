@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTenant } from '@/hooks/useTenant';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,15 +12,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { TemplateCard } from '@/components/templates/TemplateCard';
 import { TemplatePreviewDialog } from '@/components/templates/TemplatePreviewDialog';
-import { TemplateCategoryFilter, type TemplateCategory } from '@/components/templates/TemplateCategoryFilter';
+import { type TemplateCategory, TemplateCategoryFilter } from '@/components/templates/TemplateCategoryFilter';
 import { 
+  AlertCircle, 
   ArrowRight, 
-  Loader2, 
-  Sparkles, 
+  Check, 
   FileText,
-  Check,
-  Wand2,
-  AlertCircle
+  Loader2,
+  Sparkles,
+  Wand2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -96,7 +96,7 @@ export default function NewSite() {
       }
     }
 
-    fetchTemplates();
+    void fetchTemplates();
   }, []);
 
   // Calculate category counts

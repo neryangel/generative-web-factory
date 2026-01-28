@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { SectionProps } from '../SectionRenderer';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { Plus, Trash2 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';

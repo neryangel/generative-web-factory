@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { ArrowRight, ArrowLeft, ExternalLink } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, useInView } from 'framer-motion';
 

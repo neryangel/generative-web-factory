@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import type { ViewMode, Site, Page, Section } from '@/types';
+import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
+import type { ViewMode } from '@/types';
 
 interface EditorContextValue {
   // Selection state

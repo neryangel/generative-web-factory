@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useRef, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef } from 'react';
 import Lenis from 'lenis';
 
 interface SmoothScrollContextType {

@@ -1,9 +1,9 @@
-import { SectionProps } from '../SectionRenderer';
+import type { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, Quote, ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Quote, Star, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface Testimonial {

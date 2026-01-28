@@ -8,12 +8,12 @@ import { CreateTenantDialog } from '@/components/tenant/CreateTenantDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Building2,
-  Globe,
-  Plus,
   ArrowLeft,
+  Building2,
   Eye,
   FileText,
+  Globe,
+  Plus,
 } from 'lucide-react';
 
 export default function Dashboard() {

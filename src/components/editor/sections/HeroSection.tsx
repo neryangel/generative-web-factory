@@ -1,8 +1,8 @@
-import { SectionProps } from '../SectionRenderer';
+import type { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { ImagePickerDialog } from '../ImagePickerDialog';
 import { Button } from '@/components/ui/button';
-import { Image as ImageIcon, ArrowLeft, Sparkles, ChevronDown, Play } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Image as ImageIcon, Play, Sparkles } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface HeroContent {

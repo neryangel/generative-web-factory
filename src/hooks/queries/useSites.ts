@@ -1,7 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { sitesApi } from '@/api/sites.api';
 import { useTenant } from '@/hooks/useTenant';
-import { queryKeys, DISABLED_QUERY_KEY } from '@/lib/query-keys';
+import { DISABLED_QUERY_KEY, queryKeys } from '@/lib/query-keys';
 import type { SiteInsert, SiteUpdate } from '@/types';
 
 /**
@@ -62,7 +62,7 @@ export function useCreateSite() {
   return useMutation({
     mutationFn: (site: SiteInsert) => sitesApi.create(site),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
     },
   });
 }
@@ -80,7 +80,7 @@ export function useUpdateSite() {
       return sitesApi.update(siteId, currentTenant.id, updates);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
       const detailKey = queryKeys.sites.detail(data.id);
       if (detailKey) {
         queryClient.setQueryData(detailKey, data);
@@ -102,7 +102,7 @@ export function useDeleteSite() {
       return sitesApi.delete(siteId, currentTenant.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
     },
   });
 }
@@ -120,7 +120,7 @@ export function useUpdateSiteSettings() {
       return sitesApi.updateSettings(siteId, currentTenant.id, settings);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
       const detailKey = queryKeys.sites.detail(data.id);
       if (detailKey) {
         queryClient.setQueryData(detailKey, data);

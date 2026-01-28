@@ -35,7 +35,7 @@ const SlackLogo = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const NotionLogo = ({ className }: { className?: string }) => (
+const _NotionLogo = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 100 100" fill="currentColor">
     <path d="M6.017 4.313l55.333-4.087c6.797-.583 8.543-.19 12.817 2.917l17.663 12.443c2.913 2.14 3.883 2.723 3.883 5.053v68.243c0 4.277-1.553 6.807-6.99 7.193L24.467 99.967c-4.08.193-6.023-.39-8.16-3.113L3.3 79.94c-2.333-3.113-3.3-5.443-3.3-8.167V11.113c0-3.497 1.553-6.413 6.017-6.8z"/>
     <path fill="var(--background, white)" d="M61.35 4.226l-55.333 4.087C1.553 8.7 0 11.616 0 15.113v60.66c0 2.723.967 5.053 3.3 8.167l13.007 16.913c2.137 2.723 4.08 3.307 8.16 3.113l64.257-3.89c5.437-.387 6.99-2.917 6.99-7.193V20.64c0-2.21-.873-2.847-3.443-4.733L74.167 3.463c-4.273-3.107-6.02-3.5-12.817-2.917zM25.92 19.523c-5.247.353-6.437.433-9.417-1.99L8.927 11.507c-.77-.78-.383-1.753 1.557-1.947l53.193-3.887c4.467-.39 6.793 1.167 8.54 2.527l9.123 6.61c.39.197 1.36 1.36.193 1.36l-54.933 3.307-.68.047zM19.803 88.3V30.367c0-2.53.78-3.697 3.1-3.893L81.3 22.78c2.14-.193 3.107 1.167 3.107 3.693v57.547c0 2.53-.39 4.67-3.883 4.863l-56.14 3.31c-3.497.193-5.18-1.167-5.18-3.893z"/>
@@ -74,13 +74,13 @@ const FiverrLogo = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const JFrogLogo = ({ className }: { className?: string }) => (
+const _JFrogLogo = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 120 40" fill="currentColor">
     <text x="0" y="30" fontSize="28" fontWeight="bold">JFrog</text>
   </svg>
 );
 
-const ElementorLogo = ({ className }: { className?: string }) => (
+const _ElementorLogo = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 120 40" fill="currentColor">
     <rect x="5" y="5" width="8" height="30"/>
     <rect x="20" y="5" width="20" height="8"/>
@@ -90,7 +90,7 @@ const ElementorLogo = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const LemonadeLogo = ({ className }: { className?: string }) => (
+const _LemonadeLogo = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 140 40" fill="currentColor">
     <text x="0" y="30" fontSize="26" fontWeight="bold">lemonade</text>
   </svg>

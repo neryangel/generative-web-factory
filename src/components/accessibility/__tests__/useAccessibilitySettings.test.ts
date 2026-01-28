@@ -4,9 +4,33 @@ import { useAccessibilitySettings } from '../hooks/useAccessibilitySettings';
 import { DEFAULT_SETTINGS } from '../types';
 import { STORAGE_KEY, MAX_FONT_SIZE_LEVEL, MIN_FONT_SIZE_LEVEL } from '../constants';
 
+// Mock localStorage
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: vi.fn((key: string) => store[key] ?? null),
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = value;
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
+    get length() {
+      return Object.keys(store).length;
+    },
+    key: vi.fn((index: number) => Object.keys(store)[index] ?? null),
+  };
+})();
+
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+
 describe('useAccessibilitySettings', () => {
   beforeEach(() => {
-    localStorage.clear();
+    localStorageMock.clear();
+    vi.clearAllMocks();
   });
 
   it('should return default settings on first load', () => {

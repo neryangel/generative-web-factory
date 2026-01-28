@@ -1,8 +1,8 @@
-import { SectionProps } from '../SectionRenderer';
+import type { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { Card, CardContent } from '@/components/ui/card';
 import * as LucideIcons from 'lucide-react';
-import { useRef, useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface FeatureItem {

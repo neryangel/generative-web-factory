@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { SectionRenderer } from '@/components/editor/SectionRenderer';
 import { Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase as _supabase } from '@/integrations/supabase/client';
 
 // Supabase configuration from Next.js environment variables
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -91,7 +91,7 @@ export default function PublicSite() {
       }
     }
 
-    fetchSite();
+    void fetchSite();
   }, [slug]);
 
   if (loading) {

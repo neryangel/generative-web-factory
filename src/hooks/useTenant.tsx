@@ -1,7 +1,8 @@
-import { useState, useEffect, createContext, useContext, ReactNode, useCallback } from 'react';
+import type { ReactNode} from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
-import { useTenants, useCreateTenant } from './queries/useTenants';
+import { useCreateTenant, useTenants } from './queries/useTenants';
 import { queryKeys } from '@/lib/query-keys';
 import type { TenantWithRole } from '@/api/tenants.api';
 import type { Tables } from '@/integrations/supabase/types';

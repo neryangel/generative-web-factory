@@ -1,10 +1,10 @@
-import { SectionProps } from '../SectionRenderer';
+import type { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Mail, Phone, MapPin, Send, Clock, MessageCircle } from 'lucide-react';
-import { useRef, useState, useEffect } from 'react';
+import { Clock, Mail, MapPin, MessageCircle, Phone, Send } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface ContactContent {

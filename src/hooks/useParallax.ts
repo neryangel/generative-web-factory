@@ -1,5 +1,6 @@
-import { useRef, useEffect, useState } from 'react';
-import { useScroll, useTransform, useSpring, MotionValue } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import type { MotionValue } from 'framer-motion';
+import { useScroll, useSpring, useTransform } from 'framer-motion';
 
 interface UseParallaxOptions {
   speed?: number;
@@ -24,8 +25,9 @@ export function useParallax({
   offset = ['start end', 'end start'],
 }: UseParallaxOptions = {}): UseParallaxReturn {
   const ref = useRef<HTMLElement>(null);
-  const [elementTop, setElementTop] = useState(0);
-  const [elementHeight, setElementHeight] = useState(0);
+  // Reserved for future element position tracking
+  const [_elementTop, _setElementTop] = useState(0);
+  const [_elementHeight, _setElementHeight] = useState(0);
 
   const { scrollYProgress } = useScroll({
     target: ref,

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useTenant } from '@/hooks/useTenant';
 import { isValidDomain } from '@/lib/validation-patterns';
@@ -29,15 +29,15 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { 
-  Globe, 
-  Plus, 
-  Loader2, 
+  AlertCircle, 
   Check, 
-  AlertCircle,
+  Copy, 
+  ExternalLink, 
+  Globe,
+  Loader2,
+  Plus,
   RefreshCw,
-  Trash2,
-  Copy,
-  ExternalLink
+  Trash2
 } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -59,14 +59,20 @@ const statusLabels: Record<string, { label: string; variant: 'default' | 'second
 const VERCEL_CNAME_VALUE = 'cname.vercel-dns.com';
 const VERCEL_A_RECORD_VALUE = '76.76.21.21';
 
+interface VercelDomainResponse {
+  error?: string;
+  verified?: boolean;
+  configured?: boolean;
+}
+
 // Vercel API helper
-async function vercelDomainApi(action: 'add' | 'verify' | 'remove', domain: string) {
+async function vercelDomainApi(action: 'add' | 'verify' | 'remove', domain: string): Promise<VercelDomainResponse> {
   const response = await fetch(`/api/domains/${action}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ domain }),
   });
-  return response.json();
+  return response.json() as Promise<VercelDomainResponse>;
 }
 
 export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
@@ -78,9 +84,9 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
   const [adding, setAdding] = useState(false);
   const [verifying, setVerifying] = useState<string | null>(null);
 
-  const fetchDomains = async () => {
+  const fetchDomains = useCallback(async () => {
     if (!currentTenant) return;
-    
+
     try {
       const { data, error } = await supabase
         .from('domains')
@@ -95,11 +101,11 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentTenant, siteId]);
 
   useEffect(() => {
-    fetchDomains();
-  }, [siteId, currentTenant]);
+    void fetchDomains();
+  }, [siteId, currentTenant, fetchDomains]);
 
   const handleAddDomain = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,7 +119,7 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
 
     setAdding(true);
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('domains')
         .insert({
           site_id: siteId,
@@ -147,7 +153,7 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
       setAddDialogOpen(false);
       setNewDomain('');
       await fetchDomains();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error adding domain:', error);
       toast.error('שגיאה בהוספת הדומיין');
     } finally {
@@ -193,7 +199,7 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
       }
 
       await fetchDomains();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error verifying domain:', error);
       toast.error('שגיאה באימות הדומיין');
     } finally {
@@ -234,7 +240,7 @@ export function DomainManager({ siteId, siteSlug }: DomainManagerProps) {
   };
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+    void navigator.clipboard.writeText(text);
     toast.success('הועתק ללוח');
   };
 

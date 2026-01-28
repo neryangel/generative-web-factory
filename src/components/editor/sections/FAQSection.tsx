@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { SectionProps } from '../SectionRenderer';
+import type { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Plus, Minus, Trash2, HelpCircle, MessageCircle } from 'lucide-react';
+import { HelpCircle, MessageCircle, Minus, Plus, Sparkles, Trash2 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface FAQItem {
@@ -181,7 +181,7 @@ function DefaultVariant({ content, isEditing, onContentChange, onSelect, isSelec
 
         {/* FAQ Items */}
         <div className="space-y-4">
-          {filteredItems.map((item, index) => {
+          {filteredItems.map((item, _index) => {
             const realIndex = items.findIndex(i => i === item);
             const isOpen = openIndex === realIndex;
 

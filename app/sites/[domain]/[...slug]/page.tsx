@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { SiteRenderer } from '@/components/site/SiteRenderer';
 import { notFound } from 'next/navigation';
 import { fetchPublishedSiteByDomain } from '@/lib/fetch-published-site';

@@ -1,9 +1,10 @@
-import {
-  DndContext,
+import type {
   DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
+  DragStartEvent} from '@dnd-kit/core';
+import {
   closestCenter,
+  DndContext,
+  DragOverlay,
   KeyboardSensor,
   PointerSensor,
   useSensor,

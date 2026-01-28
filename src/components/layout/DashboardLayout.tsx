@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -17,14 +17,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   Building2,
+  Check,
   ChevronDown,
   Globe,
   LayoutDashboard,
   LogOut,
   Plus,
   Settings,
-  User,
-  Check
+  User
 } from 'lucide-react';
 
 interface DashboardLayoutProps {

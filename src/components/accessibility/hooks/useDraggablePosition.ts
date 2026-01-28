@@ -69,9 +69,9 @@ export function useDraggablePosition(
     try {
       const stored = localStorage.getItem(POSITION_STORAGE_KEY);
       if (stored) {
-        const parsed = JSON.parse(stored);
+        const parsed = JSON.parse(stored) as { x?: unknown; y?: unknown };
         if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
-          return parsed;
+          return { x: parsed.x, y: parsed.y };
         }
       }
     } catch {

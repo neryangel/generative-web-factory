@@ -1,7 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { tenantsApi, TenantWithRole } from '@/api/tenants.api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { TenantWithRole } from '@/api/tenants.api';
+import { tenantsApi } from '@/api/tenants.api';
 import { useAuth } from '@/hooks/useAuth';
-import { queryKeys, DISABLED_QUERY_KEY } from '@/lib/query-keys';
+import { DISABLED_QUERY_KEY, queryKeys } from '@/lib/query-keys';
 
 /**
  * Hook to fetch all tenants for the current user
@@ -42,7 +43,7 @@ export function useCreateTenant() {
   return useMutation({
     mutationFn: (input: { name: string; slug: string }) => tenantsApi.create(input),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all });
     },
   });
 }
@@ -57,7 +58,7 @@ export function useUpdateTenant() {
     mutationFn: ({ tenantId, updates }: { tenantId: string; updates: Partial<TenantWithRole> }) =>
       tenantsApi.update(tenantId, updates),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all });
       const detailKey = queryKeys.tenants.detail(data.id);
       if (detailKey) {
         queryClient.setQueryData(detailKey, data);

@@ -69,7 +69,7 @@ export function validateSettings(data: unknown): AccessibilitySettings | null {
   }
   
   return {
-    fontSize: obj.fontSize as number,
+    fontSize: obj.fontSize,
     highContrast: obj.highContrast as boolean,
     highlightLinks: obj.highlightLinks as boolean,
     pauseAnimations: obj.pauseAnimations as boolean,
@@ -107,7 +107,7 @@ export function useAccessibilitySettings(): UseAccessibilitySettingsReturn {
       if (!stored) {
         return DEFAULT_SETTINGS;
       }
-      const parsed = JSON.parse(stored);
+      const parsed: unknown = JSON.parse(stored);
       const validated = validateSettings(parsed);
       return validated ?? DEFAULT_SETTINGS;
     } catch {

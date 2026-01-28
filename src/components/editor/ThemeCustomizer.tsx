@@ -1,15 +1,15 @@
-import { useState, useEffect, forwardRef } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { 
+  Check, 
+  Loader2, 
+  Moon, 
   Palette, 
-  Type, 
-  Square, 
-  Sun, 
-  Moon,
-  Check,
-  Loader2
+  Square,
+  Sun,
+  Type
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
@@ -81,7 +81,7 @@ export const ThemeCustomizer = forwardRef<HTMLDivElement, ThemeCustomizerProps>(
   // Debounced save
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      saveTheme();
+      void saveTheme();
     }, 800);
 
     return () => clearTimeout(timeoutId);

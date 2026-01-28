@@ -1,9 +1,9 @@
 import { useRef } from 'react';
-import { SectionProps } from '../SectionRenderer';
+import type { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { ImagePickerDialog } from '../ImagePickerDialog';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Linkedin, Twitter, Mail, Plus, Trash2 } from 'lucide-react';
+import { Linkedin, Mail, Plus, Sparkles, Trash2, Twitter } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface TeamMember {

@@ -1,7 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { sectionsApi } from '@/api/sections.api';
 import { useTenant } from '@/hooks/useTenant';
-import type { Section, SectionInsert, SectionUpdate, SectionContent } from '@/types';
+import type { SectionContent, SectionInsert, SectionUpdate } from '@/types';
 
 export const SECTIONS_QUERY_KEY = ['sections'];
 
@@ -36,7 +36,7 @@ export function useCreateSection() {
   return useMutation({
     mutationFn: (section: SectionInsert) => sectionsApi.create(section),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: [...SECTIONS_QUERY_KEY, data.page_id] });
+      void queryClient.invalidateQueries({ queryKey: [...SECTIONS_QUERY_KEY, data.page_id] });
     },
   });
 }
@@ -51,7 +51,7 @@ export function useUpdateSection() {
     mutationFn: ({ sectionId, updates }: { sectionId: string; updates: SectionUpdate }) =>
       sectionsApi.update(sectionId, updates),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: [...SECTIONS_QUERY_KEY, data.page_id] });
+      void queryClient.invalidateQueries({ queryKey: [...SECTIONS_QUERY_KEY, data.page_id] });
     },
   });
 }
@@ -66,7 +66,7 @@ export function useUpdateSectionContent() {
     mutationFn: ({ sectionId, content }: { sectionId: string; content: SectionContent }) =>
       sectionsApi.updateContent(sectionId, content),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: [...SECTIONS_QUERY_KEY, data.page_id] });
+      void queryClient.invalidateQueries({ queryKey: [...SECTIONS_QUERY_KEY, data.page_id] });
     },
   });
 }
@@ -79,9 +79,9 @@ export function useDeleteSection() {
 
   return useMutation({
     mutationFn: (sectionId: string) => sectionsApi.delete(sectionId),
-    onSuccess: (_, sectionId) => {
+    onSuccess: (_data, _sectionId) => {
       // Invalidate all section queries since we don't know the page_id here
-      queryClient.invalidateQueries({ queryKey: SECTIONS_QUERY_KEY });
+      void queryClient.invalidateQueries({ queryKey: SECTIONS_QUERY_KEY });
     },
   });
 }
@@ -96,7 +96,7 @@ export function useReorderSections() {
     mutationFn: (sections: Array<{ id: string; sort_order: number }>) =>
       sectionsApi.updateOrder(sections),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: SECTIONS_QUERY_KEY });
+      void queryClient.invalidateQueries({ queryKey: SECTIONS_QUERY_KEY });
     },
   });
 }
@@ -112,7 +112,7 @@ export function useDuplicateSection() {
     mutationFn: (sectionId: string) =>
       sectionsApi.duplicate(sectionId, currentTenant!.id),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: [...SECTIONS_QUERY_KEY, data.page_id] });
+      void queryClient.invalidateQueries({ queryKey: [...SECTIONS_QUERY_KEY, data.page_id] });
     },
   });
 }

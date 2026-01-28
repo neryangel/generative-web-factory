@@ -68,11 +68,12 @@ export const domainsApi = {
    */
   async verify(domainId: string): Promise<Domain> {
     // Call edge function to verify domain
-    const { data, error } = await supabase.functions.invoke('verify-domain', {
+    const { data, error } = await supabase.functions.invoke<Domain>('verify-domain', {
       body: { domainId },
     });
 
     if (error) throw error;
+    if (!data) throw new Error('No data returned from verify-domain');
     return data;
   },
 

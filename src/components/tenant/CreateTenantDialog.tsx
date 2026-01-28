@@ -46,7 +46,7 @@ export function CreateTenantDialog({ children, onSuccess }: CreateTenantDialogPr
 
     setLoading(true);
     try {
-      const { data, error } = await createTenant(name.trim(), slug.trim());
+      const { error } = await createTenant(name.trim(), slug.trim());
       
       if (error) {
         console.error('Tenant creation error:', error);
@@ -91,7 +91,7 @@ export function CreateTenantDialog({ children, onSuccess }: CreateTenantDialogPr
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+        <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4 mt-4">
           <div className="space-y-2">
             <Label htmlFor="name">שם הארגון</Label>
             <Input

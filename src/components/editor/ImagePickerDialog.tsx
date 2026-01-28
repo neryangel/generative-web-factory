@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ImageUploader } from './ImageUploader';
 import { supabase } from '@/integrations/supabase/client';
 import { useTenant } from '@/hooks/useTenant';
-import { ImageIcon, Upload, FolderOpen, Loader2 } from 'lucide-react';
+import { FolderOpen, ImageIcon, Loader2, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ImagePickerDialogProps {
@@ -36,9 +36,9 @@ export function ImagePickerDialog({
   const [loading, setLoading] = useState(false);
   const [selectedUrl, setSelectedUrl] = useState<string | null>(currentImage || null);
 
-  const fetchAssets = async () => {
+  const fetchAssets = useCallback(async () => {
     if (!currentTenant) return;
-    
+
     setLoading(true);
     try {
       let query = supabase
@@ -52,7 +52,7 @@ export function ImagePickerDialog({
       }
 
       const { data, error } = await query;
-      
+
       if (error) throw error;
       setAssets(data || []);
     } catch (error) {
@@ -60,13 +60,13 @@ export function ImagePickerDialog({
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentTenant, siteId]);
 
   useEffect(() => {
     if (open) {
-      fetchAssets();
+      void fetchAssets();
     }
-  }, [open, currentTenant]);
+  }, [open, fetchAssets]);
 
   const getPublicUrl = (storagePath: string) => {
     const { data } = supabase.storage.from('assets').getPublicUrl(storagePath);
@@ -86,7 +86,7 @@ export function ImagePickerDialog({
 
   const handleUploadComplete = (url: string) => {
     setSelectedUrl(url);
-    fetchAssets(); // Refresh the library
+    void fetchAssets(); // Refresh the library
   };
 
   return (

@@ -2,7 +2,8 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Settings2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { SectionRenderer, SectionContent } from './SectionRenderer';
+import type { SectionContent } from './SectionRenderer';
+import { SectionRenderer } from './SectionRenderer';
 import { cn } from '@/lib/utils';
 import type { Tables } from '@/integrations/supabase/types';
 

@@ -1,5 +1,6 @@
-import { motion, Variants, useReducedMotion } from 'framer-motion';
-import { ReactNode } from 'react';
+import type { Variants} from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
+import type { ReactNode } from 'react';
 
 interface SplitTextProps {
   children: string;
@@ -75,7 +76,7 @@ export function SplitText({
 
   // Fallback for reduced motion
   if (prefersReducedMotion) {
-    const Tag = as;
+    const _Tag = as; // Reserved for future use with dynamic tag rendering
     return (
       <motion.div
         className={className}

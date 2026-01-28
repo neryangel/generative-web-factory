@@ -1,9 +1,9 @@
-import { SectionProps } from '../SectionRenderer';
+import type { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { ImagePickerDialog } from '../ImagePickerDialog';
 import { Button } from '@/components/ui/button';
-import { Image as ImageIcon, Award, Users, TrendingUp, Target, CheckCircle2, Clock, Star } from 'lucide-react';
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { Award, CheckCircle2, Clock, Image as ImageIcon, Star, Target, TrendingUp, Users } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface Stat {

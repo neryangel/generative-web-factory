@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
-import { parseSupabaseError, ApiError } from '@/lib/api-error';
-import type { Section, SectionInsert, SectionUpdate, SectionContent } from '@/types';
+import { ApiError, parseSupabaseError } from '@/lib/api-error';
+import type { Section, SectionContent, SectionInsert, SectionUpdate } from '@/types';
 import type { Json } from '@/integrations/supabase/types';
 
 export const sectionsApi = {

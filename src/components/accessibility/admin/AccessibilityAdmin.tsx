@@ -44,7 +44,6 @@ export const AccessibilityAdmin: React.FC<AccessibilityAdminProps> = ({
             </h1>
             <p className={styles.description}>{t.pageDescription}</p>
             <div className={cn(styles.languageSwitch, 'mt-4')}>
-              {/* eslint-disable-next-line custom/no-hardcoded-strings -- Language name in its own language */}
               <button onClick={() => setLanguage('he')} className={cn(styles.languageButton, language === 'he' ? styles.languageActive : styles.languageInactive)} aria-label="החלף לעברית" aria-pressed={language === 'he'}>עברית</button>
               { }
               <button onClick={() => setLanguage('en')} className={cn(styles.languageButton, language === 'en' ? styles.languageActive : styles.languageInactive)} aria-label="Switch to English" aria-pressed={language === 'en'}>English</button>

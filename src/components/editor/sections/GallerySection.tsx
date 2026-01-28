@@ -1,9 +1,9 @@
-import { SectionProps } from '../SectionRenderer';
+import type { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { ImagePickerDialog } from '../ImagePickerDialog';
-import { Image as ImageIcon, Plus, Trash2, ZoomIn, Camera, ChevronLeft, ChevronRight, Grid3X3, LayoutGrid } from 'lucide-react';
+import { Camera, ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Trash2, ZoomIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface GalleryImage {

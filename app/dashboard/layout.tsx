@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { TenantProvider } from '@/hooks/useTenant';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { Loader2 } from 'lucide-react';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 function DashboardContent({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();

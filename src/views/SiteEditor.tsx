@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTenant } from '@/hooks/useTenant';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { supabase } from '@/integrations/supabase/client';
-import { SectionContent } from '@/components/editor/SectionRenderer';
+import type { SectionContent } from '@/components/editor/SectionRenderer';
 import { SortableSectionList } from '@/components/editor/SortableSectionList';
 import { SortablePreviewSection } from '@/components/editor/SortablePreviewSection';
 import { AddSectionButton } from '@/components/editor/AddSectionButton';
@@ -29,38 +29,39 @@ import {
 } from '@/components/ui/tooltip';
 import { 
   ArrowRight, 
-  Eye, 
-  EyeOff,
-  Loader2,
-  Check,
-  Globe,
-  Smartphone,
-  Monitor,
-  Tablet,
-  Settings2,
-  Upload,
+  Check, 
   ExternalLink,
-  Plus,
-  Palette,
+  Eye,
+  EyeOff,
+  Globe,
   Layers,
+  Loader2,
+  Monitor,
+  Palette,
+  Plus,
+  Settings2,
+  Smartphone,
+  Tablet,
+  Upload,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import {
-  DndContext,
+import type {
   DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
+  DragStartEvent} from '@dnd-kit/core';
+import {
   closestCenter,
+  DndContext,
+  DragOverlay,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
 import {
+  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-  arrayMove,
 } from '@dnd-kit/sortable';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -87,7 +88,7 @@ export default function SiteEditor() {
   const [loading, setLoading] = useState(true);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   
-  const { isSaving, lastSaved, saveSection, flushSave } = useAutoSave({
+  const { isSaving, lastSaved, saveSection, flushSave: _flushSave } = useAutoSave({
     debounceMs: 1500,
   });
 
@@ -148,7 +149,7 @@ export default function SiteEditor() {
       }
     }
 
-    fetchData();
+    void fetchData();
   }, [siteId, currentTenant, router]);
 
   // Fetch sections when page changes
@@ -173,7 +174,7 @@ export default function SiteEditor() {
       }
     }
 
-    fetchSections();
+    void fetchSections();
   }, [currentPage]);
 
   const handleContentChange = useCallback((sectionId: string, content: SectionContent) => {

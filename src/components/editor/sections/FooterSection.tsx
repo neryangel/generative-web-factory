@@ -1,6 +1,6 @@
-import { SectionProps } from '../SectionRenderer';
+import type { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
-import { Building2, Facebook, Instagram, Twitter, Linkedin, Youtube, Mail, ArrowUp, Send } from 'lucide-react';
+import { ArrowUp, Building2, Facebook, Instagram, Linkedin, Mail, Send, Twitter, Youtube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -66,7 +66,7 @@ export function FooterSection({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const renderSocialIcon = (item: SocialLink, index: number, size = 'w-5 h-5', containerClass = '') => {
+  const _renderSocialIcon = (item: SocialLink, index: number, size = 'w-5 h-5', containerClass = '') => {
     const Icon = socialIcons[item.platform || 'facebook'] || Facebook;
     return (
       <a

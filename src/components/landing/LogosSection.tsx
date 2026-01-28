@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Building2, Briefcase, Store, Landmark, Warehouse, ShoppingBag } from 'lucide-react';
+import { Briefcase, Building2, Landmark, ShoppingBag, Store, Warehouse } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 
 const LogosSection = () => {

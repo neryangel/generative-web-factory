@@ -179,7 +179,7 @@ export function useFocusTrap(options: UseFocusTrapOptions): UseFocusTrapReturn {
   }, [isActive, autoFocus, focusDelay, returnFocusOnDeactivate, handleKeyDown, handleFocusIn, getFocusableElements]);
 
   return {
-    containerRef: containerRef as React.RefObject<HTMLElement>,
-    returnFocusRef: returnFocusRef as React.RefObject<HTMLElement>,
+    containerRef: containerRef,
+    returnFocusRef: returnFocusRef,
   };
 }

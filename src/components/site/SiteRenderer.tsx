@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from 'react';
 import { SectionRenderer } from '@/components/editor/SectionRenderer';
-import type { PublishedSiteData, PublishedPage } from '@/types/published-site';
+import type { PublishedPage, PublishedSiteData } from '@/types/published-site';
 
 interface SiteRendererProps {
   siteData: PublishedSiteData;
@@ -14,7 +14,7 @@ export function SiteRenderer({ siteData, currentPage }: SiteRendererProps) {
   useEffect(() => {
     try {
       if (siteData.site?.settings?.faviconUrl) {
-        const link = document.querySelector("link[rel='icon']") as HTMLLinkElement | null;
+        const link = document.querySelector("link[rel='icon']");
         if (link) {
           link.href = siteData.site.settings.faviconUrl as string;
         }

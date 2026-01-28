@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, Briefcase, Sparkles } from 'lucide-react';
+import { ArrowLeft, Briefcase, Sparkles, Users } from 'lucide-react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { WordReveal } from '@/components/effects/SplitText';

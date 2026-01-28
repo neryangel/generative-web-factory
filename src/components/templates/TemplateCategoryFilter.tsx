@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Palette, Building2, Rocket, UtensilsCrossed, LayoutGrid, Stethoscope, Home, PartyPopper, Code } from 'lucide-react';
+import { Building2, Code, Home, LayoutGrid, Palette, PartyPopper, Rocket, Stethoscope, UtensilsCrossed } from 'lucide-react';
 
 export type TemplateCategory = 'all' | 'restaurant' | 'portfolio' | 'business' | 'landing' | 'clinic' | 'realestate' | 'event' | 'saas';
 

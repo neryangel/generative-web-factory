@@ -1,11 +1,11 @@
 import { useRef } from 'react';
 import { 
-  MousePointer2, 
+  Languages, 
   LayoutTemplate, 
+  MousePointer2, 
   Smartphone, 
-  Zap, 
   Users, 
-  Languages 
+  Zap 
 } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 

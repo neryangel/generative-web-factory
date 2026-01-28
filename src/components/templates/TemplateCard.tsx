@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Check, Palette, Building2, Rocket, UtensilsCrossed, FileText } from 'lucide-react';
+import { Building2, Check, Eye, FileText, Palette, Rocket, UtensilsCrossed } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Template = Tables<'templates'>;

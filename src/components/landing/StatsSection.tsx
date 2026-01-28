@@ -1,6 +1,6 @@
 import { useRef } from 'react';
-import { Globe, Users, Clock, Headphones } from 'lucide-react';
-import { motion, useInView, animate } from 'framer-motion';
+import { Clock, Globe, Headphones, Users } from 'lucide-react';
+import { animate, motion, useInView } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 interface StatItemProps {

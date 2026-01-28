@@ -1,9 +1,9 @@
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,7 +37,10 @@ const sectionTypeLabels: Record<string, string> = {
 
 // Helper to extract section type from both old (string) and new (object) formats
 const getSectionType = (section: string | { type: string }): string => {
-  return typeof section === 'object' && section.type ? section.type : String(section);
+  if (typeof section === 'object' && section.type) {
+    return section.type;
+  }
+  return typeof section === 'string' ? section : 'unknown';
 };
 
 export function TemplatePreviewDialog({ 

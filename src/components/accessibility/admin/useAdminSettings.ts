@@ -34,7 +34,7 @@ function loadSettings(): WidgetAdminSettings {
   try {
     const stored = localStorage.getItem(ADMIN_SETTINGS_STORAGE_KEY);
     if (!stored) return DEFAULT_ADMIN_SETTINGS;
-    const parsed = JSON.parse(stored);
+    const parsed: unknown = JSON.parse(stored);
     return validateSettings(parsed) ?? DEFAULT_ADMIN_SETTINGS;
   } catch {
     return DEFAULT_ADMIN_SETTINGS;

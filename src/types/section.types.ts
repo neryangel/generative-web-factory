@@ -1,4 +1,4 @@
-import type { Tables, TablesInsert, TablesUpdate, Json } from '@/integrations/supabase/types';
+import type { Json, Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 
 // Base types from Supabase
 export type Section = Tables<'sections'>;

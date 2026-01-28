@@ -5,7 +5,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", ".next", "node_modules", "**/*.test.ts", "**/*.test.tsx"] },
+  { ignores: ["dist", ".next", "node_modules", "**/*.test.ts", "**/*.test.tsx", "api/**", "supabase/**", "tailwind.config.ts", "vitest.config.ts", "next-env.d.ts"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
     files: ["**/*.{ts,tsx}"],
@@ -55,6 +55,15 @@ export default tseslint.config(
           attributes: false,
         },
       }],
+      // Downgrade strict any rules to warnings for gradual migration
+      "@typescript-eslint/no-unsafe-assignment": "warn",
+      "@typescript-eslint/no-unsafe-member-access": "warn",
+      "@typescript-eslint/no-unsafe-call": "warn",
+      "@typescript-eslint/no-unsafe-return": "warn",
+      "@typescript-eslint/no-unsafe-argument": "warn",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/restrict-template-expressions": "warn",
+      "@typescript-eslint/no-redundant-type-constituents": "warn",
     },
   },
 );

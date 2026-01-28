@@ -48,7 +48,7 @@ export function useAdminSettingsSync(): UseAdminSettingsSyncReturn {
       if (!stored) {
         return DEFAULT_ADMIN_SETTINGS;
       }
-      const parsed = JSON.parse(stored);
+      const parsed: unknown = JSON.parse(stored);
       const validated = validateAdminSettings(parsed);
       return validated ?? DEFAULT_ADMIN_SETTINGS;
     } catch {
@@ -67,7 +67,7 @@ export function useAdminSettingsSync(): UseAdminSettingsSyncReturn {
         try {
           const stored = localStorage.getItem(ADMIN_SETTINGS_STORAGE_KEY);
           if (stored) {
-            const parsed = JSON.parse(stored);
+            const parsed: unknown = JSON.parse(stored);
             const validated = validateAdminSettings(parsed);
             if (validated) {
               setAdminSettings(validated);

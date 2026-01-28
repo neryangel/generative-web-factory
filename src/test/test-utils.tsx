@@ -1,6 +1,8 @@
-import React, { ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, RenderOptions } from '@testing-library/react';
+import type { RenderOptions } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 // Create a fresh QueryClient for each test
 export function createTestQueryClient() {
@@ -73,6 +75,6 @@ export const mockTenantContext = {
   tenants: [],
   setCurrentTenant: () => {},
   loading: false,
-  createTenant: async () => ({ data: null, error: null }),
-  refetchTenants: async () => {},
+  createTenant: () => Promise.resolve({ data: null, error: null }),
+  refetchTenants: () => Promise.resolve(),
 };

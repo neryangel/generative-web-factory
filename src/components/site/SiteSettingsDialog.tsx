@@ -19,7 +19,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings2, Globe, Palette, Loader2 } from 'lucide-react';
+import { Globe, Loader2, Palette, Settings2 } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Site = Tables<'sites'>;

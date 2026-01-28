@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { Upload, X, Loader2, ImageIcon, CheckCircle } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { CheckCircle, ImageIcon, Loader2, Upload, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useTenant } from '@/hooks/useTenant';
 import { Button } from '@/components/ui/button';
@@ -74,15 +74,15 @@ export function ImageUploader({
     setIsDragOver(false);
 
     const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFileUpload(files[0]);
+    if (files.length > 0 && files[0]) {
+      void handleFileUpload(files[0]);
     }
   }, [currentTenant, siteId]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files && files.length > 0) {
-      handleFileUpload(files[0]);
+    if (files && files.length > 0 && files[0]) {
+      void handleFileUpload(files[0]);
     }
   };
 
@@ -153,7 +153,7 @@ export function ImageUploader({
         }));
       }, 100);
 
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('assets')
         .upload(filePath, file, {
           cacheControl: '3600',

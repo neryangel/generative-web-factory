@@ -1,6 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { pagesApi } from '@/api/pages.api';
-import type { Page, PageInsert, PageUpdate } from '@/types';
+import type { PageInsert, PageUpdate } from '@/types';
 
 export const PAGES_QUERY_KEY = ['pages'];
 
@@ -46,7 +46,7 @@ export function useCreatePage() {
   return useMutation({
     mutationFn: (page: PageInsert) => pagesApi.create(page),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: [...PAGES_QUERY_KEY, data.site_id] });
+      void queryClient.invalidateQueries({ queryKey: [...PAGES_QUERY_KEY, data.site_id] });
     },
   });
 }
@@ -61,7 +61,7 @@ export function useUpdatePage() {
     mutationFn: ({ pageId, updates }: { pageId: string; updates: PageUpdate }) =>
       pagesApi.update(pageId, updates),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: [...PAGES_QUERY_KEY, data.site_id] });
+      void queryClient.invalidateQueries({ queryKey: [...PAGES_QUERY_KEY, data.site_id] });
     },
   });
 }
@@ -75,7 +75,7 @@ export function useDeletePage() {
   return useMutation({
     mutationFn: (pageId: string) => pagesApi.delete(pageId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY });
+      void queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY });
     },
   });
 }
@@ -90,7 +90,7 @@ export function useReorderPages() {
     mutationFn: (pages: Array<{ id: string; sort_order: number }>) =>
       pagesApi.updateOrder(pages),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY });
+      void queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY });
     },
   });
 }

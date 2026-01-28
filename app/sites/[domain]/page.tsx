@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { SiteRenderer } from '@/components/site/SiteRenderer';
 import { fetchPublishedSiteByDomain } from '@/lib/fetch-published-site';
 import type { PublishedPage } from '@/types/published-site';

@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
-import { Loader2, User, Building2, Shield } from 'lucide-react';
+import { Building2, Loader2, Shield, User } from 'lucide-react';
 
 export default function Settings() {
   const { user } = useAuth();

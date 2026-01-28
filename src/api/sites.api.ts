@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
-import { parseSupabaseError, ApiError } from '@/lib/api-error';
-import { siteInsertSchema, siteUpdateSchema, slugSchema, uuidSchema, siteSettingsSchema } from '@/types/schemas';
+import { parseSupabaseError } from '@/lib/api-error';
+import { siteInsertSchema, siteSettingsSchema, siteUpdateSchema, slugSchema, uuidSchema } from '@/types/schemas';
 import type { Site } from '@/types';
 import type { Json } from '@/integrations/supabase/types';
 
@@ -34,7 +34,7 @@ export const sitesApi = {
   /**
    * Get all sites for a tenant (with optional pagination)
    */
-  async getAll(tenantId: string, options?: PaginationOptions): Promise<Site[]> {
+  async getAll(tenantId: string, _options?: PaginationOptions): Promise<Site[]> {
     // Validate input
     const validTenantId = uuidSchema.parse(tenantId);
 

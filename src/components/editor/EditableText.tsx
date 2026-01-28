@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect, CSSProperties, forwardRef } from 'react';
+import type { CSSProperties} from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface EditableTextProps {
@@ -55,7 +56,7 @@ export const EditableText = forwardRef<HTMLElement, EditableTextProps>(({
 
   if (!isEditing) {
     return (
-      <Component className={className} style={style} ref={ref as any}>
+      <Component className={className} style={style} ref={ref as React.Ref<HTMLElement>}>
         {value || placeholder}
       </Component>
     );
@@ -89,7 +90,7 @@ export const EditableText = forwardRef<HTMLElement, EditableTextProps>(({
         'border border-transparent hover:border-primary/30'
       )}
       style={style}
-      ref={ref as any}
+      ref={ref as React.Ref<HTMLElement>}
       onClick={(e) => {
         e.stopPropagation();
         setIsActive(true);

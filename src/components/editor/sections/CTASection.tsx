@@ -1,8 +1,8 @@
-import { SectionProps } from '../SectionRenderer';
+import type { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Sparkles, Zap, Star, Rocket, ChevronLeft } from 'lucide-react';
-import { useRef, useState, useEffect, useMemo } from 'react';
+import { ArrowLeft, ChevronLeft, Rocket, Sparkles, Star, Zap } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface CTAContent {

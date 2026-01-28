@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
@@ -12,15 +12,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-  Layout,
   Grid,
   Image,
-  Quote,
-  Megaphone,
-  Mail,
-  Users,
+  Layout,
   LayoutGrid,
   Loader2,
+  Mail,
+  Megaphone,
+  Quote,
+  Users,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
@@ -89,7 +89,7 @@ export function AddSectionDialog({
     }
 
     if (open) {
-      fetchRegistry();
+      void fetchRegistry();
     }
   }, [open]);
 
