@@ -81,7 +81,7 @@ const TestimonialsSection = () => {
 
   const StarRating = ({ rating }: { rating: number }) => (
     <div className="flex gap-1">
-      {[...Array(5)].map((_, i) => (
+      {Array.from({ length: 5 }).map((_, i) => (
         <motion.div
           key={i}
           initial={{ opacity: 0, scale: 0 }}

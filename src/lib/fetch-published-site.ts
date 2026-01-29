@@ -71,8 +71,8 @@ async function fetchPublishedSite(
       return { data: null, isServiceError: false };
     }
 
-    const data = await response.json();
-    return { data, isServiceError: false };
+    const data: unknown = await response.json();
+    return { data: data as PublishedSiteData, isServiceError: false };
   } catch (error) {
     // Network error = service unavailable
     console.error('Error fetching site (network/service):', error);

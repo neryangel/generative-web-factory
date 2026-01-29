@@ -1,3 +1,6 @@
+// Legacy component - react-router-dom is not installed in this Next.js app
+// This file is kept for potential migration but is not currently used
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { NavLinkProps } from "react-router-dom";
 import { NavLink as RouterNavLink } from "react-router-dom";
 import { forwardRef } from "react";
@@ -15,9 +18,12 @@ const NavLink = forwardRef<HTMLAnchorElement, NavLinkCompatProps>(
       <RouterNavLink
         ref={ref}
         to={to}
-        className={({ isActive, isPending }: { isActive: boolean; isPending: boolean }) =>
-          cn(className ?? '', isActive ? (activeClassName ?? '') : '', isPending ? (pendingClassName ?? '') : '')
-        }
+        className={({ isActive, isPending }) => {
+          const baseClass = className ?? '';
+          const activeClass = isActive ? (activeClassName ?? '') : '';
+          const pendingClass = isPending ? (pendingClassName ?? '') : '';
+          return cn(baseClass, activeClass, pendingClass);
+        }}
         {...props}
       />
     );

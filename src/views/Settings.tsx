@@ -30,7 +30,7 @@ export default function Settings() {
   
   // Profile state
   const [fullName, setFullName] = useState(
-    user?.user_metadata?.full_name || ''
+    (user?.user_metadata?.full_name as string | undefined) || ''
   );
   
   // Tenant state
@@ -54,7 +54,7 @@ export default function Settings() {
         .eq('user_id', user.id);
 
       toast.success('הפרופיל עודכן בהצלחה');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('שגיאה בעדכון הפרופיל');
     } finally {
@@ -77,7 +77,7 @@ export default function Settings() {
 
       await refetchTenants();
       toast.success('הארגון עודכן בהצלחה');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error updating tenant:', error);
       toast.error('שגיאה בעדכון הארגון');
     } finally {
@@ -132,7 +132,7 @@ export default function Settings() {
                 <form onSubmit={handleUpdateProfile} className="space-y-6">
                   <div className="flex items-center gap-4">
                     <Avatar className="h-20 w-20">
-                      <AvatarImage src={user?.user_metadata?.avatar_url} />
+                      <AvatarImage src={(user?.user_metadata?.avatar_url as string | undefined)} />
                       <AvatarFallback className="text-lg">
                         {getInitials(fullName || user?.email || 'U')}
                       </AvatarFallback>

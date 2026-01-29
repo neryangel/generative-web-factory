@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { isReservedSlug } from '@/lib/validation-patterns';
 import type { Tables } from '@/integrations/supabase/types';
+import type { BlueprintPage, BlueprintSchema } from '@/types/site.types';
 
 type Template = Tables<'templates'>;
 
@@ -192,22 +193,24 @@ export default function NewSite() {
         }
       );
 
-      const data = await response.json();
+      const data: unknown = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'שגיאה ביצירת האתר');
+        const errorData = data as { error?: string };
+        throw new Error(errorData.error || 'שגיאה ביצירת האתר');
       }
 
-      if (!data.blueprint) {
+      const responseData = data as { blueprint?: AIBlueprint };
+      if (!responseData.blueprint) {
         throw new Error('לא התקבל מבנה אתר תקין');
       }
 
-      setGeneratedBlueprint(data.blueprint);
+      setGeneratedBlueprint(responseData.blueprint);
 
       // Auto-fill site name from blueprint
-      if (data.blueprint.siteName) {
-        setSiteName(data.blueprint.siteName);
-        setSiteSlug(generateSlug(data.blueprint.siteName));
+      if (responseData.blueprint.siteName) {
+        setSiteName(responseData.blueprint.siteName);
+        setSiteSlug(generateSlug(responseData.blueprint.siteName));
       }
 
       toast.success('מבנה האתר נוצר בהצלחה!');
@@ -275,13 +278,13 @@ export default function NewSite() {
             tenant_id: currentTenant.id,
             type: sectionBlueprint.type,
             variant: 'default',
-            content: JSON.parse(JSON.stringify(sectionBlueprint.content || {})),
+            content: JSON.parse(JSON.stringify(sectionBlueprint.content || {})) as Record<string, unknown>,
             sort_order: j,
           }));
 
           const { error: sectionsError } = await supabase
             .from('sections')
-            .insert(sectionsToInsert as any);
+            .insert(sectionsToInsert);
 
           if (sectionsError) {
             console.error('Error creating sections:', sectionsError);
@@ -291,9 +294,10 @@ export default function NewSite() {
 
       toast.success('האתר נוצר בהצלחה!');
       router.push(`/dashboard/sites/${site.id}`);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating site:', error);
-      if (error.message?.includes('duplicate')) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('duplicate')) {
         toast.error('שם האתר כבר קיים, נסה שם אחר');
       } else {
         toast.error('שגיאה ביצירת האתר');
@@ -322,7 +326,7 @@ export default function NewSite() {
           name: siteName.trim(),
           slug: siteSlug.trim(),
           status: 'draft',
-          settings: (selectedTemplate.blueprint_schema as any)?.settings || {},
+          settings: (selectedTemplate.blueprint_schema as BlueprintSchema)?.settings || {},
         })
         .select()
         .single();
@@ -330,10 +334,10 @@ export default function NewSite() {
       if (siteError) throw siteError;
 
       // Create default pages based on template
-      const blueprintSchema = selectedTemplate.blueprint_schema as any;
+      const blueprintSchema = selectedTemplate.blueprint_schema as BlueprintSchema;
       if (blueprintSchema?.pages) {
         for (let i = 0; i < blueprintSchema.pages.length; i++) {
-          const pageBlueprint = blueprintSchema.pages[i];
+          const pageBlueprint: BlueprintPage = blueprintSchema.pages[i];
           
           const { data: page, error: pageError } = await supabase
             .from('pages')
@@ -355,22 +359,22 @@ export default function NewSite() {
           if (pageBlueprint.sections && page) {
             for (let j = 0; j < pageBlueprint.sections.length; j++) {
               const sectionBlueprint = pageBlueprint.sections[j];
-              
+
               // Support both old format (string) and new format (object with type, variant, and content)
-              const isNewFormat = typeof sectionBlueprint === 'object' && sectionBlueprint.type;
+              const isNewFormat = typeof sectionBlueprint === 'object' && 'type' in sectionBlueprint;
               const sectionType = isNewFormat ? sectionBlueprint.type : sectionBlueprint;
               const sectionVariant = isNewFormat ? (sectionBlueprint.variant || 'default') : 'default';
               const blueprintContent = isNewFormat ? sectionBlueprint.content : null;
 
               // If blueprint has content, use it; otherwise get default from registry
-              let sectionContent = blueprintContent;
-              if (!sectionContent) {
+              let sectionContent: Record<string, unknown> = blueprintContent || {};
+              if (!blueprintContent) {
                 const { data: sectionDef } = await supabase
                   .from('section_registry')
                   .select('default_content')
                   .eq('type', sectionType)
                   .maybeSingle();
-                sectionContent = sectionDef?.default_content || {};
+                sectionContent = (sectionDef?.default_content as Record<string, unknown>) || {};
               }
 
               await supabase
@@ -378,7 +382,7 @@ export default function NewSite() {
                 .insert({
                   page_id: page.id,
                   tenant_id: currentTenant.id,
-                  type: sectionType,
+                  type: String(sectionType),
                   variant: sectionVariant,
                   content: sectionContent,
                   sort_order: j,
@@ -390,9 +394,10 @@ export default function NewSite() {
 
       toast.success('האתר נוצר בהצלחה!');
       router.push(`/dashboard/sites/${site.id}`);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating site:', error);
-      if (error.message?.includes('duplicate')) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('duplicate')) {
         toast.error('שם האתר כבר קיים, נסה שם אחר');
       } else {
         toast.error('שגיאה ביצירת האתר');

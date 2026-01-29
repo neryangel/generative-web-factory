@@ -22,3 +22,38 @@ export interface SiteSettings extends ThemeSettings {
 export type SiteStatus = 'draft' | 'published' | 'archived';
 
 export type ViewMode = 'desktop' | 'tablet' | 'mobile';
+
+// Blueprint schema types for templates
+export interface BlueprintSection {
+  type: string;
+  variant?: string;
+  content?: Record<string, unknown>;
+}
+
+export interface BlueprintPage {
+  slug: string;
+  title: string;
+  isHomepage?: boolean;
+  sections?: (string | BlueprintSection)[];
+}
+
+export interface BlueprintSettings {
+  primaryColor?: string;
+  secondaryColor?: string;
+  fontFamily?: string;
+  direction?: string;
+  colors?: {
+    primary?: string;
+    secondary?: string;
+    accent?: string;
+  };
+  fonts?: {
+    heading?: string;
+    body?: string;
+  };
+}
+
+export interface BlueprintSchema {
+  settings?: BlueprintSettings;
+  pages?: BlueprintPage[];
+}

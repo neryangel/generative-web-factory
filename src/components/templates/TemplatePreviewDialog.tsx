@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Check, FileText, Layers, Palette } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
+import type { BlueprintPage, BlueprintSchema, BlueprintSection } from '@/types/site.types';
 
 type Template = Tables<'templates'>;
 
@@ -36,8 +37,8 @@ const sectionTypeLabels: Record<string, string> = {
 };
 
 // Helper to extract section type from both old (string) and new (object) formats
-const getSectionType = (section: string | { type: string }): string => {
-  if (typeof section === 'object' && section.type) {
+const getSectionType = (section: string | BlueprintSection): string => {
+  if (typeof section === 'object' && 'type' in section) {
     return section.type;
   }
   return typeof section === 'string' ? section : 'unknown';
@@ -51,8 +52,8 @@ export function TemplatePreviewDialog({
 }: TemplatePreviewDialogProps) {
   if (!template) return null;
 
-  const blueprintSchema = template.blueprint_schema as any;
-  const pages = blueprintSchema?.pages || [];
+  const blueprintSchema = template.blueprint_schema as BlueprintSchema;
+  const pages: BlueprintPage[] = blueprintSchema?.pages || [];
   const settings = blueprintSchema?.settings || {};
   const colors = settings.colors || {};
 
@@ -130,7 +131,7 @@ export function TemplatePreviewDialog({
                 מבנה העמודים
               </h4>
               <div className="space-y-3">
-                {pages.map((page: any, idx: number) => (
+                {pages.map((page, idx: number) => (
                   <div 
                     key={idx} 
                     className="p-4 rounded-lg bg-muted/50 border"
@@ -142,9 +143,9 @@ export function TemplatePreviewDialog({
                       <span className="font-medium">{page.title}</span>
                       <span className="text-xs text-muted-foreground">/{page.slug}</span>
                     </div>
-                    
+
                     <div className="flex flex-wrap gap-2">
-                      {page.sections?.map((section: string | { type: string }, sIdx: number) => {
+                      {page.sections?.map((section, sIdx: number) => {
                         const sectionType = getSectionType(section);
                         return (
                           <Badge 

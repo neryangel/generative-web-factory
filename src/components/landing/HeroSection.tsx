@@ -94,7 +94,7 @@ const HeroSection = () => {
 
       {/* Floating particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {!prefersReducedMotion && [...Array(6)].map((_, i) => (
+        {!prefersReducedMotion && Array.from({ length: 6 }).map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-primary/30 rounded-full"
@@ -268,7 +268,7 @@ const HeroSection = () => {
                 {/* Image with Parallax Scale */}
                 <div className="aspect-[4/3] relative overflow-hidden">
                   <motion.img
-                    src={typeof portfolioHotelImg === 'string' ? portfolioHotelImg : portfolioHotelImg.src}
+                    src={typeof portfolioHotelImg === 'string' ? portfolioHotelImg : (portfolioHotelImg as { src: string }).src}
                     alt="פרויקט מוביל - מלון יוקרה"
                     className="w-full h-full object-cover"
                     style={{ scale: prefersReducedMotion ? 1 : imageScale }}

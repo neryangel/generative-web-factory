@@ -70,17 +70,19 @@ export default function PublicSite() {
           }
         );
 
-        const data = await response.json();
+        const data: unknown = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'שגיאה בטעינת האתר');
+          const errorData = data as { error?: string };
+          throw new Error(errorData.error || 'שגיאה בטעינת האתר');
         }
 
-        setSiteData(data);
+        const siteResponse = data as SiteData;
+        setSiteData(siteResponse);
 
         // Update document title
-        if (data.site?.name) {
-          document.title = data.site.name;
+        if (siteResponse.site?.name) {
+          document.title = siteResponse.site.name;
         }
       } catch (err) {
         console.error('Error fetching site:', err);

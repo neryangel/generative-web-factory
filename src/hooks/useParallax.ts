@@ -31,7 +31,7 @@ export function useParallax({
 
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: offset as any,
+    offset,
   });
 
   // Calculate parallax values based on direction

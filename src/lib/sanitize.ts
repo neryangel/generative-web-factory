@@ -65,14 +65,14 @@ export function sanitizeSectionContent<T extends Record<string, unknown>>(conten
       sanitized[key] = sanitizeHtml(value);
     } else if (Array.isArray(value)) {
       // Recursively sanitize arrays
-      sanitized[key] = value.map((item) => {
+      sanitized[key] = value.map((item: unknown) => {
         if (typeof item === 'string') {
           return sanitizeHtml(item);
         } else if (typeof item === 'object' && item !== null) {
           return sanitizeSectionContent(item as Record<string, unknown>);
         }
         return item;
-      });
+      }) as unknown;
     } else if (typeof value === 'object' && value !== null) {
       // Recursively sanitize nested objects
       sanitized[key] = sanitizeSectionContent(value as Record<string, unknown>);

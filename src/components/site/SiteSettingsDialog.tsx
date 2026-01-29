@@ -43,9 +43,9 @@ export function SiteSettingsDialog({ site, onUpdate, children }: SiteSettingsDia
     try {
       const { data, error } = await supabase
         .from('sites')
-        .update({ 
-          name, 
-          settings: JSON.parse(JSON.stringify(settings))
+        .update({
+          name,
+          settings: JSON.parse(JSON.stringify(settings)) as Record<string, unknown>
         })
         .eq('id', site.id)
         .select()

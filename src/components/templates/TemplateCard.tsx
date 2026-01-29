@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Building2, Check, Eye, FileText, Palette, Rocket, UtensilsCrossed } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
+import type { BlueprintPage, BlueprintSchema } from '@/types/site.types';
 
 type Template = Tables<'templates'>;
 
@@ -51,14 +52,15 @@ export function TemplateCard({ template, onSelect, onPreview }: TemplateCardProp
     label: template.category,
     badgeClass: 'bg-secondary text-secondary-foreground'
   };
-  
+
   const IconComponent = config.icon;
-  const blueprintSchema = template.blueprint_schema as any;
-  const pageCount = blueprintSchema?.pages?.length || 0;
-  const sectionCount = blueprintSchema?.pages?.reduce(
-    (acc: number, page: any) => acc + (page.sections?.length || 0), 
+  const blueprintSchema = template.blueprint_schema as BlueprintSchema;
+  const pages: BlueprintPage[] = blueprintSchema?.pages || [];
+  const pageCount = pages.length;
+  const sectionCount = pages.reduce(
+    (acc: number, page: BlueprintPage) => acc + (page.sections?.length || 0),
     0
-  ) || 0;
+  );
 
   return (
     <Card className="group cursor-pointer overflow-hidden border-2 border-transparent hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10">
