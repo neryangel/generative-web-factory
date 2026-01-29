@@ -85,6 +85,7 @@ export const ThemeCustomizer = forwardRef<HTMLDivElement, ThemeCustomizerProps>(
     }, 800);
 
     return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- saveTheme is stable, debounce triggers on theme change
   }, [theme]);
 
   const saveTheme = async () => {

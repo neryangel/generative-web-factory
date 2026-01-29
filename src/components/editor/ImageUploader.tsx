@@ -77,6 +77,7 @@ export function ImageUploader({
     if (files.length > 0 && files[0]) {
       void handleFileUpload(files[0]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleFileUpload depends on the same deps
   }, [currentTenant, siteId]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {

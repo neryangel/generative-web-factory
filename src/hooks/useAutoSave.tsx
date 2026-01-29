@@ -188,14 +188,15 @@ export function useAutoSave(options: AutoSaveOptions = {}) {
 
   // Flush on unmount - fire and forget since we can't await in cleanup
   useEffect(() => {
+    const pendingRef = pendingOperations.current;
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
       // Best-effort save on unmount. flushSave is async but cleanup
       // can't await it. The promise will still execute in the background.
-      if (pendingOperations.current.size > 0) {
-        flushSave().catch((err) => {
+      if (pendingRef.size > 0) {
+        flushSave().catch((err: unknown) => {
           console.error('[AutoSave] Failed to flush on unmount:', err);
         });
       }

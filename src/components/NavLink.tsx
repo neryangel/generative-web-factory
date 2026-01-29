@@ -1,6 +1,6 @@
 // Legacy component - react-router-dom is not installed in this Next.js app
 // This file is kept for potential migration but is not currently used
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 import type { NavLinkProps } from "react-router-dom";
 import { NavLink as RouterNavLink } from "react-router-dom";
 import { forwardRef } from "react";
