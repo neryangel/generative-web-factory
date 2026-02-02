@@ -2,12 +2,12 @@
 
 ## Current Position
 
-Phase: 01 complete, ready for Phase 02 (Password Policy)
-Plan: All plans complete
-Status: Phase 01 Critical Security Fixes verified and committed
-Last activity: 2026-02-03 — Phase 01 complete (auth race condition + XSS sanitization + safe Hebrew errors)
+Phase: 03 (Auth UX Improvements) in progress
+Plan: 03-01 complete (1 of 2 plans)
+Status: Password visibility toggles and autocomplete attributes added to AuthForm
+Last activity: 2026-02-03 — Completed 03-01-PLAN.md (password toggles + autocomplete + form clearing)
 
-Progress: ██████████░░░░░░░░░░ Phase 01/04 remaining (2 of 5 phases done)
+Progress: ████████████░░░░░░░░ Phase 03/04 remaining (3 of 5 phases in progress)
 
 ## Project Reference
 
@@ -31,6 +31,9 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 | auth-race-fix | Removed redundant getSession() call in useAuth.tsx | 01 | Prevents auth state flickering on page refresh - onAuthStateChange handles INITIAL_SESSION |
 | xss-sanitize | Added sanitizeText() defense-in-depth in Settings.tsx | 01 | Sanitizes full_name on display even though Supabase escapes |
 | hebrew-errors | Created auth-errors.ts with Hebrew error message mapping | 01 | User-facing errors in Hebrew, no raw Supabase errors exposed |
+| autocomplete-username | Use autocomplete="username" for email in auth forms | 03-01 | MDN spec for password manager credential association |
+| password-visibility | Eye/EyeOff toggle pattern with Hebrew aria-labels | 03-01 | Users can verify password entry, especially on mobile |
+| form-clearing-effect | useEffect clears form state on mode change | 03-01 | Centralized clearing logic, mode as single source of truth |
 
 ### Blockers
 
@@ -60,6 +63,17 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 - SEC-03: Hebrew error messages via auth-errors.ts in AuthForm.tsx
 - Files changed: useAuth.tsx, useAuth.test.tsx, Settings.tsx, auth-errors.ts (new), auth-errors.test.ts (new), AuthForm.tsx
 
+## Phase 03 Plan 01 Verification Summary
+
+- 460 tests pass (35 test files)
+- TypeScript compiles clean
+- Production build succeeds
+- UX-04: Password visibility toggle with Eye/EyeOff icons on password field
+- UX-05: Form clearing on mode switch via useEffect
+- UX-06: HTML5 autocomplete attributes (name, username, current-password/new-password)
+- Files changed: AuthForm.tsx
+- Note: Plan expected Phase 02-02 to be complete (confirmPassword field), adapted to work with current state
+
 ### Quick Tasks Completed
 
 | # | Description | Date | Commit | Directory |
@@ -69,7 +83,7 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Phase 01 complete, ready for Phase 02 (Password Policy)
+Stopped at: Completed 03-01-PLAN.md (Password visibility toggles + autocomplete)
 Resume file: None
 
 ---
