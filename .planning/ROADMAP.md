@@ -10,7 +10,7 @@
 | Phase | Name | Goal | Requirements | Effort | Status |
 |-------|------|------|--------------|--------|--------|
 | 05 | Foundation Fixes | CSP, XSS protection, CORS dedup, phone validation | FND-01 to FND-05 | 1 day | **Complete** |
-| 01 | Critical Security Fixes | Eliminate security vulnerabilities | SEC-01, SEC-02, SEC-03 | 1 day | Pending |
+| 01 | Critical Security Fixes | Eliminate security vulnerabilities | SEC-01, SEC-02, SEC-03 | 1 day | **Complete** |
 | 02 | Password Policy | Implement strong password requirements | PWD-01 to PWD-06 | 1 day | Pending |
 | 03 | Auth UX Improvements | Improve user experience | UX-01 to UX-06 | 1 day | Pending |
 | 04 | Profile & Rate Limiting | Harden profile and prevent abuse | PROF-01, PROF-02, RATE-01, RATE-02 | 1 day | Pending |
@@ -56,7 +56,7 @@
 
 ---
 
-## Phase 01: Critical Security Fixes
+## Phase 01: Critical Security Fixes ✅
 
 **Goal:** Eliminate the 3 critical security vulnerabilities identified in audit
 
@@ -70,10 +70,15 @@
 2. Malicious input in full_name field is sanitized on display
 3. Failed auth shows user-friendly message, not raw error
 
-**Files to modify:**
-- `/src/hooks/useAuth.tsx` — race condition fix
-- `/src/views/Settings.tsx` — sanitize full_name display
-- `/src/components/auth/AuthForm.tsx` — error message handling
+**Completed:** 2026-02-03
+
+**Files modified:**
+- `src/hooks/useAuth.tsx` — race condition fix (removed redundant getSession() call; onAuthStateChange handles INITIAL_SESSION)
+- `src/hooks/useAuth.test.tsx` — race condition tests
+- `src/views/Settings.tsx` — sanitizeText() defense-in-depth for full_name
+- `src/lib/auth-errors.ts` — new Hebrew error message mapping
+- `src/lib/auth-errors.test.ts` — new error mapping tests
+- `src/components/auth/AuthForm.tsx` — safe Hebrew error messages via auth-errors.ts
 
 **Dependencies:** None (can start immediately)
 
