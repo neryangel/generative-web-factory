@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Building2, Loader2 } from 'lucide-react';
+import { Building2, Loader2, Eye, EyeOff } from 'lucide-react';
+import { getAuthErrorMessage } from '@/lib/auth-errors';
 
 type Mode = 'signin' | 'signup';
 
@@ -15,7 +16,15 @@ export function AuthForm() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { signIn, signUp } = useAuth();
+
+  useEffect(() => {
+    setEmail('');
+    setPassword('');
+    setFullName('');
+    setShowPassword(false);
+  }, [mode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,14 +34,14 @@ export function AuthForm() {
       if (mode === 'signin') {
         const { error } = await signIn(email, password);
         if (error) {
-          toast.error(error.message || 'שגיאה בהתחברות');
+          toast.error(getAuthErrorMessage(error, 'שגיאה בהתחברות'));
         } else {
           toast.success('התחברת בהצלחה!');
         }
       } else {
         const { error } = await signUp(email, password, fullName);
         if (error) {
-          toast.error(error.message || 'שגיאה בהרשמה');
+          toast.error(getAuthErrorMessage(error, 'שגיאה בהרשמה'));
         } else {
           toast.success('נרשמת בהצלחה!');
         }
@@ -80,6 +89,7 @@ export function AuthForm() {
                   placeholder="ישראל ישראלי"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
+                  autoComplete="name"
                   className="text-right"
                 />
               </div>
@@ -93,6 +103,7 @@ export function AuthForm() {
                 placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
                 required
                 dir="ltr"
                 className="text-left"
@@ -101,17 +112,29 @@ export function AuthForm() {
             
             <div className="space-y-2">
               <Label htmlFor="password">סיסמה</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={8}
-                dir="ltr"
-                className="text-left"
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete={mode === 'signup' ? "new-password" : "current-password"}
+                  required
+                  minLength={8}
+                  dir="ltr"
+                  className="text-left pl-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={showPassword ? "הסתר סיסמה" : "הצג סיסמה"}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
