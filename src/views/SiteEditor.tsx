@@ -13,6 +13,9 @@ import { AddSectionButton } from '@/components/editor/AddSectionButton';
 import { DeleteSectionDialog } from '@/components/editor/DeleteSectionDialog';
 import { SiteSettingsDialog } from '@/components/site/SiteSettingsDialog';
 import { ThemeCustomizer } from '@/components/editor/ThemeCustomizer';
+import { SectionPropertiesPanel } from '@/components/editor/SectionPropertiesPanel';
+import type { SectionStyles } from '@/components/editor/SectionPropertiesPanel';
+import { PagesPanel } from '@/components/editor/PagesPanel';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -27,12 +30,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { 
-  ArrowRight, 
-  Check, 
+import {
+  ArrowRight,
+  Check,
   ExternalLink,
   Eye,
   EyeOff,
+  FileText,
   Globe,
   Layers,
   Loader2,
@@ -87,8 +91,11 @@ export default function SiteEditor() {
   const [viewMode, setViewMode] = useState<ViewMode>('desktop');
   const [loading, setLoading] = useState(true);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
-  
-  const { isSaving, lastSaved, saveSection, flushSave: _flushSave } = useAutoSave({
+  const [editingSectionSettings, setEditingSectionSettings] = useState<string | null>(null);
+  const [sectionStyles, setSectionStyles] = useState<Record<string, SectionStyles>>({});
+  const [activeTab, setActiveTab] = useState<'sections' | 'theme' | 'pages'>('sections');
+
+  const { isSaving, lastSaved, saveSection, saveSite, flushSave: _flushSave } = useAutoSave({
     debounceMs: 1500,
   });
 
@@ -125,6 +132,12 @@ export default function SiteEditor() {
           return;
         }
         setSite(siteData);
+
+        // Load section styles from site settings
+        const siteSettings = siteData.settings as Record<string, unknown> || {};
+        if (siteSettings.sectionStyles) {
+          setSectionStyles(siteSettings.sectionStyles as Record<string, SectionStyles>);
+        }
 
         // Fetch pages
         const { data: pagesData, error: pagesError } = await supabase
@@ -200,9 +213,48 @@ export default function SiteEditor() {
     }
   }, [selectedSectionId]);
 
+  // Handle section styles change
+  const handleSectionStylesChange = useCallback((sectionId: string, styles: SectionStyles) => {
+    setSectionStyles(prev => {
+      const updated = { ...prev, [sectionId]: styles };
+      // Clean up empty styles
+      if (!styles.backgroundColor && !styles.textColor && !styles.paddingY) {
+        delete updated[sectionId];
+      }
+      // Persist to site settings
+      if (site) {
+        const currentSettings = (site.settings as Record<string, unknown>) || {};
+        const newSettings = { ...currentSettings, sectionStyles: updated };
+        setSite(prev => prev ? { ...prev, settings: newSettings } : null);
+        saveSite(site.id, { settings: newSettings });
+      }
+      return updated;
+    });
+  }, [site, saveSite]);
+
+  // Handle page created
+  const handlePageCreated = useCallback((page: Page) => {
+    setPages(prev => [...prev, page]);
+    setCurrentPage(page);
+  }, []);
+
+  // Handle page deleted
+  const handlePageDeleted = useCallback((pageId: string) => {
+    setPages(prev => prev.filter(p => p.id !== pageId));
+    if (currentPage?.id === pageId) {
+      const remaining = pages.filter(p => p.id !== pageId);
+      setCurrentPage(remaining[0] || null);
+    }
+  }, [currentPage, pages]);
+
   // Get section to delete for dialog
-  const sectionToDelete = deletingSectionId 
-    ? sections.find(s => s.id === deletingSectionId) 
+  const sectionToDelete = deletingSectionId
+    ? sections.find(s => s.id === deletingSectionId)
+    : null;
+
+  // Section being edited for settings dialog
+  const editingSection = editingSectionSettings
+    ? sections.find(s => s.id === editingSectionSettings)
     : null;
 
   // Handle drag start for preview
@@ -572,9 +624,11 @@ export default function SiteEditor() {
                           section={section}
                           isSelected={selectedSectionId === section.id}
                           isEditing={isEditing}
+                          sectionStyles={sectionStyles[section.id]}
                           onSelect={() => setSelectedSectionId(section.id)}
                           onContentChange={(content) => handleContentChange(section.id, content)}
                           onDeleteClick={() => setDeletingSectionId(section.id)}
+                          onSettingsClick={() => setEditingSectionSettings(section.id)}
                         />
                       ))}
                     </SortableContext>
@@ -596,24 +650,33 @@ export default function SiteEditor() {
           </div>
         </div>
 
-        {/* Right Sidebar - Section List & Theme */}
+        {/* Right Sidebar - Section List, Theme & Pages */}
         {isEditing && (
           <aside className="w-72 bg-card border-r shrink-0 flex flex-col overflow-hidden">
             {/* Tabs - fixed at top */}
             <div className="flex border-b shrink-0">
               <button
-                onClick={() => setSelectedSectionId(null)}
-                className={`flex-1 py-3 px-4 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
-                  !selectedSectionId ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'
+                onClick={() => setActiveTab('sections')}
+                className={`flex-1 py-3 px-2 text-sm font-medium flex items-center justify-center gap-1.5 transition-colors ${
+                  activeTab === 'sections' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Layers className="w-4 h-4" />
                 סקשנים
               </button>
               <button
-                onClick={() => setSelectedSectionId('theme')}
-                className={`flex-1 py-3 px-4 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
-                  selectedSectionId === 'theme' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'
+                onClick={() => setActiveTab('pages')}
+                className={`flex-1 py-3 px-2 text-sm font-medium flex items-center justify-center gap-1.5 transition-colors ${
+                  activeTab === 'pages' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <FileText className="w-4 h-4" />
+                עמודים
+              </button>
+              <button
+                onClick={() => setActiveTab('theme')}
+                className={`flex-1 py-3 px-2 text-sm font-medium flex items-center justify-center gap-1.5 transition-colors ${
+                  activeTab === 'theme' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Palette className="w-4 h-4" />
@@ -623,12 +686,22 @@ export default function SiteEditor() {
 
             {/* Sidebar content - scrollable */}
             <div className="flex-1 overflow-y-auto p-4">
-              {selectedSectionId === 'theme' ? (
+              {activeTab === 'theme' ? (
                 <ThemeCustomizer site={site} onUpdate={setSite} />
+              ) : activeTab === 'pages' ? (
+                <PagesPanel
+                  siteId={site.id}
+                  tenantId={currentTenant?.id || ''}
+                  pages={pages}
+                  currentPageId={currentPage?.id || null}
+                  onPageSelect={(page) => setCurrentPage(page)}
+                  onPageCreated={handlePageCreated}
+                  onPageDeleted={handlePageDeleted}
+                />
               ) : (
                 <>
                   <h3 className="font-semibold mb-4">סקשנים</h3>
-                  
+
                   <SortableSectionList
                     sections={sections}
                     selectedSectionId={selectedSectionId}
@@ -658,6 +731,20 @@ export default function SiteEditor() {
         sectionId={deletingSectionId || ''}
         sectionType={sectionToDelete?.type || ''}
         onDeleted={handleSectionDeleted}
+      />
+
+      {/* Section Properties Panel */}
+      <SectionPropertiesPanel
+        open={!!editingSectionSettings}
+        onOpenChange={(open) => !open && setEditingSectionSettings(null)}
+        sectionType={editingSection?.type || ''}
+        sectionVariant={editingSection?.variant || 'default'}
+        styles={editingSectionSettings ? (sectionStyles[editingSectionSettings] || {}) : {}}
+        onStylesChange={(styles) => {
+          if (editingSectionSettings) {
+            handleSectionStylesChange(editingSectionSettings, styles);
+          }
+        }}
       />
     </div>
   );
