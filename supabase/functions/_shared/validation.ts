@@ -56,6 +56,18 @@ export function sanitizeString(value: string): string {
 }
 
 /**
+ * Escape HTML special characters to prevent XSS in HTML templates
+ */
+export function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
  * Validate and sanitize brief for AI generation
  */
 export function validateBrief(value: unknown): { valid: boolean; error?: string; brief?: string } {
@@ -101,4 +113,29 @@ export function successResponse(
     JSON.stringify(data),
     { headers: { ...headers, "Content-Type": "application/json" } }
   );
+}
+
+/**
+ * Validate Israeli phone number
+ * Accepts formats: 05X-XXXXXXX, 05XXXXXXXX, +972-5X-XXXXXXX, +9725XXXXXXXX
+ */
+export function isValidIsraeliPhone(value: string): boolean {
+  if (!value || typeof value !== 'string') return false;
+  // Remove spaces and dashes for normalization
+  const cleaned = value.replace(/[\s-]/g, '');
+  // Israeli mobile: 05X followed by 7 digits
+  // Or international: +972 5X followed by 7 digits
+  const israeliMobileRegex = /^(?:0[23489]\d{7}|05\d{8}|\+972[23489]\d{7}|\+9725\d{8})$/;
+  return israeliMobileRegex.test(cleaned);
+}
+
+/**
+ * Normalize phone number to international format
+ */
+export function normalizePhoneNumber(value: string): string {
+  const cleaned = value.replace(/[\s-]/g, '');
+  if (cleaned.startsWith('0')) {
+    return '+972' + cleaned.slice(1);
+  }
+  return cleaned;
 }

@@ -73,7 +73,7 @@ const nextConfig = {
           {
             // Content Security Policy - Enhanced security
             // Note: unsafe-inline for styles is required for Tailwind CSS
-            key: 'Content-Security-Policy',
+            key: 'Content-Security-Policy-Report-Only',
             value: [
               "default-src 'self'",
               scriptSrc,
