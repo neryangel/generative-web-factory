@@ -2,17 +2,57 @@
 
 **Created:** 2026-01-28
 **Milestone:** v1.0 Auth Security Hardening
-**Phases:** 4
-**Requirements covered:** 19/19 (100%)
+**Phases:** 5
+**Requirements covered:** 19/19 + 5 foundation (100%)
 
 ## Overview
 
-| Phase | Name | Goal | Requirements | Effort |
-|-------|------|------|--------------|--------|
-| 01 | Critical Security Fixes | Eliminate security vulnerabilities | SEC-01, SEC-02, SEC-03 | 1 day |
-| 02 | Password Policy | Implement strong password requirements | PWD-01 to PWD-06 | 1 day |
-| 03 | Auth UX Improvements | Improve user experience | UX-01 to UX-06 | 1 day |
-| 04 | Profile & Rate Limiting | Harden profile and prevent abuse | PROF-01, PROF-02, RATE-01, RATE-02 | 1 day |
+| Phase | Name | Goal | Requirements | Effort | Status |
+|-------|------|------|--------------|--------|--------|
+| 05 | Foundation Fixes | CSP, XSS protection, CORS dedup, phone validation | FND-01 to FND-05 | 1 day | **Complete** |
+| 01 | Critical Security Fixes | Eliminate security vulnerabilities | SEC-01, SEC-02, SEC-03 | 1 day | Pending |
+| 02 | Password Policy | Implement strong password requirements | PWD-01 to PWD-06 | 1 day | Pending |
+| 03 | Auth UX Improvements | Improve user experience | UX-01 to UX-06 | 1 day | Pending |
+| 04 | Profile & Rate Limiting | Harden profile and prevent abuse | PROF-01, PROF-02, RATE-01, RATE-02 | 1 day | Pending |
+
+---
+
+## Phase 05: Foundation Fixes ✅
+
+**Goal:** Harden infrastructure security: CSP, XSS protection, CORS consistency, input validation
+
+**Requirements:**
+- FND-01: CSP migrated to Report-Only for safe monitoring
+- FND-02: escapeHtml utility available for HTML template safety
+- FND-03: Edge Functions do not expose raw error messages
+- FND-04: CORS configuration deduplicated into shared module
+- FND-05: Israeli phone validation utility with tests
+
+**Success Criteria:**
+1. CSP Report-Only header in both next.config.mjs and vercel.json
+2. escapeHtml function in backend (_shared/validation.ts) and frontend (src/lib/escapeHtml.ts)
+3. All 4 Edge Functions return generic error messages (no error.message exposure)
+4. All 4 Edge Functions import CORS from _shared/cors.ts
+5. Phone validation passes 31 tests
+
+**Completed:** 2026-02-02
+
+**Files modified:**
+- `next.config.mjs` — CSP header key changed to Report-Only
+- `vercel.json` — CSP Report-Only header added
+- `supabase/functions/_shared/cors.ts` — new shared CORS module
+- `supabase/functions/_shared/validation.ts` — escapeHtml + phone validation added
+- `supabase/functions/generate-site/index.ts` — shared CORS import
+- `supabase/functions/get-published-site/index.ts` — shared CORS + generic errors
+- `supabase/functions/manage-vercel-domain/index.ts` — shared CORS + generic errors
+- `supabase/functions/verify-domain/index.ts` — shared CORS + generic errors
+- `src/lib/escapeHtml.ts` — new frontend HTML escaping utility
+- `src/lib/escapeHtml.test.ts` — 15 tests
+- `src/lib/sanitize.test.ts` — 16 tests for DOMPurify functions
+- `src/lib/phone-validation.ts` — new frontend phone validation
+- `src/lib/phone-validation.test.ts` — 31 tests
+
+**Dependencies:** None (foundation phase, no upstream dependencies)
 
 ---
 

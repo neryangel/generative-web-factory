@@ -7,6 +7,14 @@
 
 Requirements derived from auth flow audit (25 issues identified).
 
+### Foundation Fixes (FND)
+
+- [x] **FND-01**: CSP migrated to Report-Only for safe monitoring
+- [x] **FND-02**: escapeHtml utility available for HTML template safety
+- [x] **FND-03**: Edge Functions do not expose raw error messages
+- [x] **FND-04**: CORS configuration deduplicated into shared module
+- [x] **FND-05**: Israeli phone validation utility with tests
+
 ### Critical Security (SEC)
 
 - [ ] **SEC-01**: Auth initialization handles race condition correctly (no state flickering)
@@ -70,6 +78,11 @@ Deferred to future milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| FND-01 | Phase 5 | **Complete** |
+| FND-02 | Phase 5 | **Complete** |
+| FND-03 | Phase 5 | **Complete** |
+| FND-04 | Phase 5 | **Complete** |
+| FND-05 | Phase 5 | **Complete** |
 | SEC-01 | Phase 1 | Pending |
 | SEC-02 | Phase 1 | Pending |
 | SEC-03 | Phase 1 | Pending |
@@ -91,10 +104,12 @@ Deferred to future milestone.
 | RATE-02 | Phase 4 | Pending |
 
 **Coverage:**
-- v1 requirements: 19 total
-- Mapped to phases: 19
+- v1 requirements: 24 total (19 auth + 5 foundation)
+- Mapped to phases: 24
+- Complete: 5 (Phase 5)
+- Remaining: 19
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-28 after auth audit*
+*Last updated: 2026-02-02 — Phase 5 foundation requirements added and completed*
