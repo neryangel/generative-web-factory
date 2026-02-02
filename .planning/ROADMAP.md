@@ -11,7 +11,7 @@
 |-------|------|------|--------------|--------|--------|
 | 05 | Foundation Fixes | CSP, XSS protection, CORS dedup, phone validation | FND-01 to FND-05 | 1 day | **Complete** |
 | 01 | Critical Security Fixes | Eliminate security vulnerabilities | SEC-01, SEC-02, SEC-03 | 1 day | **Complete** |
-| 02 | Password Policy | Implement strong password requirements | PWD-01 to PWD-06 | 1 day | Pending |
+| 02 | Password Policy | Implement strong password requirements | PWD-01 to PWD-06 | 1 day | Planned |
 | 03 | Auth UX Improvements | Improve user experience | UX-01 to UX-06 | 1 day | Pending |
 | 04 | Profile & Rate Limiting | Harden profile and prevent abuse | PROF-01, PROF-02, RATE-01, RATE-02 | 1 day | Pending |
 
@@ -87,6 +87,12 @@
 ## Phase 02: Password Policy
 
 **Goal:** Implement strong password requirements with visual feedback
+
+**Plans:** 2 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — TDD password validation logic (validatePassword function + tests)
+- [ ] 02-02-PLAN.md — PasswordStrengthIndicator component + AuthForm integration + confirmation field
 
 **Requirements:**
 - PWD-01: Minimum 8 characters
