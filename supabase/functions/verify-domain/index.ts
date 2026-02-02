@@ -1,31 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-/**
- * Allowed origins for CORS
- * Configure based on your deployment domains
- */
-const ALLOWED_ORIGINS = [
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "https://generative-web-factory.vercel.app",
-  "https://amdir.app",
-  "https://www.amdir.app",
-];
-
-function getCorsHeaders(origin: string | null): Record<string, string> {
-  // In production, validate origin against allowed list
-  // Allow Vercel preview deployments (*.vercel.app)
-  const isAllowed = origin && (
-    ALLOWED_ORIGINS.includes(origin) ||
-    origin.endsWith('.vercel.app')
-  );
-
-  return {
-    "Access-Control-Allow-Origin": isAllowed ? origin : ALLOWED_ORIGINS[0],
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-  };
-}
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 interface VerifyDomainRequest {
   domainId: string;
@@ -103,8 +77,7 @@ async function verifyDns(domain: string): Promise<{ verified: boolean; records: 
 }
 
 Deno.serve(async (req) => {
-  const origin = req.headers.get("Origin");
-  const corsHeaders = getCorsHeaders(origin);
+  const corsHeaders = getCorsHeaders(req);
 
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
@@ -209,9 +182,8 @@ Deno.serve(async (req) => {
     );
   } catch (error: unknown) {
     console.error("Verify domain error:", error);
-    const message = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

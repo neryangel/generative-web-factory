@@ -1,27 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-/**
- * CORS headers for public site endpoint
- *
- * IMPORTANT: This endpoint intentionally allows all origins (*) because:
- * 1. It serves published sites on custom domains (user's own domains)
- * 2. These domains are unpredictable and user-configured
- * 3. The endpoint is read-only and serves only public/published content
- *
- * SECURITY: Uses anon key with RLS policies that allow public access to
- * published content only. Never use service role key for public endpoints.
- */
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
-};
+import { publicCorsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: publicCorsHeaders });
   }
 
   try {
@@ -32,7 +16,7 @@ serve(async (req) => {
     if (!slug && !domain) {
       return new Response(
         JSON.stringify({ error: "Missing slug or domain parameter" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...publicCorsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -75,7 +59,7 @@ serve(async (req) => {
         console.error("Site lookup error:", siteError);
         return new Response(
           JSON.stringify({ error: "Error finding site" }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 500, headers: { ...publicCorsHeaders, "Content-Type": "application/json" } }
         );
       }
 
@@ -87,7 +71,7 @@ serve(async (req) => {
     if (!siteId) {
       return new Response(
         JSON.stringify({ error: "Site not found" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 404, headers: { ...publicCorsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -103,14 +87,14 @@ serve(async (req) => {
       console.error("Publish lookup error:", publishError);
       return new Response(
         JSON.stringify({ error: "Error fetching published version" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...publicCorsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     if (!publishData) {
       return new Response(
         JSON.stringify({ error: "No published version found" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 404, headers: { ...publicCorsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -131,14 +115,14 @@ serve(async (req) => {
         version: publishData.version,
         publishedAt: publishData.published_at,
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: { ...publicCorsHeaders, "Content-Type": "application/json" } }
     );
 
   } catch (error) {
     console.error("get-published-site error:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: "Internal server error" }),
+      { status: 500, headers: { ...publicCorsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

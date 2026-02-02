@@ -1,30 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { isValidUuid, isValidDomain, errorResponse } from "../_shared/validation.ts";
-
-/**
- * Allowed origins for CORS
- * Configure based on your deployment domains
- */
-const ALLOWED_ORIGINS = [
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "https://generative-web-factory.vercel.app",
-  "https://amdir.app",
-  "https://www.amdir.app",
-];
-
-function getCorsHeaders(origin: string | null): Record<string, string> {
-  const isAllowed = origin && (
-    ALLOWED_ORIGINS.includes(origin) ||
-    origin.endsWith('.vercel.app')
-  );
-
-  return {
-    "Access-Control-Allow-Origin": isAllowed ? origin : ALLOWED_ORIGINS[0],
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-  };
-}
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 interface ManageDomainRequest {
   action: "add" | "remove" | "verify" | "status";
@@ -183,8 +159,7 @@ async function getDomainConfig(domain: string): Promise<{ configured: boolean; m
 }
 
 Deno.serve(async (req) => {
-  const origin = req.headers.get("Origin");
-  const corsHeaders = getCorsHeaders(origin);
+  const corsHeaders = getCorsHeaders(req);
 
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -368,9 +343,8 @@ Deno.serve(async (req) => {
     );
   } catch (error: unknown) {
     console.error("Manage Vercel domain error:", error);
-    const message = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
