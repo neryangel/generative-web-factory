@@ -2,12 +2,12 @@
 
 ## Current Position
 
-Phase: 03 (Auth UX Improvements) in progress
-Plan: 03-01 complete (1 of 2 plans)
-Status: Password visibility toggles and autocomplete attributes added to AuthForm
-Last activity: 2026-02-03 — Completed 03-01-PLAN.md (password toggles + autocomplete + form clearing)
+Phase: 03 (Auth UX Improvements) complete
+Plan: 03-02 complete (2 of 2 plans)
+Status: All Auth UX improvements complete - password toggles, autocomplete, forgot password
+Last activity: 2026-02-03 — Completed 03-02-PLAN.md (forgot password link with Supabase integration)
 
-Progress: ████████████░░░░░░░░ Phase 03/04 remaining (3 of 5 phases in progress)
+Progress: ████████████████░░░░ Phase 04/04 remaining (4 of 5 phases complete)
 
 ## Project Reference
 
@@ -34,6 +34,9 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 | autocomplete-username | Use autocomplete="username" for email in auth forms | 03-01 | MDN spec for password manager credential association |
 | password-visibility | Eye/EyeOff toggle pattern with Hebrew aria-labels | 03-01 | Users can verify password entry, especially on mobile |
 | form-clearing-effect | useEffect clears form state on mode change | 03-01 | Centralized clearing logic, mode as single source of truth |
+| direct-supabase-reset | Use supabase.auth.resetPasswordForEmail directly in component | 03-02 | Single-use case doesn't justify useAuth hook abstraction |
+| forgot-password-inline | Forgot password as inline toast flow, no navigation | 03-02 | Faster UX, keeps user in auth form context |
+| email-validation-first | Validate email before resetPasswordForEmail call | 03-02 | Avoid consuming rate limit quota on empty email |
 
 ### Blockers
 
@@ -63,8 +66,9 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 - SEC-03: Hebrew error messages via auth-errors.ts in AuthForm.tsx
 - Files changed: useAuth.tsx, useAuth.test.tsx, Settings.tsx, auth-errors.ts (new), auth-errors.test.ts (new), AuthForm.tsx
 
-## Phase 03 Plan 01 Verification Summary
+## Phase 03 Verification Summary
 
+**Plan 01:**
 - 460 tests pass (35 test files)
 - TypeScript compiles clean
 - Production build succeeds
@@ -73,6 +77,16 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 - UX-06: HTML5 autocomplete attributes (name, username, current-password/new-password)
 - Files changed: AuthForm.tsx
 - Note: Plan expected Phase 02-02 to be complete (confirmPassword field), adapted to work with current state
+
+**Plan 02:**
+- User-verified forgot password flow (checkpoint approved)
+- UX-03: Forgot password link in signin mode only
+- Supabase resetPasswordForEmail integration with Hebrew toast feedback
+- Email validation before API call
+- Rate limit error handling with Hebrew messages
+- Files changed: AuthForm.tsx, auth-errors.ts
+
+**Phase 03 Complete:** All auth UX improvements shipped (password toggles, autocomplete, form clearing, forgot password)
 
 ### Quick Tasks Completed
 
@@ -83,7 +97,7 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Completed 03-01-PLAN.md (Password visibility toggles + autocomplete)
+Stopped at: Completed 03-02-PLAN.md (Forgot password link with Supabase integration) - Phase 03 complete
 Resume file: None
 
 ---
