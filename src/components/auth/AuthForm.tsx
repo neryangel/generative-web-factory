@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Building2, Loader2, Eye, EyeOff } from 'lucide-react';
 import { getAuthErrorMessage } from '@/lib/auth-errors';
+import { supabase } from '@/integrations/supabase/client';
 
 type Mode = 'signin' | 'signup';
 
@@ -48,6 +49,27 @@ export function AuthForm() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      toast.error('יש להזין כתובת אימייל תחילה');
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+
+      if (error) {
+        toast.error(getAuthErrorMessage(error, 'שגיאה בשליחת קישור לאיפוס'));
+      } else {
+        toast.success('נשלח קישור לאיפוס סיסמה לכתובת האימייל');
+      }
+    } catch {
+      toast.error('שגיאה בשליחת קישור לאיפוס');
     }
   };
 
@@ -111,7 +133,18 @@ export function AuthForm() {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">סיסמה</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">סיסמה</Label>
+                {mode === 'signin' && (
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    שכחתי סיסמה
+                  </button>
+                )}
+              </div>
               <div className="relative">
                 <Input
                   id="password"
