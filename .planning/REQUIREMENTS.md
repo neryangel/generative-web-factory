@@ -17,9 +17,9 @@ Requirements derived from auth flow audit (25 issues identified).
 
 ### Critical Security (SEC)
 
-- [ ] **SEC-01**: Auth initialization handles race condition correctly (no state flickering)
-- [ ] **SEC-02**: User-supplied content (full_name) is sanitized before display (XSS protection)
-- [ ] **SEC-03**: Error messages do not expose internal system details
+- [x] **SEC-01**: Auth initialization handles race condition correctly (no state flickering)
+- [x] **SEC-02**: User-supplied content (full_name) is sanitized before display (XSS protection)
+- [x] **SEC-03**: Error messages do not expose internal system details
 
 ### Password Policy (PWD)
 
@@ -32,12 +32,12 @@ Requirements derived from auth flow audit (25 issues identified).
 
 ### Authentication UX (UX)
 
-- [ ] **UX-01**: Form shows loading state during authentication
-- [ ] **UX-02**: Error messages are user-friendly (Hebrew)
-- [ ] **UX-03**: "Forgot password" link visible on login form
-- [ ] **UX-04**: Password visibility toggle available
-- [ ] **UX-05**: Form clears when switching between signin/signup modes
-- [ ] **UX-06**: Autocomplete attributes set correctly on form fields
+- [x] **UX-01**: Form shows loading state during authentication
+- [x] **UX-02**: Error messages are user-friendly (Hebrew)
+- [x] **UX-03**: "Forgot password" link visible on login form
+- [x] **UX-04**: Password visibility toggle available
+- [x] **UX-05**: Form clears when switching between signin/signup modes
+- [x] **UX-06**: Autocomplete attributes set correctly on form fields
 
 ### Profile Security (PROF)
 
@@ -83,21 +83,21 @@ Deferred to future milestone.
 | FND-03 | Phase 5 | **Complete** |
 | FND-04 | Phase 5 | **Complete** |
 | FND-05 | Phase 5 | **Complete** |
-| SEC-01 | Phase 1 | Pending |
-| SEC-02 | Phase 1 | Pending |
-| SEC-03 | Phase 1 | Pending |
+| SEC-01 | Phase 1 | **Complete** |
+| SEC-02 | Phase 1 | **Complete** |
+| SEC-03 | Phase 1 | **Complete** |
 | PWD-01 | Phase 2 | Pending |
 | PWD-02 | Phase 2 | Pending |
 | PWD-03 | Phase 2 | Pending |
 | PWD-04 | Phase 2 | Pending |
 | PWD-05 | Phase 2 | Pending |
 | PWD-06 | Phase 2 | Pending |
-| UX-01 | Phase 3 | Pending |
-| UX-02 | Phase 3 | Pending |
-| UX-03 | Phase 3 | Pending |
-| UX-04 | Phase 3 | Pending |
-| UX-05 | Phase 3 | Pending |
-| UX-06 | Phase 3 | Pending |
+| UX-01 | Phase 3 | **Complete** |
+| UX-02 | Phase 3 | **Complete** |
+| UX-03 | Phase 3 | **Complete** |
+| UX-04 | Phase 3 | **Complete** |
+| UX-05 | Phase 3 | **Complete** |
+| UX-06 | Phase 3 | **Complete** |
 | PROF-01 | Phase 4 | Pending |
 | PROF-02 | Phase 4 | Pending |
 | RATE-01 | Phase 4 | Pending |
@@ -106,10 +106,10 @@ Deferred to future milestone.
 **Coverage:**
 - v1 requirements: 24 total (19 auth + 5 foundation)
 - Mapped to phases: 24
-- Complete: 5 (Phase 5)
-- Remaining: 19
+- Complete: 14 (Phase 5 + Phase 1 + Phase 3)
+- Remaining: 10
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-02-02 — Phase 5 foundation requirements added and completed*
+*Last updated: 2026-02-03 — Phase 1 (SEC) and Phase 3 (UX) requirements marked complete*

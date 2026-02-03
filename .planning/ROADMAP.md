@@ -12,7 +12,7 @@
 | 05 | Foundation Fixes | CSP, XSS protection, CORS dedup, phone validation | FND-01 to FND-05 | 1 day | **Complete** |
 | 01 | Critical Security Fixes | Eliminate security vulnerabilities | SEC-01, SEC-02, SEC-03 | 1 day | **Complete** |
 | 02 | Password Policy | Implement strong password requirements | PWD-01 to PWD-06 | 1 day | Planned |
-| 03 | Auth UX Improvements | Improve user experience | UX-01 to UX-06 | 1 day | Planned |
+| 03 | Auth UX Improvements | Improve user experience | UX-01 to UX-06 | 1 day | **Complete** |
 | 04 | Profile & Rate Limiting | Harden profile and prevent abuse | PROF-01, PROF-02, RATE-01, RATE-02 | 1 day | Pending |
 
 ---
@@ -116,15 +116,9 @@ Plans:
 
 ---
 
-## Phase 03: Auth UX Improvements
+## Phase 03: Auth UX Improvements ✅
 
 **Goal:** Improve authentication user experience with password toggles, autocomplete, form clearing, and forgot password flow
-
-**Plans:** 2 plans
-
-Plans:
-- [ ] 03-01-PLAN.md — Password visibility toggles + autocomplete attributes + form clearing on mode switch
-- [ ] 03-02-PLAN.md — Forgot password link with Supabase resetPasswordForEmail integration
 
 **Requirements:**
 - UX-01: Loading states (already implemented)
@@ -137,12 +131,14 @@ Plans:
 **Success Criteria:**
 1. User sees loading spinner during auth operations (already working)
 2. All error messages display in Hebrew (already working)
-3. User can toggle password visibility on both password fields
+3. User can toggle password visibility on password field
 4. User can navigate to password reset from login via "שכחתי סיסמה" link
 
-**Files to modify:**
-- `/src/components/auth/AuthForm.tsx` — all UX improvements
-- `/src/lib/auth-errors.ts` — password reset error mappings
+**Completed:** 2026-02-03
+
+**Files modified:**
+- `src/components/auth/AuthForm.tsx` — password visibility toggle, autocomplete attributes, form clearing, forgot password link
+- `src/lib/auth-errors.ts` — password reset error mappings
 
 **Dependencies:** Phase 02 (password field changes)
 
