@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { parseSupabaseError } from '@/lib/api-error';
 import type { Template } from '@/types/api.types';
 
 export const templatesApi = {
@@ -12,7 +13,7 @@ export const templatesApi = {
       .eq('is_active', true)
       .order('category');
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data || [];
   },
 
@@ -27,7 +28,7 @@ export const templatesApi = {
       .eq('category', category)
       .order('name');
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data || [];
   },
 
@@ -41,7 +42,7 @@ export const templatesApi = {
       .eq('id', templateId)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -55,7 +56,7 @@ export const templatesApi = {
       .eq('slug', slug)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -68,7 +69,7 @@ export const templatesApi = {
       .select('category')
       .eq('is_active', true);
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     
     const categories = [...new Set(data?.map(t => t.category) || [])];
     return categories.sort();

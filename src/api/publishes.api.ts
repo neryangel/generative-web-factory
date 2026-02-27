@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { parseSupabaseError } from '@/lib/api-error';
 import type { Publish } from '@/types/api.types';
 import type { Json } from '@/integrations/supabase/types';
 
@@ -30,7 +31,7 @@ export const publishesApi = {
       .eq('site_id', siteId)
       .order('version', { ascending: false });
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data || [];
   },
 
@@ -45,7 +46,7 @@ export const publishesApi = {
       .eq('is_current', true)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -60,7 +61,7 @@ export const publishesApi = {
       .eq('version', version)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -102,7 +103,7 @@ export const publishesApi = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -146,7 +147,7 @@ export const publishesApi = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -162,7 +163,7 @@ export const publishesApi = {
       .limit(1)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data?.version || 0;
   },
 };

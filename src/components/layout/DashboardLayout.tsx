@@ -44,6 +44,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">
+      {/* Skip link for accessibility */}
+      <a href="#main-content" className="skip-to-content">דלג לתוכן הראשי</a>
       {/* Header */}
       <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="container flex h-16 items-center justify-between px-4">
@@ -98,7 +100,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav aria-label="ניווט ראשי" className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -119,7 +121,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
+              <Button variant="ghost" size="icon" className="rounded-full min-h-[44px] min-w-[44px]" aria-label="תפריט משתמש">
                 <User className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
@@ -143,7 +145,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="container px-4 py-8">
+      <main id="main-content" className="container px-4 py-8">
         {children}
       </main>
     </div>

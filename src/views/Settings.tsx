@@ -22,6 +22,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { Building2, Loader2, Shield, User } from 'lucide-react';
+import { sanitizeText } from '@/lib/sanitize';
 
 export default function Settings() {
   const { user } = useAuth();
@@ -138,7 +139,7 @@ export default function Settings() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium">{fullName || 'משתמש'}</p>
+                      <p className="font-medium">{sanitizeText(fullName) || 'משתמש'}</p>
                       <p className="text-sm text-muted-foreground">{user?.email}</p>
                     </div>
                   </div>
@@ -180,7 +181,7 @@ export default function Settings() {
               <CardHeader>
                 <CardTitle>הגדרות ארגון</CardTitle>
                 <CardDescription>
-                  נהל את הארגון: {currentTenant?.name}
+                  נהל את הארגון: {sanitizeText(currentTenant?.name ?? '')}
                 </CardDescription>
               </CardHeader>
               <CardContent>

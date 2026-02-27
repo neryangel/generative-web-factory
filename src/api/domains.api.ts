@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { parseSupabaseError } from '@/lib/api-error';
 import type { Domain } from '@/types/api.types';
 
 export const domainsApi = {
@@ -12,7 +13,7 @@ export const domainsApi = {
       .eq('site_id', siteId)
       .order('created_at');
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data || [];
   },
 
@@ -26,7 +27,7 @@ export const domainsApi = {
       .eq('id', domainId)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -47,7 +48,7 @@ export const domainsApi = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data;
   },
 
@@ -60,7 +61,7 @@ export const domainsApi = {
       .delete()
       .eq('id', domainId);
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
   },
 
   /**
@@ -72,8 +73,8 @@ export const domainsApi = {
       body: { domainId },
     });
 
-    if (result.error) throw result.error;
-    if (!result.data) throw new Error('No data returned from verify-domain');
+    if (result.error) throw parseSupabaseError(result.error);
+    if (!result.data) throw parseSupabaseError(new Error('No data returned from verify-domain'));
     return result.data;
   },
 
@@ -87,7 +88,7 @@ export const domainsApi = {
       .eq('domain', domain)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) throw parseSupabaseError(error);
     return data === null;
   },
 };

@@ -5,7 +5,7 @@ import { useTenant } from '@/hooks/useTenant';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface ImageUploaderProps {
   siteId?: string;
@@ -89,10 +89,8 @@ export function ImageUploader({
 
   const handleFileUpload = async (file: File) => {
     if (!currentTenant) {
-      toast({
-        title: 'שגיאה',
+      toast.error('שגיאה', {
         description: 'לא נמצא ארגון פעיל',
-        variant: 'destructive',
       });
       return;
     }
@@ -194,8 +192,7 @@ export function ImageUploader({
 
       onUploadComplete(urlData.publicUrl);
 
-      toast({
-        title: 'הועלה בהצלחה',
+      toast.success('הועלה בהצלחה', {
         description: 'התמונה הועלתה בהצלחה',
       });
 
@@ -209,10 +206,8 @@ export function ImageUploader({
         error: message,
       }));
 
-      toast({
-        title: 'שגיאה בהעלאה',
+      toast.error('שגיאה בהעלאה', {
         description: message,
-        variant: 'destructive',
       });
     }
   };

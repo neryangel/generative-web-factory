@@ -23,10 +23,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     const { domain } = req.body;
 
     if (!domain) {
       return res.status(400).json({ error: 'Missing domain' });
+    }
+
+    // Validate domain format (defense-in-depth)
+    const domainRegex = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+    if (typeof domain !== 'string' || domain.length > 253 || !domainRegex.test(domain)) {
+      return res.status(400).json({ error: 'Invalid domain format' });
     }
 
     const token = process.env.VERCEL_TOKEN;

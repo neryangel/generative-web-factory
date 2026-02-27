@@ -1,7 +1,11 @@
 import type { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
 import { Card, CardContent } from '@/components/ui/card';
-import * as LucideIcons from 'lucide-react';
+import {
+  BarChart3, Headphones, Palette, Shield, Smartphone, Sparkles, Zap,
+  ArrowLeft, Globe, Heart, Rocket, Star, Target, TrendingUp, Users,
+  Award, Crown, Plus, Trash2,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -26,10 +30,15 @@ const defaultFeatures: FeatureItem[] = [
   { icon: 'Headphones', title: 'תמיכה 24/7', description: 'צוות מומחים זמין בכל שעה לעזור לכם להצליח' },
 ];
 
+const featureIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  BarChart3, Headphones, Palette, Shield, Smartphone, Sparkles, Zap,
+  ArrowLeft, Globe, Heart, Rocket, Star, Target, TrendingUp, Users,
+  Award, Crown,
+};
+
 function getIcon(iconName?: string): React.ComponentType<{ className?: string }> {
-  if (!iconName) return LucideIcons.Sparkles;
-  const icons = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>;
-  return icons[iconName] || LucideIcons.Sparkles;
+  if (!iconName) return Sparkles;
+  return featureIconMap[iconName] || Sparkles;
 }
 
 function getGradientForIndex(index: number, primary: string, accent: string, secondary: string) {

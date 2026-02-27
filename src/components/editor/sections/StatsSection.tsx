@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SectionProps } from '../SectionRenderer';
 import { EditableText } from '../EditableText';
-import { Plus, Trash2 } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import {
+  Award, Crown, Globe, Heart, Plus, Rocket, Sparkles, Star,
+  Target, Trash2, TrendingUp, Users, Zap,
+} from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface StatItem {
@@ -30,20 +32,11 @@ const iconOptions = [
 ];
 
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
-  Users: LucideIcons.Users,
-  Globe: LucideIcons.Globe,
-  Award: LucideIcons.Award,
-  TrendingUp: LucideIcons.TrendingUp,
-  Heart: LucideIcons.Heart,
-  Star: LucideIcons.Star,
-  Zap: LucideIcons.Zap,
-  Target: LucideIcons.Target,
-  Rocket: LucideIcons.Rocket,
-  Crown: LucideIcons.Crown,
+  Users, Globe, Award, TrendingUp, Heart, Star, Zap, Target, Rocket, Crown,
 };
 
 function getIcon(iconName: string, className?: string, style?: React.CSSProperties) {
-  const IconComponent = iconMap[iconName] || LucideIcons.Sparkles;
+  const IconComponent = iconMap[iconName] || Sparkles;
   return <IconComponent className={className} style={style} />;
 }
 

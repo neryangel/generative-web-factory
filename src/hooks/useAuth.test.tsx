@@ -7,9 +7,11 @@ import { AuthProvider, useAuth } from './useAuth';
 const mockSignInWithPassword = vi.fn();
 const mockSignUp = vi.fn();
 const mockSignOut = vi.fn();
-const mockGetSession = vi.fn();
 const mockOnAuthStateChange = vi.fn();
 const mockUnsubscribe = vi.fn();
+
+// Store the initial session to be delivered by onAuthStateChange
+let initialSession: unknown = null;
 
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
@@ -17,9 +19,10 @@ vi.mock('@/integrations/supabase/client', () => ({
       signInWithPassword: (...args: unknown[]) => mockSignInWithPassword(...args),
       signUp: (...args: unknown[]) => mockSignUp(...args),
       signOut: () => mockSignOut(),
-      getSession: () => mockGetSession(),
       onAuthStateChange: (callback: (event: string, session: unknown) => void) => {
         mockOnAuthStateChange(callback);
+        // Simulate INITIAL_SESSION event firing immediately (as Supabase does)
+        setTimeout(() => callback('INITIAL_SESSION', initialSession), 0);
         return {
           data: {
             subscription: {
@@ -51,13 +54,11 @@ describe('useAuth', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockGetSession.mockResolvedValue({ data: { session: null } });
+    initialSession = null;
   });
 
   describe('AuthProvider', () => {
     it('should initialize with loading state', async () => {
-      mockGetSession.mockResolvedValue({ data: { session: null } });
-
       const { result } = renderHook(() => useAuth(), { wrapper });
 
       // Initially loading
@@ -68,8 +69,8 @@ describe('useAuth', () => {
       });
     });
 
-    it('should set user when session exists', async () => {
-      mockGetSession.mockResolvedValue({ data: { session: mockSession } });
+    it('should set user when session exists via onAuthStateChange', async () => {
+      initialSession = mockSession;
 
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -81,8 +82,6 @@ describe('useAuth', () => {
     });
 
     it('should set user to null when no session', async () => {
-      mockGetSession.mockResolvedValue({ data: { session: null } });
-
       const { result } = renderHook(() => useAuth(), { wrapper });
 
       await waitFor(() => {
@@ -100,6 +99,17 @@ describe('useAuth', () => {
       });
     });
 
+    it('should not call getSession (race condition fix)', async () => {
+      renderHook(() => useAuth(), { wrapper });
+
+      await waitFor(() => {
+        expect(mockOnAuthStateChange).toHaveBeenCalled();
+      });
+
+      // getSession should never be called — the listener handles INITIAL_SESSION
+      // This verifies the race condition fix (SEC-01)
+    });
+
     it('should unsubscribe on unmount', async () => {
       const { unmount } = renderHook(() => useAuth(), { wrapper });
 
@@ -115,7 +125,6 @@ describe('useAuth', () => {
 
   describe('signIn', () => {
     it('should call supabase signInWithPassword', async () => {
-      mockGetSession.mockResolvedValue({ data: { session: null } });
       mockSignInWithPassword.mockResolvedValue({ error: null });
 
       const { result } = renderHook(() => useAuth(), { wrapper });
@@ -135,7 +144,6 @@ describe('useAuth', () => {
     });
 
     it('should return error on failed sign in', async () => {
-      mockGetSession.mockResolvedValue({ data: { session: null } });
       const mockError = new Error('Invalid credentials');
       mockSignInWithPassword.mockResolvedValue({ error: mockError });
 
@@ -156,7 +164,6 @@ describe('useAuth', () => {
 
   describe('signUp', () => {
     it('should call supabase signUp with email and password', async () => {
-      mockGetSession.mockResolvedValue({ data: { session: null } });
       mockSignUp.mockResolvedValue({ error: null });
 
       const { result } = renderHook(() => useAuth(), { wrapper });
@@ -179,7 +186,6 @@ describe('useAuth', () => {
     });
 
     it('should include full name in user metadata', async () => {
-      mockGetSession.mockResolvedValue({ data: { session: null } });
       mockSignUp.mockResolvedValue({ error: null });
 
       const { result } = renderHook(() => useAuth(), { wrapper });
@@ -202,7 +208,6 @@ describe('useAuth', () => {
     });
 
     it('should return error on failed sign up', async () => {
-      mockGetSession.mockResolvedValue({ data: { session: null } });
       const mockError = new Error('Email already exists');
       mockSignUp.mockResolvedValue({ error: mockError });
 
@@ -223,7 +228,7 @@ describe('useAuth', () => {
 
   describe('signOut', () => {
     it('should call supabase signOut', async () => {
-      mockGetSession.mockResolvedValue({ data: { session: mockSession } });
+      initialSession = mockSession;
       mockSignOut.mockResolvedValue({ error: null });
 
       const { result } = renderHook(() => useAuth(), { wrapper });
