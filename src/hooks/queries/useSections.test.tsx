@@ -63,7 +63,7 @@ describe('useSections hooks', () => {
 
   describe('useSections', () => {
     it('should fetch all sections for a page', async () => {
-      const { result } = renderHook(() => useSections('page-1'), { wrapper });
+      const { result } = renderHook(() => useSections('page-1', 'tenant-1'), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -74,7 +74,7 @@ describe('useSections hooks', () => {
 
     it('should not fetch if pageId is undefined', async () => {
       const { sectionsApi } = await import('@/api/sections.api');
-      const { result } = renderHook(() => useSections(undefined), { wrapper });
+      const { result } = renderHook(() => useSections(undefined, 'tenant-1'), { wrapper });
 
       expect(result.current.isLoading).toBe(false);
       expect(sectionsApi.getByPageId).not.toHaveBeenCalled();
@@ -82,7 +82,7 @@ describe('useSections hooks', () => {
 
     it('should not fetch if pageId is null', async () => {
       const { sectionsApi } = await import('@/api/sections.api');
-      const { result } = renderHook(() => useSections(null), { wrapper });
+      const { result } = renderHook(() => useSections(null, 'tenant-1'), { wrapper });
 
       expect(result.current.isLoading).toBe(false);
       expect(sectionsApi.getByPageId).not.toHaveBeenCalled();
@@ -91,7 +91,7 @@ describe('useSections hooks', () => {
 
   describe('useSection', () => {
     it('should fetch a single section by ID', async () => {
-      const { result } = renderHook(() => useSection('section-1'), { wrapper });
+      const { result } = renderHook(() => useSection('section-1', 'tenant-1'), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -102,7 +102,7 @@ describe('useSections hooks', () => {
 
     it('should not fetch if sectionId is undefined', async () => {
       const { sectionsApi } = await import('@/api/sections.api');
-      const { result } = renderHook(() => useSection(undefined), { wrapper });
+      const { result } = renderHook(() => useSection(undefined, 'tenant-1'), { wrapper });
 
       expect(result.current.isLoading).toBe(false);
       expect(sectionsApi.getById).not.toHaveBeenCalled();
@@ -131,11 +131,12 @@ describe('useSections hooks', () => {
 
       await result.current.mutateAsync({
         sectionId: 'section-1',
+        tenantId: 'tenant-1',
         updates: { variant: 'centered' },
       });
 
       const { sectionsApi } = await import('@/api/sections.api');
-      expect(sectionsApi.update).toHaveBeenCalledWith('section-1', { variant: 'centered' });
+      expect(sectionsApi.update).toHaveBeenCalledWith('section-1', 'tenant-1', { variant: 'centered' });
     });
   });
 
@@ -147,11 +148,12 @@ describe('useSections hooks', () => {
 
       await result.current.mutateAsync({
         sectionId: 'section-1',
+        tenantId: 'tenant-1',
         content: newContent,
       });
 
       const { sectionsApi } = await import('@/api/sections.api');
-      expect(sectionsApi.updateContent).toHaveBeenCalledWith('section-1', newContent);
+      expect(sectionsApi.updateContent).toHaveBeenCalledWith('section-1', 'tenant-1', newContent);
     });
   });
 
@@ -159,10 +161,10 @@ describe('useSections hooks', () => {
     it('should delete a section', async () => {
       const { result } = renderHook(() => useDeleteSection(), { wrapper });
 
-      await result.current.mutateAsync('section-1');
+      await result.current.mutateAsync({ sectionId: 'section-1', tenantId: 'tenant-1' });
 
       const { sectionsApi } = await import('@/api/sections.api');
-      expect(sectionsApi.delete).toHaveBeenCalledWith('section-1');
+      expect(sectionsApi.delete).toHaveBeenCalledWith('section-1', 'tenant-1');
     });
   });
 

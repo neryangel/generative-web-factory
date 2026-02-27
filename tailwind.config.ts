@@ -19,7 +19,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "Heebo", "sans-serif"],
+        sans: ["Heebo", "Inter", "sans-serif"],
         hebrew: ["Heebo", "sans-serif"],
       },
       colors: {

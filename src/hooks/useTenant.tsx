@@ -1,5 +1,5 @@
 import type { ReactNode} from 'react';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
 import { useCreateTenant, useTenants } from './queries/useTenants';
@@ -85,15 +85,17 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     await queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all });
   }, [queryClient]);
 
+  const contextValue = useMemo(() => ({
+    tenants,
+    currentTenant,
+    setCurrentTenant,
+    loading: isLoading,
+    createTenant,
+    refetchTenants,
+  }), [tenants, currentTenant, setCurrentTenant, isLoading, createTenant, refetchTenants]);
+
   return (
-    <TenantContext.Provider value={{
-      tenants,
-      currentTenant,
-      setCurrentTenant,
-      loading: isLoading,
-      createTenant,
-      refetchTenants,
-    }}>
+    <TenantContext.Provider value={contextValue}>
       {children}
     </TenantContext.Provider>
   );

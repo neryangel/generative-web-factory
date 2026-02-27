@@ -12,16 +12,29 @@ vi.mock('sonner', () => ({
 
 // Mock supabase
 const mockUpdate = vi.fn();
-const mockEq = vi.fn(() => Promise.resolve({ error: null }));
+const mockEq = vi.fn();
+
+// Build a chainable eq mock: each .eq() returns an object with another .eq()
+// The final .eq() also acts as a thenable (Promise-like) resolving to { error: null }
+function createEqChain() {
+  const result = Promise.resolve({ error: null });
+  const chainable = {
+    eq: (...args: unknown[]) => {
+      mockEq(...args);
+      return chainable;
+    },
+    then: result.then.bind(result),
+    catch: result.catch.bind(result),
+  };
+  return chainable;
+}
 
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     from: (table: string) => ({
       update: (data: unknown) => {
         mockUpdate(table, data);
-        return {
-          eq: mockEq,
-        };
+        return createEqChain();
       },
     }),
   },
@@ -71,7 +84,7 @@ describe('useAutoSave', () => {
       const { result } = renderHook(() => useAutoSave({ debounceMs: 1000 }));
 
       act(() => {
-        result.current.saveSection('section-1', { title: 'Test' });
+        result.current.saveSection('section-1', 'tenant-1', { title: 'Test' });
       });
 
       // Should not have called update yet
@@ -102,7 +115,7 @@ describe('useAutoSave', () => {
       const { result } = renderHook(() => useAutoSave({ debounceMs: 100 }));
 
       act(() => {
-        result.current.savePage('page-1', { title: 'Updated Page' });
+        result.current.savePage('page-1', 'tenant-1', { title: 'Updated Page' });
       });
 
       await act(async () => {
@@ -118,7 +131,7 @@ describe('useAutoSave', () => {
       const { result } = renderHook(() => useAutoSave({ debounceMs: 100 }));
 
       act(() => {
-        result.current.saveSite('site-1', { name: 'Updated Site' });
+        result.current.saveSite('site-1', 'tenant-1', { name: 'Updated Site' });
       });
 
       await act(async () => {
@@ -134,7 +147,7 @@ describe('useAutoSave', () => {
       const { result } = renderHook(() => useAutoSave({ debounceMs: 5000 }));
 
       act(() => {
-        result.current.saveSection('section-1', { title: 'Test' });
+        result.current.saveSection('section-1', 'tenant-1', { title: 'Test' });
       });
 
       expect(mockUpdate).not.toHaveBeenCalled();
@@ -153,7 +166,7 @@ describe('useAutoSave', () => {
       const { result } = renderHook(() => useAutoSave({ debounceMs: 100, onSaveStart }));
 
       act(() => {
-        result.current.saveSection('section-1', { title: 'Test' });
+        result.current.saveSection('section-1', 'tenant-1', { title: 'Test' });
       });
 
       await act(async () => {
@@ -169,9 +182,9 @@ describe('useAutoSave', () => {
       const { result } = renderHook(() => useAutoSave({ debounceMs: 100 }));
 
       act(() => {
-        result.current.saveSection('section-1', { title: 'Section' });
-        result.current.savePage('page-1', { title: 'Page' });
-        result.current.saveSite('site-1', { name: 'Site' });
+        result.current.saveSection('section-1', 'tenant-1', { title: 'Section' });
+        result.current.savePage('page-1', 'tenant-1', { title: 'Page' });
+        result.current.saveSite('site-1', 'tenant-1', { name: 'Site' });
       });
 
       await act(async () => {

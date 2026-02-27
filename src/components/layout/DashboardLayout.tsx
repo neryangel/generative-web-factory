@@ -82,7 +82,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       {currentTenant?.id === tenant.id && (
                         <Check className="h-4 w-4" />
                       )}
-                      <span className={currentTenant?.id !== tenant.id ? 'mr-6' : ''}>
+                      <span className={currentTenant?.id !== tenant.id ? 'me-6' : ''}>
                         {tenant.name}
                       </span>
                     </DropdownMenuItem>
@@ -90,7 +90,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   <DropdownMenuSeparator />
                   <CreateTenantDialog>
                     <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                      <Plus className="ml-2 h-4 w-4" />
+                      <Plus className="ms-2 h-4 w-4" />
                       ארגון חדש
                     </DropdownMenuItem>
                   </CreateTenantDialog>
@@ -104,13 +104,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
-                <Link key={item.href} href={item.href}>
+                <Link key={item.href} href={item.href} aria-current={isActive ? 'page' : undefined}>
                   <Button
                     variant={isActive ? 'secondary' : 'ghost'}
                     size="sm"
                     className="gap-2"
                   >
-                    <item.icon className="h-4 w-4" />
+                    <item.icon aria-hidden="true" className="h-4 w-4" />
                     {item.label}
                   </Button>
                 </Link>
@@ -136,7 +136,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={signOut} className="text-destructive">
-                <LogOut className="ml-2 h-4 w-4" />
+                <LogOut className="ms-2 h-4 w-4" />
                 התנתק
               </DropdownMenuItem>
             </DropdownMenuContent>

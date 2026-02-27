@@ -36,10 +36,11 @@ describe('LoadingSpinner', () => {
   });
 
   describe('text', () => {
-    it('should not render text by default', () => {
+    it('should render sr-only fallback text by default', () => {
       render(<LoadingSpinner />);
 
-      expect(screen.queryByText(/.+/)).not.toBeInTheDocument();
+      const srOnly = screen.getByText('טוען');
+      expect(srOnly).toHaveClass('sr-only');
     });
 
     it('should render text when provided', () => {

@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { Loader2, Plus } from 'lucide-react';
+import { generateSlug } from '@/lib/helpers';
+import { isReservedSlug } from '@/lib/validation-patterns';
 
 interface CreateTenantDialogProps {
   children?: React.ReactNode;
@@ -26,15 +28,6 @@ export function CreateTenantDialog({ children, onSuccess }: CreateTenantDialogPr
   const [loading, setLoading] = useState(false);
   const { createTenant } = useTenant();
 
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
-  };
-
   const handleNameChange = (value: string) => {
     setName(value);
     setSlug(generateSlug(value));
@@ -43,6 +36,11 @@ export function CreateTenantDialog({ children, onSuccess }: CreateTenantDialogPr
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !slug.trim()) return;
+
+    if (isReservedSlug(slug)) {
+      toast.error('שם הכתובת שמור למערכת. נא לבחור שם אחר.');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -78,7 +76,7 @@ export function CreateTenantDialog({ children, onSuccess }: CreateTenantDialogPr
       <DialogTrigger asChild>
         {children || (
           <Button>
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="ms-2 h-4 w-4" />
             ארגון חדש
           </Button>
         )}
@@ -125,7 +123,7 @@ export function CreateTenantDialog({ children, onSuccess }: CreateTenantDialogPr
 
           <div className="flex gap-3 pt-4">
             <Button type="submit" disabled={loading} className="flex-1">
-              {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              {loading && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
               צור ארגון
             </Button>
             <Button 

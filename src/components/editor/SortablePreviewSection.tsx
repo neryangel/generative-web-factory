@@ -1,3 +1,4 @@
+import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Settings2, Trash2 } from 'lucide-react';
@@ -28,7 +29,7 @@ interface SortablePreviewSectionProps {
   onSettingsClick?: () => void;
 }
 
-export function SortablePreviewSection({
+export const SortablePreviewSection = React.memo(function SortablePreviewSection({
   section,
   isSelected,
   isEditing,
@@ -122,4 +123,4 @@ export function SortablePreviewSection({
       />
     </div>
   );
-}
+});

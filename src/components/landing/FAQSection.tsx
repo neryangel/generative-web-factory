@@ -34,14 +34,31 @@ const FAQSection = () => {
     },
   ];
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+
   return (
-    <section 
-      ref={sectionRef} 
-      id="faq" 
-      dir="rtl" 
+    <section
+      ref={sectionRef}
+      id="faq"
+      dir="rtl"
       className="py-16 md:py-24 bg-background relative overflow-hidden"
       aria-labelledby="faq-heading"
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       {/* Decorative Line */}
       <motion.div 
         className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-24 bg-gradient-to-b from-transparent via-primary/30 to-transparent hidden sm:block"

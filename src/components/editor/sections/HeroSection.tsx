@@ -17,6 +17,31 @@ interface HeroContent {
   badge_text?: string;
 }
 
+/**
+ * Sanitize a URL for safe use in CSS url().
+ * Only allows http:, https:, and data: protocols.
+ * Rejects characters that could break out of the CSS url() context
+ * (parentheses, quotes, semicolons, backslashes, newlines).
+ * Returns empty string for invalid URLs.
+ */
+function sanitizeCssUrl(url: string | undefined): string {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  // Only allow safe protocols
+  if (
+    !trimmed.startsWith('https://') &&
+    !trimmed.startsWith('http://') &&
+    !trimmed.startsWith('data:image/')
+  ) {
+    return '';
+  }
+  // Reject characters that can break out of CSS url() context
+  if (/[()'"\\;\n\r]/.test(trimmed)) {
+    return '';
+  }
+  return trimmed;
+}
+
 export function HeroSection({
   content,
   variant = 'default',
@@ -151,7 +176,7 @@ export function HeroSection({
         style={{ fontFamily: fonts.body }}
       >
         <div className="absolute inset-0 bg-[length:400%_400%] animate-gradient" style={{ background: `linear-gradient(-45deg, ${colors.primary}, ${colors.secondary}, ${colors.accent}, ${colors.primary})`, backgroundSize: '400% 400%' }} />
-        {heroContent.background_image && <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroContent.background_image})` }} />}
+        {sanitizeCssUrl(heroContent.background_image) && <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${sanitizeCssUrl(heroContent.background_image)})` }} />}
         <div className="absolute inset-0 bg-black/50" />
         <div className="absolute inset-0 noise-texture" />
 
@@ -197,7 +222,7 @@ export function HeroSection({
       style={{ fontFamily: fonts.body }}
     >
       <div className="absolute inset-0 animated-gradient-bg" style={{ background: `linear-gradient(135deg, ${colors.primary}40 0%, ${colors.secondary}60 50%, ${colors.accent}40 100%)` }} />
-      {heroContent.background_image && <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroContent.background_image})` }} />}
+      {sanitizeCssUrl(heroContent.background_image) && <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${sanitizeCssUrl(heroContent.background_image)})` }} />}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" style={{ opacity: heroContent.overlay_opacity ?? 0.7 }} />
       <div className="absolute inset-0" style={{ background: 'var(--gradient-mesh)', opacity: 0.5 }} />
       <div className="absolute inset-0 grid-pattern opacity-30" />

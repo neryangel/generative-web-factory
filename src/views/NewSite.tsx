@@ -25,6 +25,7 @@ import {
 import { toast } from 'sonner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { isReservedSlug } from '@/lib/validation-patterns';
+import { generateSlug } from '@/lib/helpers';
 import type { Tables } from '@/integrations/supabase/types';
 import type { BlueprintPage, BlueprintSchema } from '@/types/site.types';
 
@@ -143,15 +144,6 @@ export default function NewSite() {
     );
   }
 
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
-  };
-
   const handleNameChange = (value: string) => {
     setSiteName(value);
     setSiteSlug(generateSlug(value));
@@ -174,10 +166,15 @@ export default function NewSite() {
 
     try {
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-      if (!supabaseUrl || !supabaseKey) {
+      if (!supabaseUrl) {
         throw new Error('Supabase configuration is missing');
+      }
+
+      // Use the authenticated user's session token instead of the anon key
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('יש להתחבר מחדש כדי להשתמש בתכונה זו');
       }
 
       const response = await fetch(
@@ -186,7 +183,7 @@ export default function NewSite() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${supabaseKey}`,
+            Authorization: `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({ brief: brief.trim() }),
           signal: abortController.signal,
@@ -252,9 +249,11 @@ export default function NewSite() {
       if (siteError) throw siteError;
 
       // Create pages and sections from blueprint
+      let sectionFailures = 0;
+
       for (let i = 0; i < generatedBlueprint.pages.length; i++) {
         const pageBlueprint = generatedBlueprint.pages[i];
-        
+
         const { data: page, error: pageError } = await supabase
           .from('pages')
           .insert({
@@ -288,11 +287,16 @@ export default function NewSite() {
 
           if (sectionsError) {
             console.error('Error creating sections:', sectionsError);
+            sectionFailures += sectionsToInsert.length;
           }
         }
       }
 
-      toast.success('האתר נוצר בהצלחה!');
+      if (sectionFailures > 0) {
+        toast.warning(`האתר נוצר, אך ${sectionFailures} סקשנים לא נוצרו בהצלחה. ניתן להוסיף אותם ידנית.`);
+      } else {
+        toast.success('האתר נוצר בהצלחה!');
+      }
       router.push(`/dashboard/sites/${site.id}`);
     } catch (error) {
       console.error('Error creating site:', error);
@@ -334,11 +338,12 @@ export default function NewSite() {
       if (siteError) throw siteError;
 
       // Create default pages based on template
+      let sectionFailures = 0;
       const blueprintSchema = selectedTemplate.blueprint_schema as BlueprintSchema;
       if (blueprintSchema?.pages) {
         for (let i = 0; i < blueprintSchema.pages.length; i++) {
           const pageBlueprint: BlueprintPage = blueprintSchema.pages[i];
-          
+
           const { data: page, error: pageError } = await supabase
             .from('pages')
             .insert({
@@ -377,7 +382,7 @@ export default function NewSite() {
                 sectionContent = (sectionDef?.default_content as Record<string, unknown>) || {};
               }
 
-              await supabase
+              const { error: sectionError } = await supabase
                 .from('sections')
                 .insert({
                   page_id: page.id,
@@ -387,12 +392,21 @@ export default function NewSite() {
                   content: sectionContent,
                   sort_order: j,
                 });
+
+              if (sectionError) {
+                console.error('Error creating section:', sectionError);
+                sectionFailures++;
+              }
             }
           }
         }
       }
 
-      toast.success('האתר נוצר בהצלחה!');
+      if (sectionFailures > 0) {
+        toast.warning(`האתר נוצר, אך ${sectionFailures} סקשנים לא נוצרו בהצלחה. ניתן להוסיף אותם ידנית.`);
+      } else {
+        toast.success('האתר נוצר בהצלחה!');
+      }
       router.push(`/dashboard/sites/${site.id}`);
     } catch (error) {
       console.error('Error creating site:', error);
@@ -453,9 +467,12 @@ export default function NewSite() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <Card 
+              <Card
                 className="cursor-pointer hover:shadow-lg transition-all hover:border-primary group"
                 onClick={() => setMode('template')}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMode('template'); } }}
               >
                 <CardHeader className="text-center pb-2">
                   <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-4 bg-primary/10 group-hover:bg-primary/20 transition-colors">
@@ -468,9 +485,12 @@ export default function NewSite() {
                 </CardHeader>
               </Card>
 
-              <Card 
+              <Card
                 className="cursor-pointer hover:shadow-lg transition-all hover:border-accent group"
                 onClick={() => setMode('ai')}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMode('ai'); } }}
               >
                 <CardHeader className="text-center pb-2">
                   <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-4 bg-accent/10 group-hover:bg-accent/20 transition-colors">

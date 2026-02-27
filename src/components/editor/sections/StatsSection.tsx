@@ -264,7 +264,7 @@ function DefaultVariant({
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-dark border border-white/20 mb-6">
-            <LucideIcons.TrendingUp className="w-4 h-4 text-cyan-400" />
+            <TrendingUp className="w-4 h-4 text-cyan-400" />
             <span className="text-sm text-white/80">המספרים מדברים</span>
           </div>
 

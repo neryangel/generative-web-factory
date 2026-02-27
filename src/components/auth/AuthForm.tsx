@@ -59,8 +59,9 @@ export function AuthForm() {
     }
 
     try {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
+        redirectTo: `${siteUrl}/auth/reset-password`,
       });
 
       if (error) {
@@ -171,7 +172,7 @@ export function AuthForm() {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              {loading && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
               {mode === 'signin' ? 'התחבר' : 'הירשם'}
             </Button>
           </form>

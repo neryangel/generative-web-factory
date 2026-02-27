@@ -123,6 +123,8 @@ const ClientLogosMarquee = () => {
         className="flex items-center justify-center px-10 md:px-14"
         whileHover={{ scale: 1.1 }}
         transition={{ type: "spring", stiffness: 300 }}
+        role="img"
+        aria-label={logo.name}
       >
         <Logo className="h-6 md:h-8 w-auto opacity-40 hover:opacity-100 transition-all duration-500 text-muted-foreground hover:text-foreground" />
       </motion.div>

@@ -54,6 +54,58 @@ describe('sanitizeHtml', () => {
     expect(output).not.toContain('<iframe');
     expect(output).toContain('<p>Content</p>');
   });
+
+  it('handles empty string input', () => {
+    expect(sanitizeHtml('')).toBe('');
+  });
+
+  it('strips form and input tags', () => {
+    const input = '<form action="/steal"><input type="text" name="password"></form>';
+    const output = sanitizeHtml(input);
+    expect(output).not.toContain('<form');
+    expect(output).not.toContain('<input');
+  });
+
+  it('strips object and embed tags', () => {
+    const input = '<object data="evil.swf"></object><embed src="evil.swf">';
+    const output = sanitizeHtml(input);
+    expect(output).not.toContain('<object');
+    expect(output).not.toContain('<embed');
+  });
+
+  it('strips style tags', () => {
+    const input = '<style>body { background: url("evil.com") }</style><p>Text</p>';
+    const output = sanitizeHtml(input);
+    expect(output).not.toContain('<style');
+    expect(output).toContain('<p>Text</p>');
+  });
+
+  it('handles RTL/Hebrew text correctly', () => {
+    const input = '<p>שלום עולם</p>';
+    const output = sanitizeHtml(input);
+    expect(output).toContain('שלום עולם');
+    expect(output).toContain('<p>');
+  });
+
+  it('strips onmouseover event handler', () => {
+    const input = '<div onmouseover="alert(1)">Hover me</div>';
+    const output = sanitizeHtml(input);
+    expect(output).not.toContain('onmouseover');
+    expect(output).toContain('Hover me');
+  });
+
+  it('strips onload event handler from img', () => {
+    const input = '<img src="valid.jpg" onload="alert(1)">';
+    const output = sanitizeHtml(input);
+    expect(output).not.toContain('onload');
+  });
+
+  it('preserves allowed img attributes', () => {
+    const input = '<img src="photo.jpg" alt="A photo" width="100" height="100">';
+    const output = sanitizeHtml(input);
+    expect(output).toContain('src="photo.jpg"');
+    expect(output).toContain('alt="A photo"');
+  });
 });
 
 describe('sanitizeText', () => {
@@ -86,6 +138,22 @@ describe('sanitizeText', () => {
     expect(output).not.toContain('onerror');
     expect(output).not.toContain('alert');
     expect(output).toContain('Text');
+  });
+
+  it('handles empty string', () => {
+    expect(sanitizeText('')).toBe('');
+  });
+
+  it('handles RTL/Hebrew text', () => {
+    const input = 'שלום <b>עולם</b>';
+    const output = sanitizeText(input);
+    expect(output).toBe('שלום עולם');
+  });
+
+  it('handles deeply nested HTML', () => {
+    const input = '<div><div><div><p><span>Deep text</span></p></div></div></div>';
+    const output = sanitizeText(input);
+    expect(output).toBe('Deep text');
   });
 });
 
@@ -169,5 +237,50 @@ describe('sanitizeSectionContent', () => {
 
     expect(output.level1.level2.level3.text).not.toContain('<script');
     expect(output.level1.level2.level3.text).toContain('Deep text');
+  });
+
+  it('handles empty object', () => {
+    const input = {};
+    const output = sanitizeSectionContent(input);
+    expect(output).toEqual({});
+  });
+
+  it('preserves undefined values', () => {
+    const input = { key: undefined };
+    const output = sanitizeSectionContent(input);
+    expect(output.key).toBeUndefined();
+  });
+
+  it('handles arrays with mixed types', () => {
+    const input = {
+      items: [
+        '<script>bad</script>text',
+        42,
+        true,
+        null,
+        { nested: '<b>ok</b>' },
+      ],
+    };
+    const output = sanitizeSectionContent(input);
+
+    expect(output.items[0]).not.toContain('<script');
+    expect(output.items[0]).toContain('text');
+    expect(output.items[1]).toBe(42);
+    expect(output.items[2]).toBe(true);
+    expect(output.items[3]).toBe(null);
+    expect((output.items[4] as Record<string, string>).nested).toContain('<b>ok</b>');
+  });
+
+  it('handles empty arrays', () => {
+    const input = { items: [] };
+    const output = sanitizeSectionContent(input);
+    expect(output.items).toEqual([]);
+  });
+
+  it('handles empty strings in objects', () => {
+    const input = { text: '', title: 'Valid' };
+    const output = sanitizeSectionContent(input);
+    expect(output.text).toBe('');
+    expect(output.title).toBe('Valid');
   });
 });

@@ -13,9 +13,10 @@ const ALLOWED_ORIGINS = [
 
 export function getCorsHeaders(req: Request): Record<string, string> {
   const origin = req.headers.get("Origin");
+  // Only allow the specific project Vercel preview domain, not any *.vercel.app
   const isAllowed = origin && (
     ALLOWED_ORIGINS.includes(origin) ||
-    origin.endsWith('.vercel.app')
+    /^https:\/\/generative-web-factory[a-z0-9-]*\.vercel\.app$/.test(origin)
   );
 
   return {

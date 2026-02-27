@@ -39,6 +39,11 @@ export function SiteSettingsDialog({ site, onUpdate, children }: SiteSettingsDia
   );
 
   const handleSave = async () => {
+    if (!name.trim()) {
+      toast.error('שם האתר לא יכול להיות ריק');
+      return;
+    }
+
     setSaving(true);
     try {
       const { data, error } = await supabase
@@ -129,7 +134,7 @@ export function SiteSettingsDialog({ site, onUpdate, children }: SiteSettingsDia
             </div>
 
             <Button onClick={handleSave} disabled={saving} className="w-full">
-              {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              {saving && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
               שמור שינויים
             </Button>
           </TabsContent>
@@ -175,7 +180,7 @@ export function SiteSettingsDialog({ site, onUpdate, children }: SiteSettingsDia
             </div>
 
             <Button onClick={handleSave} disabled={saving} className="w-full">
-              {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              {saving && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
               שמור שינויים
             </Button>
           </TabsContent>

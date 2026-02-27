@@ -91,7 +91,7 @@ export function SortableSectionList({
               <GripVertical className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium capitalize">{activeSection.type}</span>
             </div>
-            <span className="text-xs text-muted-foreground mr-6">
+            <span className="text-xs text-muted-foreground me-6">
               {activeSection.variant}
             </span>
           </div>

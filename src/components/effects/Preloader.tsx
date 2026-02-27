@@ -12,16 +12,23 @@ export function Preloader({ onComplete, minDuration = 2000 }: PreloaderProps) {
 
   useEffect(() => {
     const startTime = Date.now();
-    
-    // Simulate loading progress
-    const progressInterval = setInterval(() => {
-      setProgress(prev => {
-        const elapsed = Date.now() - startTime;
-        const targetProgress = Math.min((elapsed / minDuration) * 100, 100);
-        const newProgress = prev + (targetProgress - prev) * 0.1;
-        return Math.min(newProgress, 100);
-      });
-    }, 50);
+    let rafId: number;
+    let currentProgress = 0;
+
+    // Animate loading progress with requestAnimationFrame
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const targetProgress = Math.min((elapsed / minDuration) * 100, 100);
+      currentProgress = currentProgress + (targetProgress - currentProgress) * 0.1;
+      const clampedProgress = Math.min(currentProgress, 100);
+      setProgress(clampedProgress);
+
+      if (elapsed < minDuration) {
+        rafId = requestAnimationFrame(animate);
+      }
+    };
+
+    rafId = requestAnimationFrame(animate);
 
     // Complete after minimum duration
     const timeout = setTimeout(() => {
@@ -33,7 +40,7 @@ export function Preloader({ onComplete, minDuration = 2000 }: PreloaderProps) {
     }, minDuration);
 
     return () => {
-      clearInterval(progressInterval);
+      cancelAnimationFrame(rafId);
       clearTimeout(timeout);
     };
   }, [minDuration, onComplete]);
@@ -62,7 +69,7 @@ export function Preloader({ onComplete, minDuration = 2000 }: PreloaderProps) {
               animate={{ clipPath: 'inset(0 0% 0 0)' }}
               transition={{ duration: 1, delay: 0.3, ease: [0.76, 0, 0.24, 1] }}
             >
-              Starter
+              AMDIR
             </motion.div>
             
             {/* Decorative line */}

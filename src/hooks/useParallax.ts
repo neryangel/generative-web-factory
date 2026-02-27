@@ -25,9 +25,6 @@ export function useParallax({
   offset = ['start end', 'end start'],
 }: UseParallaxOptions = {}): UseParallaxReturn {
   const ref = useRef<HTMLElement>(null);
-  // Reserved for future element position tracking
-  const [_elementTop, _setElementTop] = useState(0);
-  const [_elementHeight, _setElementHeight] = useState(0);
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -108,19 +105,35 @@ export function useScrollReveal(threshold = 0.1) {
 // Hook for mouse-based parallax (for hero sections)
 export function useMouseParallax(intensity = 0.02) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const positionRef = useRef({ x: 0, y: 0 });
+  const rafIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX - window.innerWidth / 2) * intensity;
-      const y = (e.clientY - window.innerHeight / 2) * intensity;
-      setPosition({ x, y });
+      positionRef.current = {
+        x: (e.clientX - window.innerWidth / 2) * intensity,
+        y: (e.clientY - window.innerHeight / 2) * intensity,
+      };
+
+      if (rafIdRef.current === null) {
+        rafIdRef.current = requestAnimationFrame(() => {
+          setPosition({ ...positionRef.current });
+          rafIdRef.current = null;
+        });
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+    };
   }, [intensity]);
 
   return position;

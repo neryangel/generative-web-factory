@@ -33,6 +33,7 @@ const HowItWorksSection = () => {
       ref={sectionRef}
       dir="rtl"
       className="relative py-24 bg-background overflow-hidden"
+      aria-labelledby="how-it-works-heading"
     >
       {/* Decorative Lines */}
       <svg 
@@ -62,6 +63,7 @@ const HowItWorksSection = () => {
             איך זה עובד
           </motion.p>
           <motion.h2
+            id="how-it-works-heading"
             className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground mb-4"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}

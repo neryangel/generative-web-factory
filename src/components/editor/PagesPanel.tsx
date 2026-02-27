@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import {
   FileText,
   Home,
@@ -56,6 +57,7 @@ export function PagesPanel({
   const [newPageSlug, setNewPageSlug] = useState('');
   const [creating, setCreating] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const handleTitleChange = (title: string) => {
     setNewPageTitle(title);
@@ -182,7 +184,7 @@ export function PagesPanel({
                 className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
                 onClick={(e) => {
                   e.stopPropagation();
-                  void handleDeletePage(page.id);
+                  setConfirmDeleteId(page.id);
                 }}
                 disabled={deletingId === page.id}
               >
@@ -203,6 +205,23 @@ export function PagesPanel({
           <p className="text-sm">אין עמודים</p>
         </div>
       )}
+
+      {/* Confirm Delete Dialog */}
+      <ConfirmDialog
+        open={!!confirmDeleteId}
+        onOpenChange={(open) => { if (!open) setConfirmDeleteId(null); }}
+        title="מחיקת עמוד"
+        description="האם אתה בטוח שברצונך למחוק את העמוד? פעולה זו לא ניתנת לביטול."
+        confirmText="מחק"
+        cancelText="ביטול"
+        variant="destructive"
+        onConfirm={() => {
+          if (confirmDeleteId) {
+            void handleDeletePage(confirmDeleteId);
+            setConfirmDeleteId(null);
+          }
+        }}
+      />
 
       {/* Create Page Dialog */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>

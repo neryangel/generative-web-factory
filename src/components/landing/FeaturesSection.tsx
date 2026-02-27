@@ -80,6 +80,7 @@ const FeaturesSection = () => {
       ref={sectionRef}
       dir="rtl"
       className="relative py-16 md:py-24 bg-card/30 overflow-hidden"
+      aria-labelledby="features-heading"
     >
       {/* Background Decorations - Hidden on mobile for performance */}
       <div className="absolute top-20 right-10 w-48 md:w-72 h-48 md:h-72 bg-primary/5 rounded-full blur-3xl hidden sm:block" />
@@ -97,6 +98,7 @@ const FeaturesSection = () => {
             השירותים שלנו
           </motion.p>
           <motion.h2
+            id="features-heading"
             className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-foreground mb-3 md:mb-4"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}

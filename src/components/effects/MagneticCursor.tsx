@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 export function MagneticCursor() {
   const [isVisible, setIsVisible] = useState(false);
+  const isVisibleRef = useRef(false);
   const [cursorVariant, setCursorVariant] = useState<'default' | 'hover'>('default');
   // Start with null to avoid hydration mismatch - will be set in useEffect
   const [isTouchDevice, setIsTouchDevice] = useState<boolean | null>(null);
@@ -25,11 +26,20 @@ export function MagneticCursor() {
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
-      setIsVisible(true);
+      if (!isVisibleRef.current) {
+        isVisibleRef.current = true;
+        setIsVisible(true);
+      }
     };
 
-    const handleMouseLeave = () => setIsVisible(false);
-    const handleMouseEnter = () => setIsVisible(true);
+    const handleMouseLeave = () => {
+      isVisibleRef.current = false;
+      setIsVisible(false);
+    };
+    const handleMouseEnter = () => {
+      isVisibleRef.current = true;
+      setIsVisible(true);
+    };
 
     // Detect hover states for interactive elements only
     const handleElementHover = (e: MouseEvent) => {

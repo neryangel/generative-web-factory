@@ -120,7 +120,7 @@ export function SplitText({
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-50px' }}
-          className="inline-block mr-[0.25em]"
+          className="inline-block me-[0.25em]"
         >
           {word}
         </motion.span>
@@ -176,7 +176,7 @@ export function WordReveal({ children, className = '', delay = 0 }: WordRevealPr
         <span
           key={i}
           className="inline-block overflow-hidden"
-          style={{ marginRight: '0.25em' }}
+          style={{ marginInlineEnd: '0.25em' }}
         >
           <motion.span
             className="inline-block"

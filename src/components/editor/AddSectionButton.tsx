@@ -33,7 +33,7 @@ export function AddSectionButton({
             size="sm"
             className="mx-2 h-7 px-2 opacity-0 group-hover:opacity-100 transition-opacity"
           >
-            <Plus className="h-4 w-4 ml-1" />
+            <Plus className="h-4 w-4 ms-1" />
             הוסף סקשן
           </Button>
           <div className="flex-1 h-px bg-border group-hover:bg-primary/50 transition-colors" />

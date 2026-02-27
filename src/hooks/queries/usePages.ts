@@ -1,39 +1,41 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { pagesApi } from '@/api/pages.api';
+import { queryKeys } from '@/lib/query-keys';
 import type { PageInsert, PageUpdate } from '@/types';
 
-export const PAGES_QUERY_KEY = ['pages'];
+/** @deprecated Use queryKeys.pages from '@/lib/query-keys' instead */
+export const PAGES_QUERY_KEY = queryKeys.pages.all;
 
 /**
  * Hook to fetch all pages for a site
  */
-export function usePages(siteId: string | undefined) {
+export function usePages(siteId: string | undefined, tenantId: string | undefined) {
   return useQuery({
-    queryKey: [...PAGES_QUERY_KEY, siteId],
-    queryFn: () => pagesApi.getBySiteId(siteId!),
-    enabled: !!siteId,
+    queryKey: queryKeys.pages.list(siteId) ?? ['_disabled'],
+    queryFn: () => pagesApi.getBySiteId(siteId!, tenantId!),
+    enabled: !!siteId && !!tenantId,
   });
 }
 
 /**
  * Hook to fetch a single page
  */
-export function usePage(pageId: string | undefined) {
+export function usePage(pageId: string | undefined, tenantId: string | undefined) {
   return useQuery({
-    queryKey: [...PAGES_QUERY_KEY, 'detail', pageId],
-    queryFn: () => pagesApi.getById(pageId!),
-    enabled: !!pageId,
+    queryKey: queryKeys.pages.detail(pageId) ?? ['_disabled'],
+    queryFn: () => pagesApi.getById(pageId!, tenantId!),
+    enabled: !!pageId && !!tenantId,
   });
 }
 
 /**
  * Hook to fetch homepage for a site
  */
-export function useHomepage(siteId: string | undefined) {
+export function useHomepage(siteId: string | undefined, tenantId: string | undefined) {
   return useQuery({
-    queryKey: [...PAGES_QUERY_KEY, 'homepage', siteId],
-    queryFn: () => pagesApi.getHomepage(siteId!),
-    enabled: !!siteId,
+    queryKey: [...queryKeys.pages.all, 'homepage', siteId],
+    queryFn: () => pagesApi.getHomepage(siteId!, tenantId!),
+    enabled: !!siteId && !!tenantId,
   });
 }
 
@@ -46,7 +48,7 @@ export function useCreatePage() {
   return useMutation({
     mutationFn: (page: PageInsert) => pagesApi.create(page),
     onSuccess: (data) => {
-      void queryClient.invalidateQueries({ queryKey: [...PAGES_QUERY_KEY, data.site_id] });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.pages.list(data.site_id) });
     },
   });
 }
@@ -58,10 +60,10 @@ export function useUpdatePage() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ pageId, updates }: { pageId: string; updates: PageUpdate }) =>
-      pagesApi.update(pageId, updates),
+    mutationFn: ({ pageId, tenantId, updates }: { pageId: string; tenantId: string; updates: PageUpdate }) =>
+      pagesApi.update(pageId, tenantId, updates),
     onSuccess: (data) => {
-      void queryClient.invalidateQueries({ queryKey: [...PAGES_QUERY_KEY, data.site_id] });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.pages.list(data.site_id) });
     },
   });
 }
@@ -73,9 +75,10 @@ export function useDeletePage() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (pageId: string) => pagesApi.delete(pageId),
+    mutationFn: ({ pageId, tenantId }: { pageId: string; tenantId: string }) =>
+      pagesApi.delete(pageId, tenantId),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.pages.all });
     },
   });
 }
@@ -90,7 +93,7 @@ export function useReorderPages() {
     mutationFn: (pages: Array<{ id: string; sort_order: number }>) =>
       pagesApi.updateOrder(pages),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.pages.all });
     },
   });
 }

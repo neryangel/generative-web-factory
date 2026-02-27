@@ -43,15 +43,16 @@ export default function Settings() {
 
     setSaving(true);
     try {
+      const sanitizedName = sanitizeText(fullName);
       const { error } = await supabase.auth.updateUser({
-        data: { full_name: fullName },
+        data: { full_name: sanitizedName },
       });
 
       if (error) throw error;
 
       await supabase
         .from('profiles')
-        .update({ full_name: fullName })
+        .update({ full_name: sanitizedName })
         .eq('user_id', user.id);
 
       toast.success('הפרופיל עודכן בהצלחה');
@@ -69,9 +70,10 @@ export default function Settings() {
 
     setSaving(true);
     try {
+      const sanitizedTenantName = sanitizeText(tenantName);
       const { error } = await supabase
         .from('tenants')
-        .update({ name: tenantName })
+        .update({ name: sanitizedTenantName })
         .eq('id', currentTenant.id);
 
       if (error) throw error;
@@ -168,7 +170,7 @@ export default function Settings() {
                   </div>
 
                   <Button type="submit" disabled={saving}>
-                    {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                    {saving && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
                     שמור שינויים
                   </Button>
                 </form>
@@ -224,7 +226,7 @@ export default function Settings() {
                     </div>
 
                     <Button type="submit" disabled={saving || currentTenant.role !== 'owner'}>
-                      {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                      {saving && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
                       שמור שינויים
                     </Button>
                     

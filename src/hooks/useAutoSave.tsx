@@ -16,28 +16,14 @@ type SaveableTable = 'sections' | 'pages' | 'sites';
 interface SaveOperation {
   table: SaveableTable;
   id: string;
+  tenantId: string;
   data: Record<string, unknown>;
   version: number; // Track operation version for race condition prevention
   retryCount: number;
 }
 
-// Track the latest version for each entity to prevent stale updates
-const entityVersions = new Map<string, number>();
-
 function getEntityKey(table: string, id: string): string {
   return `${table}:${id}`;
-}
-
-function getNextVersion(key: string): number {
-  const current = entityVersions.get(key) || 0;
-  const next = current + 1;
-  entityVersions.set(key, next);
-  return next;
-}
-
-function isLatestVersion(key: string, version: number): boolean {
-  const current = entityVersions.get(key) || 0;
-  return version >= current;
 }
 
 export function useAutoSave(options: AutoSaveOptions = {}) {
@@ -48,6 +34,21 @@ export function useAutoSave(options: AutoSaveOptions = {}) {
   const pendingOperations = useRef<Map<string, SaveOperation>>(new Map());
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const saveInProgressRef = useRef(false);
+
+  // Track the latest version for each entity to prevent stale updates (per-hook instance)
+  const entityVersionsRef = useRef<Map<string, number>>(new Map());
+
+  function getNextVersion(key: string): number {
+    const current = entityVersionsRef.current.get(key) || 0;
+    const next = current + 1;
+    entityVersionsRef.current.set(key, next);
+    return next;
+  }
+
+  function isLatestVersion(key: string, version: number): boolean {
+    const current = entityVersionsRef.current.get(key) || 0;
+    return version >= current;
+  }
 
   const flushSave = useCallback(async () => {
     // Prevent concurrent flush operations
@@ -85,7 +86,8 @@ export function useAutoSave(options: AutoSaveOptions = {}) {
             const { error } = await supabase
               .from(table as SaveableTable)
               .update(op.data)
-              .eq('id', op.id);
+              .eq('id', op.id)
+              .eq('tenant_id', op.tenantId);
 
             if (error) {
               throw error;
@@ -152,10 +154,11 @@ export function useAutoSave(options: AutoSaveOptions = {}) {
     timeoutRef.current = setTimeout(flushSave, debounceMs);
   }, [debounceMs, flushSave]);
 
-  const saveSection = useCallback((sectionId: string, content: Record<string, unknown>, settings?: Record<string, unknown>) => {
+  const saveSection = useCallback((sectionId: string, tenantId: string, content: Record<string, unknown>, settings?: Record<string, unknown>) => {
     queueSave({
       table: 'sections',
       id: sectionId,
+      tenantId,
       data: {
         content,
         ...(settings && { settings }),
@@ -164,10 +167,11 @@ export function useAutoSave(options: AutoSaveOptions = {}) {
     });
   }, [queueSave]);
 
-  const savePage = useCallback((pageId: string, data: Record<string, unknown>) => {
+  const savePage = useCallback((pageId: string, tenantId: string, data: Record<string, unknown>) => {
     queueSave({
       table: 'pages',
       id: pageId,
+      tenantId,
       data: {
         ...data,
         updated_at: new Date().toISOString(),
@@ -175,10 +179,11 @@ export function useAutoSave(options: AutoSaveOptions = {}) {
     });
   }, [queueSave]);
 
-  const saveSite = useCallback((siteId: string, data: Record<string, unknown>) => {
+  const saveSite = useCallback((siteId: string, tenantId: string, data: Record<string, unknown>) => {
     queueSave({
       table: 'sites',
       id: siteId,
+      tenantId,
       data: {
         ...data,
         updated_at: new Date().toISOString(),

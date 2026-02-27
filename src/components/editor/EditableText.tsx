@@ -70,6 +70,7 @@ export const EditableText = forwardRef<HTMLElement, EditableTextProps>(({
         onChange={(e) => setLocalValue(e.target.value)}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
+        aria-label={placeholder}
         className={cn(
           'bg-transparent border-none outline-none resize-none w-full',
           'focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded',
@@ -83,7 +84,7 @@ export const EditableText = forwardRef<HTMLElement, EditableTextProps>(({
   }
 
   return (
-    <Component 
+    <Component
       className={cn(
         className,
         'cursor-text hover:bg-primary/10 rounded px-1 -mx-1 transition-colors',
@@ -91,9 +92,19 @@ export const EditableText = forwardRef<HTMLElement, EditableTextProps>(({
       )}
       style={style}
       ref={ref as React.Ref<HTMLElement>}
+      role="button"
+      tabIndex={0}
+      aria-label={`לחץ לעריכת: ${value || placeholder}`}
       onClick={(e) => {
         e.stopPropagation();
         setIsActive(true);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsActive(true);
+        }
       }}
     >
       {value || <span className="text-muted-foreground italic">{placeholder}</span>}

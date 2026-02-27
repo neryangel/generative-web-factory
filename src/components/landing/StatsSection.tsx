@@ -96,29 +96,31 @@ const StatsSection = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
+                aria-label={`${stat.label}: ${stat.decimals ? stat.value.toFixed(stat.decimals) : stat.value}${stat.suffix}`}
               >
-                <motion.div 
+                <motion.div
                   className="relative p-6 md:p-8 rounded-xl bg-background/50 border border-primary/10 hover:border-primary/30 transition-all duration-300 group"
                   whileHover={{ y: -5, boxShadow: "0 20px 40px -20px hsl(var(--primary) / 0.15)" }}
                 >
                   {/* Icon */}
-                  <motion.div 
+                  <motion.div
                     className="inline-flex w-12 h-12 rounded-full border border-primary/30 items-center justify-center mb-4 group-hover:border-primary group-hover:bg-primary/10 transition-all duration-300"
                     whileHover={{ rotate: 360 }}
                     transition={{ duration: 0.6 }}
                   >
-                    <Icon className="w-5 h-5 text-primary" />
+                    <Icon aria-hidden="true" className="w-5 h-5 text-primary" />
                   </motion.div>
 
                   {/* Value */}
-                  <div className="text-3xl md:text-4xl font-bold mb-2">
-                    <AnimatedCounter 
-                      value={stat.value} 
-                      suffix={stat.suffix} 
+                  <div className="text-3xl md:text-4xl font-bold mb-2" aria-hidden="true">
+                    <AnimatedCounter
+                      value={stat.value}
+                      suffix={stat.suffix}
                       decimals={stat.decimals}
                       isInView={isInView}
                     />
                   </div>
+                  <span className="sr-only">{stat.decimals ? stat.value.toFixed(stat.decimals) : stat.value}{stat.suffix}</span>
 
                   {/* Label */}
                   <p className="text-sm text-muted-foreground">{stat.label}</p>

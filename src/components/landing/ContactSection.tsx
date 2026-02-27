@@ -202,28 +202,32 @@ const ContactSection = React.forwardRef<HTMLElement>((_, ref) => {
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.5, delay: 0.4 }}
                 >
-                  <label className="text-xs text-muted-foreground mb-2 block">
+                  <label htmlFor="contact-name" className="text-xs text-muted-foreground mb-2 block">
                     שם מלא *
                   </label>
                   <Input
+                    id="contact-name"
                     value={formData.name}
                     onChange={(e) => handleChange('name', e.target.value)}
                     onBlur={(e) => validateField('name', e.target.value)}
                     placeholder="ישראל ישראלי"
                     className={`bg-background border-primary/20 focus:border-primary h-12 transition-all duration-300 ${errors.name ? 'border-red-500' : ''}`}
                     disabled={isSubmitting}
+                    aria-invalid={!!errors.name}
+                    aria-describedby={errors.name ? 'contact-name-error' : undefined}
                   />
-                  {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                  {errors.name && <p id="contact-name-error" role="alert" className="text-red-500 text-xs mt-1">{errors.name}</p>}
                 </motion.div>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.5, delay: 0.5 }}
                 >
-                  <label className="text-xs text-muted-foreground mb-2 block">
+                  <label htmlFor="contact-email" className="text-xs text-muted-foreground mb-2 block">
                     אימייל *
                   </label>
                   <Input
+                    id="contact-email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleChange('email', e.target.value)}
@@ -231,8 +235,10 @@ const ContactSection = React.forwardRef<HTMLElement>((_, ref) => {
                     placeholder="israel@example.com"
                     className={`bg-background border-primary/20 focus:border-primary h-12 transition-all duration-300 ${errors.email ? 'border-red-500' : ''}`}
                     disabled={isSubmitting}
+                    aria-invalid={!!errors.email}
+                    aria-describedby={errors.email ? 'contact-email-error' : undefined}
                   />
-                  {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                  {errors.email && <p id="contact-email-error" role="alert" className="text-red-500 text-xs mt-1">{errors.email}</p>}
                 </motion.div>
               </div>
               
@@ -241,10 +247,11 @@ const ContactSection = React.forwardRef<HTMLElement>((_, ref) => {
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.6 }}
               >
-                <label className="text-xs text-muted-foreground mb-2 block">
+                <label htmlFor="contact-phone" className="text-xs text-muted-foreground mb-2 block">
                   מספר טלפון
                 </label>
                 <Input
+                  id="contact-phone"
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => handleChange('phone', e.target.value)}
@@ -259,18 +266,21 @@ const ContactSection = React.forwardRef<HTMLElement>((_, ref) => {
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.7 }}
               >
-                <label className="text-xs text-muted-foreground mb-2 block">
+                <label htmlFor="contact-message" className="text-xs text-muted-foreground mb-2 block">
                   ההודעה שלכם *
                 </label>
                 <Textarea
+                  id="contact-message"
                   value={formData.message}
                   onChange={(e) => handleChange('message', e.target.value)}
                   onBlur={(e) => validateField('message', e.target.value)}
                   placeholder="ספרו לנו על הפרויקט שלכם..."
                   className={`bg-background border-primary/20 focus:border-primary min-h-[150px] resize-none transition-all duration-300 ${errors.message ? 'border-red-500' : ''}`}
                   disabled={isSubmitting}
+                  aria-invalid={!!errors.message}
+                  aria-describedby={errors.message ? 'contact-message-error' : undefined}
                 />
-                {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
+                {errors.message && <p id="contact-message-error" role="alert" className="text-red-500 text-xs mt-1">{errors.message}</p>}
               </motion.div>
               
               <motion.div
@@ -288,12 +298,12 @@ const ContactSection = React.forwardRef<HTMLElement>((_, ref) => {
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                      <Loader2 className="w-4 h-4 ms-2 animate-spin" />
                       שולח...
                     </>
                   ) : (
                     <>
-                      <Send className="w-4 h-4 ml-2" />
+                      <Send className="w-4 h-4 ms-2" />
                       שליחת הודעה
                     </>
                   )}

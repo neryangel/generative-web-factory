@@ -1,16 +1,10 @@
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 
 /**
  * Sanitize HTML content to prevent XSS attacks
- * Uses DOMPurify with strict configuration
+ * Uses isomorphic-dompurify which works on both server (SSR) and client.
  */
 export function sanitizeHtml(dirty: string): string {
-  if (typeof window === 'undefined') {
-    // Server-side: return as-is (will be sanitized on client)
-    // For SSR, consider using isomorphic-dompurify instead
-    return dirty;
-  }
-
   return DOMPurify.sanitize(dirty, {
     // Allow safe HTML tags
     ALLOWED_TAGS: [
@@ -37,11 +31,6 @@ export function sanitizeHtml(dirty: string): string {
  * Sanitize plain text (strip all HTML)
  */
 export function sanitizeText(dirty: string): string {
-  if (typeof window === 'undefined') {
-    // Basic server-side sanitization
-    return dirty.replace(/<[^>]*>/g, '');
-  }
-
   return DOMPurify.sanitize(dirty, {
     ALLOWED_TAGS: [], // No HTML allowed
     ALLOWED_ATTR: [],
@@ -53,10 +42,6 @@ export function sanitizeText(dirty: string): string {
  * Applies sanitization to all string values in an object
  */
 export function sanitizeSectionContent<T extends Record<string, unknown>>(content: T): T {
-  if (typeof window === 'undefined') {
-    return content;
-  }
-
   const sanitized: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(content)) {

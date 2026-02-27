@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useTenant } from '@/hooks/useTenant';
 import { supabase } from '@/integrations/supabase/client';
@@ -63,19 +63,21 @@ export default function Sites() {
     void fetchSites();
   }, [currentTenant]);
 
-  const filteredSites = sites.filter(site =>
+  const filteredSites = useMemo(() => sites.filter(site =>
     site.name.toLowerCase().includes(search.toLowerCase()) ||
     site.slug.toLowerCase().includes(search.toLowerCase())
-  );
+  ), [sites, search]);
 
   const handleDelete = async (siteId: string) => {
+    if (!currentTenant) return;
     if (!confirm('האם אתה בטוח שברצונך למחוק את האתר?')) return;
 
     try {
       const { error } = await supabase
         .from('sites')
         .delete()
-        .eq('id', siteId);
+        .eq('id', siteId)
+        .eq('tenant_id', currentTenant.id);
 
       if (error) throw error;
 
@@ -108,12 +110,13 @@ export default function Sites() {
 
         {/* Search */}
         <div className="relative max-w-md">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search aria-hidden="true" className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="חפש אתרים..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pr-10"
+            aria-label="חיפוש אתרים"
           />
         </div>
 
@@ -161,7 +164,7 @@ export default function Sites() {
                   </div>
 
                   {/* Hover Actions */}
-                  <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <Link href={`/dashboard/sites/${site.id}`}>
                       <Button size="sm" variant="secondary" className="gap-1">
                         <Pencil className="h-3 w-3" />
@@ -195,8 +198,8 @@ export default function Sites() {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreVertical className="h-4 w-4" />
+                          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="אפשרויות נוספות">
+                            <MoreVertical aria-hidden="true" className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">

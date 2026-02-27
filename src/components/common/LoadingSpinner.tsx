@@ -22,8 +22,8 @@ export function LoadingSpinner({
 }: LoadingSpinnerProps) {
   const content = (
     <div role="status" aria-live="polite" aria-label={text || 'טוען'} className={cn('flex flex-col items-center justify-center gap-2', className)}>
-      <Loader2 className={cn('animate-spin text-primary', sizeClasses[size])} />
-      {text && <span className="text-sm text-muted-foreground">{text}</span>}
+      <Loader2 aria-hidden="true" className={cn('animate-spin text-primary', sizeClasses[size])} />
+      {text ? <span className="text-sm text-muted-foreground">{text}</span> : <span className="sr-only">טוען</span>}
     </div>
   );
 

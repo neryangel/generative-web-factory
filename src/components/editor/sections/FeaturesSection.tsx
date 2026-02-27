@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import {
   BarChart3, Headphones, Palette, Shield, Smartphone, Sparkles, Zap,
   ArrowLeft, Globe, Heart, Rocket, Star, Target, TrendingUp, Users,
-  Award, Crown, Plus, Trash2,
+  Award, Crown, Plus, PlusCircle, Trash2,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -75,7 +75,7 @@ function ItemControls({ index, total, isEditing, onAdd, onRemove, primaryColor }
         disabled={total <= 1}
         style={{ opacity: total <= 1 ? 0.3 : 1 }}
       >
-        <LucideIcons.Trash2 className="w-4 h-4" />
+        <Trash2 className="w-4 h-4" />
       </button>
       {index === total - 1 && (
         <button
@@ -84,7 +84,7 @@ function ItemControls({ index, total, isEditing, onAdd, onRemove, primaryColor }
           style={{ color: primaryColor }}
           title="הוסף פריט"
         >
-          <LucideIcons.PlusCircle className="w-4 h-4" />
+          <PlusCircle className="w-4 h-4" />
         </button>
       )}
     </div>
@@ -131,7 +131,7 @@ function DefaultVariant({
               borderRadius: getButtonRadius(),
             }}
           >
-            <LucideIcons.Sparkles className="w-4 h-4" />
+            <Sparkles className="w-4 h-4" />
             <span>למה לבחור בנו</span>
           </div>
           <EditableText
@@ -217,7 +217,7 @@ function DefaultVariant({
                     style={{ color: colors.primary }}
                   >
                     <span className="text-sm font-medium">למידע נוסף</span>
-                    <LucideIcons.ArrowLeft className="w-4 h-4" />
+                    <ArrowLeft className="w-4 h-4" />
                   </div>
 
                   <ItemControls

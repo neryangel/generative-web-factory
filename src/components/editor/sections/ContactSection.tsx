@@ -106,16 +106,18 @@ export function ContactSection({
       <form className="space-y-6" onClick={(e) => e.stopPropagation()}>
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className={`text-sm font-medium ${labelColor}`}>שם מלא</label>
+            <label htmlFor="editor-contact-name" className={`text-sm font-medium ${labelColor}`}>שם מלא</label>
             <Input
+              id="editor-contact-name"
               placeholder="ישראל ישראלי"
               className={`h-12 ${inputBg} border-border/50 focus:border-primary transition-colors`}
               style={{ borderRadius: getButtonRadius() }}
             />
           </div>
           <div className="space-y-2">
-            <label className={`text-sm font-medium ${labelColor}`}>טלפון</label>
+            <label htmlFor="editor-contact-phone" className={`text-sm font-medium ${labelColor}`}>טלפון</label>
             <Input
+              id="editor-contact-phone"
               placeholder="054-1234567"
               className={`h-12 ${inputBg} border-border/50 focus:border-primary transition-colors`}
               style={{ borderRadius: getButtonRadius() }}
@@ -124,8 +126,9 @@ export function ContactSection({
         </div>
 
         <div className="space-y-2">
-          <label className={`text-sm font-medium ${labelColor}`}>אימייל</label>
+          <label htmlFor="editor-contact-email" className={`text-sm font-medium ${labelColor}`}>אימייל</label>
           <Input
+            id="editor-contact-email"
             type="email"
             placeholder="example@email.com"
             className={`h-12 ${inputBg} border-border/50 focus:border-primary transition-colors`}
@@ -134,8 +137,9 @@ export function ContactSection({
         </div>
 
         <div className="space-y-2">
-          <label className={`text-sm font-medium ${labelColor}`}>הודעה</label>
+          <label htmlFor="editor-contact-message" className={`text-sm font-medium ${labelColor}`}>הודעה</label>
           <Textarea
+            id="editor-contact-message"
             placeholder="ספרו לנו איך נוכל לעזור..."
             rows={5}
             className={`${inputBg} border-border/50 focus:border-primary transition-colors resize-none`}

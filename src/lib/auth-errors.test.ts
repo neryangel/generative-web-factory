@@ -51,4 +51,18 @@ describe('getAuthErrorMessage', () => {
     error.message = '';
     expect(getAuthErrorMessage(error, 'שגיאה כללית')).toBe('שגיאה כללית');
   });
+
+  it('should return Hebrew message for alternative rate limit wording', () => {
+    const error = new Error('For security purposes, you can only request this after 60 seconds');
+    expect(getAuthErrorMessage(error, 'fallback')).toBe('מטעמי אבטחה, ניתן לנסות שוב בעוד 60 שניות');
+  });
+
+  it('should return Hebrew message for "User not found"', () => {
+    const error = new Error('User not found');
+    expect(getAuthErrorMessage(error, 'fallback')).toBe('לא נמצא משתמש עם כתובת אימייל זו');
+  });
+
+  it('should return fallback for non-Error objects treated as null', () => {
+    expect(getAuthErrorMessage(null, 'default message')).toBe('default message');
+  });
 });

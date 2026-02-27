@@ -41,7 +41,6 @@ import {
   useDeleteSite,
   useUpdateSiteSettings,
   useCheckSlugAvailability,
-  SITES_QUERY_KEY,
 } from './useSites';
 
 describe('useSites hooks', () => {
@@ -179,6 +178,74 @@ describe('useSites hooks', () => {
       const { sitesApi } = await import('@/api/sites.api');
       expect(sitesApi.isSlugAvailable).toHaveBeenCalledWith('new-slug', undefined);
       expect(isAvailable).toBe(true);
+    });
+  });
+
+  describe('error states', () => {
+    it('useSites should expose error state when API rejects', async () => {
+      const { sitesApi } = await import('@/api/sites.api');
+      (sitesApi.getAll as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'));
+
+      const { result } = renderHook(() => useSites(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
+
+      expect(result.current.error).toBeDefined();
+      expect(result.current.error?.message).toBe('Network error');
+    });
+
+    it('useSite should expose error when API rejects', async () => {
+      const { sitesApi } = await import('@/api/sites.api');
+      (sitesApi.getById as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Not found'));
+
+      const { result } = renderHook(() => useSite('site-999'), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
+
+      expect(result.current.error?.message).toBe('Not found');
+    });
+
+    it('useCreateSite should expose error on mutation failure', async () => {
+      const { sitesApi } = await import('@/api/sites.api');
+      (sitesApi.create as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Duplicate slug'));
+
+      const { result } = renderHook(() => useCreateSite(), { wrapper });
+
+      await expect(
+        result.current.mutateAsync({
+          name: 'Dup Site',
+          slug: 'dup-site',
+          tenant_id: 'tenant-1',
+        })
+      ).rejects.toThrow('Duplicate slug');
+    });
+
+    it('useDeleteSite should expose error on mutation failure', async () => {
+      const { sitesApi } = await import('@/api/sites.api');
+      (sitesApi.delete as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Forbidden'));
+
+      const { result } = renderHook(() => useDeleteSite(), { wrapper });
+
+      await expect(
+        result.current.mutateAsync('site-1')
+      ).rejects.toThrow('Forbidden');
+    });
+
+    it('useSiteBySlug should expose error when API rejects', async () => {
+      const { sitesApi } = await import('@/api/sites.api');
+      (sitesApi.getBySlug as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Server error'));
+
+      const { result } = renderHook(() => useSiteBySlug('bad-slug'), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
+
+      expect(result.current.error?.message).toBe('Server error');
     });
   });
 });

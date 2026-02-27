@@ -96,6 +96,11 @@ export function ImageUploader({
     }
 
     // Validate file type
+    // SECURITY NOTE: image/svg+xml is included for design flexibility, but SVG files
+    // can contain embedded JavaScript and are a known XSS vector. This is partially
+    // mitigated by Supabase Storage serving SVGs with Content-Disposition: attachment
+    // and our Content-Security-Policy headers blocking inline scripts. For maximum
+    // security, consider removing SVG support or sanitizing SVGs server-side before storage.
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
     if (!allowedTypes.includes(file.type)) {
       setUploadState({

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 
 export interface ThemeColors {
   primary: string;
@@ -96,39 +96,39 @@ export function ThemeProvider({ settings, children }: ThemeProviderProps) {
   }, [theme.fonts.heading, theme.fonts.body]);
 
   // Helper functions for border radius
-  const getCssRadius = () => {
+  const getCssRadius = useCallback(() => {
     switch (theme.borderRadius) {
       case 'sharp': return '0px';
       case 'rounded': return '8px';
       case 'pill': return '9999px';
       default: return '8px';
     }
-  };
+  }, [theme.borderRadius]);
 
-  const getButtonRadius = () => {
+  const getButtonRadius = useCallback(() => {
     switch (theme.borderRadius) {
       case 'sharp': return '0px';
       case 'rounded': return '8px';
       case 'pill': return '9999px';
       default: return '8px';
     }
-  };
+  }, [theme.borderRadius]);
 
-  const getCardRadius = () => {
+  const getCardRadius = useCallback(() => {
     switch (theme.borderRadius) {
       case 'sharp': return '0px';
       case 'rounded': return '12px';
       case 'pill': return '24px';
       default: return '12px';
     }
-  };
+  }, [theme.borderRadius]);
 
-  const contextValue: ThemeContextValue = {
+  const contextValue: ThemeContextValue = useMemo(() => ({
     ...theme,
     getCssRadius,
     getButtonRadius,
     getCardRadius,
-  };
+  }), [theme, getCssRadius, getButtonRadius, getCardRadius]);
 
   // CSS custom properties for the theme
   const cssVariables = {

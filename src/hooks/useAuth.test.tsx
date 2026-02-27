@@ -13,12 +13,15 @@ const mockUnsubscribe = vi.fn();
 // Store the initial session to be delivered by onAuthStateChange
 let initialSession: unknown = null;
 
+const mockGetSession = vi.fn();
+
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     auth: {
       signInWithPassword: (...args: unknown[]) => mockSignInWithPassword(...args),
       signUp: (...args: unknown[]) => mockSignUp(...args),
       signOut: () => mockSignOut(),
+      getSession: (...args: unknown[]) => mockGetSession(...args),
       onAuthStateChange: (callback: (event: string, session: unknown) => void) => {
         mockOnAuthStateChange(callback);
         // Simulate INITIAL_SESSION event firing immediately (as Supabase does)
@@ -55,6 +58,7 @@ describe('useAuth', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     initialSession = null;
+    mockGetSession.mockResolvedValue({ data: { session: null } });
   });
 
   describe('AuthProvider', () => {
@@ -71,6 +75,7 @@ describe('useAuth', () => {
 
     it('should set user when session exists via onAuthStateChange', async () => {
       initialSession = mockSession;
+      mockGetSession.mockResolvedValue({ data: { session: mockSession } });
 
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -99,15 +104,12 @@ describe('useAuth', () => {
       });
     });
 
-    it('should not call getSession (race condition fix)', async () => {
+    it('should call getSession on mount to fetch existing session', async () => {
       renderHook(() => useAuth(), { wrapper });
 
       await waitFor(() => {
-        expect(mockOnAuthStateChange).toHaveBeenCalled();
+        expect(mockGetSession).toHaveBeenCalled();
       });
-
-      // getSession should never be called — the listener handles INITIAL_SESSION
-      // This verifies the race condition fix (SEC-01)
     });
 
     it('should unsubscribe on unmount', async () => {
@@ -229,6 +231,7 @@ describe('useAuth', () => {
   describe('signOut', () => {
     it('should call supabase signOut', async () => {
       initialSession = mockSession;
+      mockGetSession.mockResolvedValue({ data: { session: mockSession } });
       mockSignOut.mockResolvedValue({ error: null });
 
       const { result } = renderHook(() => useAuth(), { wrapper });

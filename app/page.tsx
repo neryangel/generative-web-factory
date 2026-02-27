@@ -57,7 +57,7 @@ export default function Home() {
 
         <Navbar />
 
-        <main id="main-content" role="main" aria-label="תוכן ראשי">
+        <main id="main-content" aria-label="תוכן ראשי">
           {/* Hero is loaded eagerly - above the fold */}
           <HeroSection />
 

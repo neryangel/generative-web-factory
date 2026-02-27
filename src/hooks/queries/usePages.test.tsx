@@ -49,7 +49,7 @@ describe('usePages hooks', () => {
 
   describe('usePages', () => {
     it('should fetch all pages for a site', async () => {
-      const { result } = renderHook(() => usePages('site-1'), { wrapper });
+      const { result } = renderHook(() => usePages('site-1', 'tenant-1'), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -60,7 +60,7 @@ describe('usePages hooks', () => {
 
     it('should not fetch if siteId is undefined', async () => {
       const { pagesApi } = await import('@/api/pages.api');
-      const { result } = renderHook(() => usePages(undefined), { wrapper });
+      const { result } = renderHook(() => usePages(undefined, 'tenant-1'), { wrapper });
 
       expect(result.current.isLoading).toBe(false);
       expect(pagesApi.getBySiteId).not.toHaveBeenCalled();
@@ -69,7 +69,7 @@ describe('usePages hooks', () => {
 
   describe('usePage', () => {
     it('should fetch a single page by ID', async () => {
-      const { result } = renderHook(() => usePage('page-1'), { wrapper });
+      const { result } = renderHook(() => usePage('page-1', 'tenant-1'), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -80,7 +80,7 @@ describe('usePages hooks', () => {
 
     it('should not fetch if pageId is undefined', async () => {
       const { pagesApi } = await import('@/api/pages.api');
-      const { result } = renderHook(() => usePage(undefined), { wrapper });
+      const { result } = renderHook(() => usePage(undefined, 'tenant-1'), { wrapper });
 
       expect(result.current.isLoading).toBe(false);
       expect(pagesApi.getById).not.toHaveBeenCalled();
@@ -89,7 +89,7 @@ describe('usePages hooks', () => {
 
   describe('useHomepage', () => {
     it('should fetch homepage for a site', async () => {
-      const { result } = renderHook(() => useHomepage('site-1'), { wrapper });
+      const { result } = renderHook(() => useHomepage('site-1', 'tenant-1'), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -100,7 +100,7 @@ describe('usePages hooks', () => {
 
     it('should not fetch if siteId is undefined', async () => {
       const { pagesApi } = await import('@/api/pages.api');
-      const { result } = renderHook(() => useHomepage(undefined), { wrapper });
+      const { result } = renderHook(() => useHomepage(undefined, 'tenant-1'), { wrapper });
 
       expect(result.current.isLoading).toBe(false);
       expect(pagesApi.getHomepage).not.toHaveBeenCalled();
@@ -129,11 +129,12 @@ describe('usePages hooks', () => {
 
       await result.current.mutateAsync({
         pageId: 'page-1',
+        tenantId: 'tenant-1',
         updates: { title: 'Updated Page' },
       });
 
       const { pagesApi } = await import('@/api/pages.api');
-      expect(pagesApi.update).toHaveBeenCalledWith('page-1', { title: 'Updated Page' });
+      expect(pagesApi.update).toHaveBeenCalledWith('page-1', 'tenant-1', { title: 'Updated Page' });
     });
   });
 
@@ -141,10 +142,10 @@ describe('usePages hooks', () => {
     it('should delete a page', async () => {
       const { result } = renderHook(() => useDeletePage(), { wrapper });
 
-      await result.current.mutateAsync('page-1');
+      await result.current.mutateAsync({ pageId: 'page-1', tenantId: 'tenant-1' });
 
       const { pagesApi } = await import('@/api/pages.api');
-      expect(pagesApi.delete).toHaveBeenCalledWith('page-1');
+      expect(pagesApi.delete).toHaveBeenCalledWith('page-1', 'tenant-1');
     });
   });
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { useTenant } from '@/hooks/useTenant';
 import { useSites } from '@/hooks/queries/useSites';
@@ -50,7 +51,7 @@ export default function Dashboard() {
   }
 
   // Stats use allSites for accurate counts
-  const stats = [
+  const stats = useMemo(() => [
     {
       label: 'סה"כ אתרים',
       value: allSites.length,
@@ -69,7 +70,7 @@ export default function Dashboard() {
       icon: FileText,
       color: 'text-warning'
     },
-  ];
+  ], [allSites]);
 
   return (
     <DashboardLayout>

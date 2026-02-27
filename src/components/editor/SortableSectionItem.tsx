@@ -43,14 +43,15 @@ export function SortableSectionItem({ section, isSelected, onSelect }: SortableS
       <div className="flex items-center gap-2">
         <button
           className="cursor-grab active:cursor-grabbing touch-none p-1 -m-1 rounded hover:bg-muted"
+          aria-label="גרור לשינוי סדר"
           {...attributes}
           {...listeners}
         >
-          <GripVertical className="h-4 w-4 text-muted-foreground" />
+          <GripVertical aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
         </button>
         <span className="text-sm font-medium capitalize">{section.type}</span>
       </div>
-      <span className="text-xs text-muted-foreground mr-6">
+      <span className="text-xs text-muted-foreground me-6">
         {section.variant}
       </span>
     </div>

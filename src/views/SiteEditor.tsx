@@ -192,13 +192,15 @@ export default function SiteEditor() {
 
   const handleContentChange = useCallback((sectionId: string, content: SectionContent) => {
     // Update local state immediately
-    setSections(prev => prev.map(s => 
+    setSections(prev => prev.map(s =>
       s.id === sectionId ? { ...s, content: content as Section['content'] } : s
     ));
-    
+
     // Queue auto-save
-    saveSection(sectionId, content);
-  }, [saveSection]);
+    if (currentTenant) {
+      saveSection(sectionId, currentTenant.id, content);
+    }
+  }, [saveSection, currentTenant]);
 
   // Handle new section added
   const handleSectionAdded = useCallback((section: Section) => {
@@ -222,15 +224,15 @@ export default function SiteEditor() {
         delete updated[sectionId];
       }
       // Persist to site settings
-      if (site) {
+      if (site && currentTenant) {
         const currentSettings = (site.settings as Record<string, unknown>) || {};
         const newSettings = { ...currentSettings, sectionStyles: updated };
         setSite(prev => prev ? { ...prev, settings: newSettings } : null);
-        saveSite(site.id, { settings: newSettings });
+        saveSite(site.id, currentTenant.id, { settings: newSettings });
       }
       return updated;
     });
-  }, [site, saveSite]);
+  }, [site, currentTenant, saveSite]);
 
   // Handle page created
   const handlePageCreated = useCallback((page: Page) => {
@@ -265,7 +267,7 @@ export default function SiteEditor() {
   // Handle drag end - reorder sections
   const handleDragEnd = async (event: DragEndEvent) => {
     setActiveDragId(null);
-    
+
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
@@ -273,6 +275,9 @@ export default function SiteEditor() {
     const newIndex = sections.findIndex(s => s.id === over.id);
 
     if (oldIndex === -1 || newIndex === -1) return;
+
+    // Capture current sections before optimistic update for rollback
+    const prevSections = [...sections];
 
     // Optimistic update
     const reorderedSections = arrayMove(sections, oldIndex, newIndex);
@@ -296,8 +301,8 @@ export default function SiteEditor() {
       toast.success('סדר הסקשנים עודכן');
     } catch (error) {
       console.error('Error updating sort order:', error);
-      // Rollback on error
-      setSections(sections);
+      // Rollback on error using captured previous state
+      setSections(prevSections);
       toast.error('שגיאה בעדכון סדר הסקשנים');
     }
   };
@@ -428,13 +433,13 @@ export default function SiteEditor() {
       <header className="h-14 bg-card border-b flex items-center justify-between px-4 shrink-0">
         <div className="flex items-center gap-4">
           <Link href="/dashboard/sites">
-            <Button variant="ghost" size="icon">
-              <ArrowRight className="h-4 w-4" />
+            <Button variant="ghost" size="icon" aria-label="חזרה לרשימת האתרים">
+              <ArrowRight aria-hidden="true" className="h-4 w-4" />
             </Button>
           </Link>
           
           <div className="flex items-center gap-2">
-            <Globe className="h-4 w-4 text-muted-foreground" />
+            <Globe aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
             <span className="font-medium">{site.name}</span>
             <span className={`text-xs px-2 py-0.5 rounded-full border ${
               site.status === 'published' ? 'status-published' : 'status-draft'
@@ -442,8 +447,8 @@ export default function SiteEditor() {
               {site.status === 'published' ? 'פורסם' : 'טיוטה'}
             </span>
             <SiteSettingsDialog site={site} onUpdate={setSite}>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Settings2 className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="הגדרות אתר">
+                <Settings2 aria-hidden="true" className="h-4 w-4" />
               </Button>
             </SiteSettingsDialog>
           </div>
@@ -483,7 +488,7 @@ export default function SiteEditor() {
                   className="h-8 w-8"
                   onClick={() => setViewMode('desktop')}
                 >
-                  <Monitor className="h-4 w-4" />
+                  <Monitor aria-hidden="true" className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>מחשב</TooltipContent>
@@ -497,7 +502,7 @@ export default function SiteEditor() {
                   className="h-8 w-8"
                   onClick={() => setViewMode('tablet')}
                 >
-                  <Tablet className="h-4 w-4" />
+                  <Tablet aria-hidden="true" className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>טאבלט</TooltipContent>
@@ -511,7 +516,7 @@ export default function SiteEditor() {
                   className="h-8 w-8"
                   onClick={() => setViewMode('mobile')}
                 >
-                  <Smartphone className="h-4 w-4" />
+                  <Smartphone aria-hidden="true" className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>נייד</TooltipContent>
@@ -527,27 +532,27 @@ export default function SiteEditor() {
           >
             {isEditing ? (
               <>
-                <Eye className="h-4 w-4" />
+                <Eye aria-hidden="true" className="h-4 w-4" />
                 תצוגה מקדימה
               </>
             ) : (
               <>
-                <EyeOff className="h-4 w-4" />
+                <EyeOff aria-hidden="true" className="h-4 w-4" />
                 חזרה לעריכה
               </>
             )}
           </Button>
 
           {/* Save Status */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground px-3">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground px-3" aria-live="polite">
             {isSaving ? (
               <>
-                <Loader2 className="h-3 w-3 animate-spin" />
+                <Loader2 aria-hidden="true" className="h-3 w-3 animate-spin" />
                 <span>שומר...</span>
               </>
             ) : lastSaved ? (
               <>
-                <Check className="h-3 w-3 text-success" />
+                <Check aria-hidden="true" className="h-3 w-3 text-success" />
                 <span>נשמר</span>
               </>
             ) : null}
@@ -563,7 +568,7 @@ export default function SiteEditor() {
                   onClick={handleViewPublished}
                   className="gap-2"
                 >
-                  <ExternalLink className="h-4 w-4" />
+                  <ExternalLink aria-hidden="true" className="h-4 w-4" />
                   צפה באתר
                 </Button>
               </TooltipTrigger>
@@ -573,7 +578,7 @@ export default function SiteEditor() {
 
           {/* Publish Button */}
           <Button onClick={handlePublish} className="gap-2">
-            <Upload className="h-4 w-4" />
+            <Upload aria-hidden="true" className="h-4 w-4" />
             פרסם
           </Button>
         </div>
@@ -595,7 +600,7 @@ export default function SiteEditor() {
               <div className="flex-1 overflow-y-auto">
                 {sections.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-96 text-muted-foreground">
-                    <Plus className="h-12 w-12 mb-4 opacity-30" />
+                    <Plus aria-hidden="true" className="h-12 w-12 mb-4 opacity-30" />
                     <p>אין סקשנים בעמוד זה</p>
                     <p className="text-sm mb-4">הוסף סקשנים מהתפריט הימני</p>
                     {currentPage && currentTenant && (
@@ -637,7 +642,7 @@ export default function SiteEditor() {
                       {activeDragSection ? (
                         <div className="bg-card/80 backdrop-blur-sm border-2 border-primary rounded-lg p-4 shadow-2xl">
                           <span className="font-medium capitalize">{activeDragSection.type}</span>
-                          <span className="text-sm text-muted-foreground mr-2">
+                          <span className="text-sm text-muted-foreground me-2">
                             ({activeDragSection.variant})
                           </span>
                         </div>
@@ -654,32 +659,44 @@ export default function SiteEditor() {
         {isEditing && (
           <aside className="w-72 bg-card border-r shrink-0 flex flex-col overflow-hidden">
             {/* Tabs - fixed at top */}
-            <div className="flex border-b shrink-0">
+            <div className="flex border-b shrink-0" role="tablist" aria-label="לוחות עריכה">
               <button
+                role="tab"
+                id="tab-sections"
+                aria-selected={activeTab === 'sections'}
+                aria-controls="tabpanel-sections"
                 onClick={() => setActiveTab('sections')}
                 className={`flex-1 py-3 px-2 text-sm font-medium flex items-center justify-center gap-1.5 transition-colors ${
                   activeTab === 'sections' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Layers className="w-4 h-4" />
+                <Layers aria-hidden="true" className="w-4 h-4" />
                 סקשנים
               </button>
               <button
+                role="tab"
+                id="tab-pages"
+                aria-selected={activeTab === 'pages'}
+                aria-controls="tabpanel-pages"
                 onClick={() => setActiveTab('pages')}
                 className={`flex-1 py-3 px-2 text-sm font-medium flex items-center justify-center gap-1.5 transition-colors ${
                   activeTab === 'pages' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <FileText className="w-4 h-4" />
+                <FileText aria-hidden="true" className="w-4 h-4" />
                 עמודים
               </button>
               <button
+                role="tab"
+                id="tab-theme"
+                aria-selected={activeTab === 'theme'}
+                aria-controls="tabpanel-theme"
                 onClick={() => setActiveTab('theme')}
                 className={`flex-1 py-3 px-2 text-sm font-medium flex items-center justify-center gap-1.5 transition-colors ${
                   activeTab === 'theme' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Palette className="w-4 h-4" />
+                <Palette aria-hidden="true" className="w-4 h-4" />
                 עיצוב
               </button>
             </div>
@@ -687,19 +704,23 @@ export default function SiteEditor() {
             {/* Sidebar content - scrollable */}
             <div className="flex-1 overflow-y-auto p-4">
               {activeTab === 'theme' ? (
-                <ThemeCustomizer site={site} onUpdate={setSite} />
+                <div role="tabpanel" id="tabpanel-theme" aria-labelledby="tab-theme">
+                  <ThemeCustomizer site={site} onUpdate={setSite} />
+                </div>
               ) : activeTab === 'pages' ? (
-                <PagesPanel
-                  siteId={site.id}
-                  tenantId={currentTenant?.id || ''}
-                  pages={pages}
-                  currentPageId={currentPage?.id || null}
-                  onPageSelect={(page) => setCurrentPage(page)}
-                  onPageCreated={handlePageCreated}
-                  onPageDeleted={handlePageDeleted}
-                />
+                <div role="tabpanel" id="tabpanel-pages" aria-labelledby="tab-pages">
+                  <PagesPanel
+                    siteId={site.id}
+                    tenantId={currentTenant?.id || ''}
+                    pages={pages}
+                    currentPageId={currentPage?.id || null}
+                    onPageSelect={(page) => setCurrentPage(page)}
+                    onPageCreated={handlePageCreated}
+                    onPageDeleted={handlePageDeleted}
+                  />
+                </div>
               ) : (
-                <>
+                <div role="tabpanel" id="tabpanel-sections" aria-labelledby="tab-sections">
                   <h3 className="font-semibold mb-4">סקשנים</h3>
 
                   <SortableSectionList
@@ -717,7 +738,7 @@ export default function SiteEditor() {
                       onSectionAdded={handleSectionAdded}
                     />
                   )}
-                </>
+                </div>
               )}
             </div>
           </aside>
